@@ -1,0 +1,6 @@
+*
+!*.html
+!*/
+.*
+!README.md
+!.gitignore
