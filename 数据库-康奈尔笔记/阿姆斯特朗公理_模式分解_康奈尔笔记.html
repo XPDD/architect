@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 阿姆斯特朗公理 + 模式分解</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+.page{max-width:880px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+.page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+.header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+.header-top{display:flex;align-items:flex-start;gap:16px}
+.header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden}
+.header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+.header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+.header-title-group{flex:1}
+.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+.header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+.header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+.header-meta .meta-item{display:flex;align-items:center;gap:8px}
+.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+.cornell{display:grid;grid-template-columns:230px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+.cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+.cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+.cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+.cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+.cornell-notes{grid-area:notes;padding:24px 32px 20px}
+.notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+.note-section{margin-bottom:8px}
+.note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25);flex-shrink:0}
+.note-section p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+.note-section ul{list-style:none;padding-left:0}
+.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+.note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+.note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+.hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+.hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+.hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+.feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+.feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+.feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+.feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}
+.feynman p strong{color:var(--green)}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+.compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+.compare-table thead th:first-child{border-radius:var(--radius) 0 0 0}
+.compare-table thead th:last-child{border-radius:0 var(--radius) 0 0}
+.compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+.compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+.numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+.numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+.card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0}
+.axiom-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:12px;text-align:center;transition:none}
+.axiom-card.accent{border-color:rgba(0,212,255,.15);background:rgba(0,212,255,.04)}
+.axiom-card .axiom-icon{font-family:var(--font-mono);font-size:22px;font-weight:700;color:var(--cyan);display:block;margin-bottom:6px}
+.axiom-card .axiom-name{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.axiom-card .axiom-rule{font-size:10.5px;color:rgba(255,255,255,.6);line-height:1.5;font-family:var(--font-mono)}
+.axiom-card .axiom-intuition{font-size:10.5px;color:var(--green);line-height:1.4;margin-top:3px}
+.code-block{font-family:var(--font-mono);font-size:11px;color:rgba(255,255,255,.65);background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 12px;margin:4px 0;line-height:1.8;overflow-x:auto}
+.diagram{margin-top:10px;padding:12px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+.diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:8px}
+.cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+.cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+.cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+.cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+.cornell-summary .summary-text strong{color:var(--cyan)}
+.cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+.tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+@media(max-width:768px){
+.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}
+.page::before{display:none}
+.cornell{grid-template-columns:1fr;grid-template-areas:"cue" "notes" "summary"}
+.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}
+.cornell-notes,.cornell-summary{padding:16px}
+.card-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+<div class="header">
+<div class="header-top">
+<div class="header-badge"><span class="header-badge-icon">&#x2200;</span></div>
+<div class="header-title-group">
+<div class="header-kicker">康奈尔分析 / P50-P51</div>
+<div class="header-title">数据库 — 阿姆斯特朗公理系统 + 模式分解</div>
+</div>
+</div>
+<div class="header-meta">
+<div class="meta-item"><span class="meta-dot"></span>2026-08-08</div>
+<div class="meta-item"><span class="meta-dot"></span>架构直播1 精华提炼</div>
+<div class="meta-item"><span class="meta-dot"></span>函数依赖推理工具</div>
+</div>
+</div>
+
+<div class="cornell">
+<div class="cornell-cue">
+<div class="cue-header">&#x25B8; 线索</div>
+<div class="cue-item"><span class="q-mark">?</span> 阿姆斯特朗公理三条基本规则是什么？</div>
+<div class="cue-item"><span class="q-mark">?</span> 三条基本规则能推出哪三条？</div>
+<div class="cue-item"><span class="q-mark">?</span> 保持函数依赖分解 vs 无损分解的区别？</div>
+<div class="cue-item"><span class="q-mark">?</span> 判断无损分解的充要条件是什么？</div>
+<div class="cue-item"><span class="q-mark">?</span> 冗余依赖需要管吗？</div>
+</div>
+
+<div class="cornell-notes">
+<div class="notes-header">&#x25B8; 核心要点</div>
+
+<!-- 阿姆斯特朗公理 -->
+<div class="numbered-header"><span class="num">1</span>阿姆斯特朗公理 — 三条基本规则（P50）</div>
+<div class="note-section">
+<p>Armstrong公理是关系数据库中推导<strong>属性依赖</strong>的一套形式化推理规则。用它可以推导出关系中<strong>所有潜在的属性依赖</strong>。</p>
+</div>
+
+<div class="card-grid">
+<div class="axiom-card accent">
+<span class="axiom-icon">Y &#x2286; X</span>
+<span class="axiom-name">&#x2460; 自反律</span>
+<div class="axiom-rule">Y&#x2286;X &#x21D2; X&#x2192;Y</div>
+<div class="axiom-intuition">大集合决定小集合<br>身份证号&#x2192;姓名</div>
+</div>
+<div class="axiom-card accent">
+<span class="axiom-icon">+Z</span>
+<span class="axiom-name">&#x2461; 增广律</span>
+<div class="axiom-rule">X&#x2192;Y &#x21D2; XZ&#x2192;YZ</div>
+<div class="axiom-intuition">两边加同样东西<br>依赖关系不变</div>
+</div>
+<div class="axiom-card accent">
+<span class="axiom-icon">&#x2192;&#x2192;</span>
+<span class="axiom-name">&#x2462; 传递律</span>
+<div class="axiom-rule">X&#x2192;Y, Y&#x2192;Z &#x21D2; X&#x2192;Z</div>
+<div class="axiom-intuition">链条式传递<br>A&#x2192;B&#x2192;C &#x2234; A&#x2192;C</div>
+</div>
+</div>
+
+<div class="numbered-header"><span class="num">1'</span>三条派生规则</div>
+
+<table class="compare-table">
+<thead><tr><th style="width:14%">规则</th><th style="width:26%">公式</th><th>白话理解</th></tr></thead>
+<tbody>
+<tr>
+<td><span class="note-highlight">合并律</span></td>
+<td><span class="note-highlight">X&#x2192;Y, X&#x2192;Z &#x21D2; X&#x2192;YZ</span></td>
+<td>同一个X决定Y也决定Z → X可以一起决定YZ<strong>合体</strong></td>
+</tr>
+<tr>
+<td><span class="note-highlight">分解律</span></td>
+<td><span class="note-highlight">X&#x2192;YZ &#x21D2; X&#x2192;Y, X&#x2192;Z</span></td>
+<td>（合并律的反向）X决定合体 → 自然也分别决定Y和Z</td>
+</tr>
+<tr>
+<td><span class="hl-purple">伪传递规则</span></td>
+<td><span class="hl-purple">X&#x2192;Y, WY&#x2192;Z &#x21D2; XW&#x2192;Z</span></td>
+<td>X决定Y + WY决定Z → 把X和W<strong>合起来</strong>就能决定Z</td>
+</tr>
+</tbody>
+</table>
+
+<div class="note-section" style="margin-top:4px;">
+<h4><span class="dot"></span>记忆技巧</h4>
+<ul>
+<li><strong>自反律</strong>：自己包含别人→自己决定别人（最自然）</li>
+<li><strong>增广律</strong>：关系两边"加同样的料"，味道不变</li>
+<li><strong>传递律</strong>：A认识B，B认识C → A也能找到C</li>
+<li><strong>合并律+分解律</strong>：互为逆操作，合久必分、分久必合</li>
+</ul>
+</div>
+
+<!-- 模式分解 -->
+<div class="numbered-header"><span class="num">2</span>模式分解 — 两种分解评价标准（P51）</div>
+
+<div class="vs-block" style="grid-template-columns:1fr 1fr;gap:10px;margin:6px 0;">
+<div style="border:1px solid rgba(0,212,255,.15);background:rgba(0,212,255,.04);border-radius:var(--radius);padding:12px 14px;">
+<div style="font-size:12px;font-weight:700;color:var(--cyan);margin-bottom:6px;">&#x25C6; 保持函数依赖分解</div>
+<div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;">
+<strong>定义：</strong>分解后，原来所有函数依赖在每个子模式中都能被<strong>直接表示</strong>（不含冗余依赖如传递依赖）。<br><br>
+<strong>示例：</strong><br>
+R(A,B,C), F={A&#x2192;B, B&#x2192;C, A&#x2192;C}<br>
+分解为 R1(A,B) + R2(B,C)<br>
+R1有 A&#x2192;B &#x2714; &nbsp;R2有 B&#x2192;C &#x2714;<br>
+A&#x2192;C 是<strong>冗余依赖</strong>（传递可得）&#x2192; 不用管
+</div>
+</div>
+<div style="border:1px solid rgba(52,211,153,.15);background:rgba(52,211,153,.04);border-radius:var(--radius);padding:12px 14px;">
+<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">&#x25C6; 无损连接分解</div>
+<div style="font-size:12px;color:rgba(255,255,255,.7);line-height:1.6;">
+<strong>定义：</strong>分解后的子模式能通过自然连接<strong>还原</strong>出原关系模式。<br><br>
+<strong>充要条件：</strong><br>
+<span class="note-highlight">R1&#x2229;R2 &#x2192; (R1-R2)</span><br>或<br><span class="note-highlight">R1&#x2229;R2 &#x2192; (R2-R1)</span><br>
+R1和R2的<strong>交集</strong>能决定其中<strong>一方的差集</strong>。
+</div>
+</div>
+</div>
+
+<div class="note-section" style="margin-top:6px;">
+<h4><span class="dot"></span>无损分解公式详解</h4>
+<p>设分解为 p={R1, R2}，F为依赖集：</p>
+<div class="code-block" style="text-align:center;margin-top:4px;">
+R1 <strong>&#x2229;</strong> R2 &#x2192; (R1 <strong>&#x2212;</strong> R2) &nbsp; 或 &nbsp; R1 <strong>&#x2229;</strong> R2 &#x2192; (R2 <strong>&#x2212;</strong> R1)
+</div>
+<p style="margin-top:4px;font-size:12px;color:rgba(255,255,255,.6);">通俗理解：<strong>两个子模式的交集属性</strong>能不能决定其中<strong>某一边独有的属性</strong>？能→无损，不能→有损。</p>
+</div>
+
+<!-- 费曼 -->
+<div class="feynman">
+<div class="feynman-label">&#x25C6; 费曼</div>
+<p><strong>阿姆斯特朗公理就是"推理游戏"的基本规则</strong>：自反律像"你的全名必然包含你的姓"（大决定小），增广律像"等式两边同加一个数，等号还成立"（两边加Z），传递律像"朋友的朋友也是朋友"（链条传递）。<strong>合并律和分解律</strong>是一对互逆操作：X决定Y和Z↔X决定YZ，就像"我既会画画又会唱歌"和"我会画画，我会唱歌"是等价的。<strong>模式分解两个标准</strong>：保持函数依赖是"分解后每条规则还在"，无损是"拆开后能拼回来"。判断无损的窍门：看<strong>交集属性</strong>能不能做<strong>主键</strong>——交集能决定某一边的独有属性，就能无损还原。</p>
+</div>
+
+</div>
+
+<div class="cornell-summary">
+<h3>&#x25B8; 总结</h3>
+<div class="summary-text"><strong>Armstrong公理</strong>：<strong>自反律（大&#x2286;小&#x21D2;大&#x2192;小）+ 增广律（两边同加）+ 传递律（A&#x2192;B&#x2192;C）</strong>三条基本规则，可推出合并律、分解律、伪传递规则。<strong>模式分解</strong>两种评价标准：<strong>保持函数依赖</strong>（分解后依赖都在，冗余的不用管）和<strong>无损连接</strong>（交集能决定某边差集 = 能还原），软考常考无损分解的充要条件判断。</div>
+<div class="summary-tags">
+<span class="tag primary">阿姆斯特朗公理</span>
+<span class="tag">自反律</span>
+<span class="tag">增广律</span>
+<span class="tag">传递律</span>
+<span class="tag">模式分解</span>
+<span class="tag">无损连接</span>
+<span class="tag">保持函数依赖</span>
+</div>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>

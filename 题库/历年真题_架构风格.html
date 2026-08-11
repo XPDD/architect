@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架构风格 · 历年真题 + 知识点</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-elevated: #1a2030;
+    --border-default: rgba(255,255,255,.06); --border-subtle: rgba(255,255,255,.04);
+    --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --blue: #4d7cff; --purple: #a78bfa; --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%);
+    line-height: 1.6; min-height: 100vh; padding: 36px 0;
+  }
+  .container { max-width: 800px; margin: 0 auto; padding: 0 20px; }
+
+  .page-header {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 30px 36px; margin-bottom: 28px;
+    box-shadow: 0 0 0 1px rgba(0,212,255,.04), 0 4px 32px rgba(0,0,0,.3);
+    position: relative; overflow: hidden;
+  }
+  .page-header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent);
+  }
+  .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 6px; }
+  .header-title { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; }
+  .header-sub { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+  .stats-row { display: flex; gap: 16px; margin-top: 16px; flex-wrap: wrap; }
+  .stat-pill {
+    font-family: var(--font-mono); font-size: 11px; padding: 5px 14px; border-radius: 3px;
+    background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-weight: 600;
+  }
+
+  .year-section { margin-bottom: 28px; }
+  .year-title {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--cyan); letter-spacing: .1em;
+    margin-bottom: 14px; padding: 10px 16px;
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius);
+    border-left: 3px solid var(--cyan);
+  }
+
+  .q-card {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius);
+    padding: 18px 22px; margin-bottom: 10px;
+    transition: border-color .2s;
+  }
+  .q-card:hover { border-color: rgba(0,212,255,.15); }
+  .q-number {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--cyan);
+    padding: 2px 8px; border-radius: 3px; background: rgba(0,212,255,.08);
+    display: inline-block; margin-bottom: 10px;
+  }
+  .q-stem { font-size: 14px; color: var(--text-primary); line-height: 1.7; margin-bottom: 12px; }
+
+  .options-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;
+  }
+  .opt {
+    font-size: 13px; color: rgba(255,255,255,.6); padding: 8px 12px;
+    border: 1px solid rgba(255,255,255,.05); border-radius: 4px;
+    background: rgba(255,255,255,.01);
+  }
+  .opt.correct {
+    color: var(--green); border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.05);
+    font-weight: 600;
+  }
+  .opt.wrong { color: rgba(255,255,255,.4); }
+
+  .answer-bar {
+    display: flex; align-items: center; gap: 10px; margin-top: 8px;
+    padding: 10px 14px; border-radius: var(--radius);
+    background: rgba(52,211,153,.04); border: 1px solid rgba(52,211,153,.1);
+    font-size: 13px;
+  }
+  .answer-tag {
+    font-family: var(--font-mono); font-size: 11px; font-weight: 700; color: var(--green);
+    padding: 2px 8px; border-radius: 3px; border: 1px solid rgba(52,211,153,.2);
+    flex-shrink: 0;
+  }
+  .kp-tag {
+    font-family: var(--font-mono); font-size: 10px; padding: 2px 8px; border-radius: 3px;
+    background: rgba(77,124,255,.08); border: 1px solid rgba(77,124,255,.15); color: var(--blue);
+    flex-shrink: 0;
+  }
+
+  @media (max-width: 768px) {
+    .options-grid { grid-template-columns: 1fr; }
+    .header-title { font-size: 20px; }
+    .q-stem { font-size: 13px; }
+    .opt { font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="page-header">
+    <div class="header-kicker">历年真题 · 架构风格</div>
+    <div class="header-title">2025年下 + 2026年上 综合知识真题</div>
+    <div class="header-sub">P36-P41 + P49-P50 + P57-P58 + P67-P69 + P80-P81 精选 · 全部 29 题带答案与知识点标记</div>
+    <div class="stats-row">
+      <span class="stat-pill">29 题</span>
+      <span class="stat-pill">架构风格 7 题</span>
+      <span class="stat-pill">质量属性 6 题</span>
+      <span class="stat-pill">架构评估 6 题</span>
+      <span class="stat-pill">微服务 2 题</span>
+      <span class="stat-pill">DSSA 3 题</span>
+      <span class="stat-pill">ABSD 2 题</span>
+      <span class="stat-pill">MVP/解释器/智能家居</span>
+    </div>
+  </div>
+
+  <!-- ===== 2025年下 ===== -->
+  <div class="year-section">
+    <div class="year-title">&#x25B6; 2025年 下半年 · 综合知识</div>
+
+    <!-- Q27 -->
+    <div class="q-card">
+      <span class="q-number">第 27 题</span>
+      <div class="q-stem">下列关于 MVP（Model-View-Presenter）模式的说法<strong>错误</strong>的是（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong" style="text-decoration:line-through;text-decoration-color:rgba(248,113,113,.4);">A. View 可以直接访问 model</div>
+        <div class="opt correct">B. MVP 常用在移动端</div>
+        <div class="opt correct">C. M 表示 Model 数据实体，V 表示 View 展示数据，P 表示 Presenter 处理数据</div>
+        <div class="opt correct">D. 一个 Presenter 可以对应多个页面</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">MVP 模式</span>
+        <span style="color:rgba(255,255,255,.7);">View 不能直接访问 Model，必须通过 Presenter 作为中介。MVP 中 View 和 Model 是完全解耦的</span>
+      </div>
+    </div>
+
+    <!-- Q28 -->
+    <div class="q-card">
+      <span class="q-number">第 28 题</span>
+      <div class="q-stem">ABSD 方法的三个核心<strong>不</strong>包括（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 对系统进行功能分解</div>
+        <div class="opt correct">B. 采用架构风格实现质量属性和商业需求</div>
+        <div class="opt correct">C. 采用软件模板设计软件结构</div>
+        <div class="opt wrong" style="text-decoration:line-through;text-decoration-color:rgba(248,113,113,.4);">D. 项目管理</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 D</span>
+        <span class="kp-tag">ABSD 核心</span>
+        <span style="color:rgba(255,255,255,.7);">ABSD 三核心：①<strong>功能分解</strong> ②<strong>架构风格驱动质量属性与商业需求</strong> ③<strong>软件模板设计软件结构</strong>。项目管理不属于 ABSD 核心方法</span>
+      </div>
+    </div>
+
+    <!-- Q33 -->
+    <div class="q-card">
+      <span class="q-number">第 33 题</span>
+      <div class="q-stem">客户端服务器是属于（ ）架构风格。</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 层次</div>
+        <div class="opt wrong">B. 独立构件</div>
+        <div class="opt wrong">C. 黑板</div>
+        <div class="opt wrong">D. 数据流</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">调用/返回风格</span>
+        <span style="color:rgba(255,255,255,.7);">C/S 属于"调用/返回"大类下的层次风格。调用/返回风格包含：主程序/子程序、面向对象、层次结构、客户端服务器</span>
+      </div>
+    </div>
+
+    <!-- Q48 -->
+    <div class="q-card">
+      <span class="q-number">第 48 题</span>
+      <div class="q-stem">一个解释器通常包括完成解释工作的解释引擎，一个包含被解释的代码存储区，（ ）和一个记录源代码被解释执行进度的数据结构。</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 解释器引擎的内部状态的数据结构</div>
+        <div class="opt wrong">B. 工作日志存储</div>
+        <div class="opt wrong">C. 保存代码的存储区状态</div>
+        <div class="opt wrong">D. 规则引擎</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">解释器四要素</span>
+        <span style="color:rgba(255,255,255,.7);">解释器四大组件：①解释引擎 ②被解释代码存储区 ③<strong>引擎内部状态数据结构</strong> ④源代码被解释执行的进度记录</span>
+      </div>
+    </div>
+
+    <!-- Q58 -->
+    <div class="q-card">
+      <span class="q-number">第 58 题</span>
+      <div class="q-stem">智能家居涉及到各种传感器的使用，需要根据温度、湿度、用户的使用习惯和预定状态动态调整各项参数，最适合的是（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 规则系统</div>
+        <div class="opt wrong">B. 解释器</div>
+        <div class="opt wrong">C. 黑板风格</div>
+        <div class="opt wrong">D. 管道-过滤器</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">基于规则的系统</span>
+        <span style="color:rgba(255,255,255,.7);">根据<strong>预先定义的规则或条件</strong>控制行为（温度>30°→开空调，湿度<40%→开加湿器），典型用于智能家居、AI、DSS</span>
+      </div>
+    </div>
+
+    <!-- Q59 -->
+    <div class="q-card">
+      <span class="q-number">第 59 题</span>
+      <div class="q-stem">一个软件可以在不同架构、操作系统、编译器、环境运行、编译，这体现了软件的（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 可变性</div>
+        <div class="opt correct">B. 可移植性</div>
+        <div class="opt wrong">C. 互操作性</div>
+        <div class="opt wrong">D. 互操作性</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 B</span>
+        <span class="kp-tag">可移植性</span>
+        <span style="color:rgba(255,255,255,.7);">跨架构+跨OS+跨编译器+跨环境 → <strong>可移植性</strong>。属开发期质量属性。互操作性强调系统间协作，可移植性强调环境适配能力</span>
+      </div>
+    </div>
+
+    <!-- Q62 -->
+    <div class="q-card">
+      <span class="q-number">第 62 题</span>
+      <div class="q-stem">CBAM 选择架构的核心依据是（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 项目干系人需求优先级</div>
+        <div class="opt correct">B. 投资回报（ROI）</div>
+        <div class="opt wrong">C. 项目干系人角度的实现成本</div>
+        <div class="opt wrong">D. 系统架构师角度的实现难度</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 B</span>
+        <span class="kp-tag">CBAM</span>
+        <span style="color:rgba(255,255,255,.7);">CBAM（基于成本的架构分析方法）= 经济视角，核心依据是<strong>投资回报(ROI)</strong>。在质量属性与成本之间找最优权衡，不是单纯的优先级或成本</span>
+      </div>
+    </div>
+
+    <!-- Q65 -->
+    <div class="q-card">
+      <span class="q-number">第 65 题</span>
+      <div class="q-stem">下列关于微服务架构的描述，<strong>错误</strong>的是（ ）。</div>
+      <div class="options-grid">
+        <div class="opt wrong" style="text-decoration:line-through;text-decoration-color:rgba(248,113,113,.4);">A. 必须部署在统一环境，否则无法相互调用</div>
+        <div class="opt correct">B. 服务间通过 API（如 REST、gRPC）通信</div>
+        <div class="opt correct">C. 每个服务聚焦单一业务功能</div>
+        <div class="opt correct">D. 支持独立部署和扩展</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">微服务架构</span>
+        <span style="color:rgba(255,255,255,.7);">微服务<strong>不要求</strong>统一环境部署，不同服务可以部署在不同环境（不同语言、不同平台），通过网络 API 互调</span>
+      </div>
+    </div>
+
+    <!-- Q47 -->
+    <div class="q-card">
+      <span class="q-number">第 47 题</span>
+      <div class="q-stem">DSSA 领域分析阶段产物是（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 领域模型</div>
+        <div class="opt wrong">B. 领域知识</div>
+        <div class="opt wrong">C. 特定领域</div>
+        <div class="opt wrong">D. 领域样本</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">DSSA 领域分析</span>
+        <span style="color:rgba(255,255,255,.7);">领域分析阶段产物 = <strong>领域模型</strong>（含领域需求规约、领域字典/术语表）。领域设计→领域参考架构，领域实现→可复用构件</span>
+      </div>
+    </div>
+
+    <!-- Q49 -->
+    <div class="q-card">
+      <span class="q-number">第 49 题</span>
+      <div class="q-stem">DSSA 的建立过程通常具有并发、递归和反复特征，因此更接近（ ）式过程。</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 瀑布</div>
+        <div class="opt wrong">B. 螺旋</div>
+        <div class="opt wrong">C. V 模型</div>
+        <div class="opt correct">D. 喷泉</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 D</span>
+        <span class="kp-tag">DSSA 过程模型</span>
+        <span style="color:rgba(255,255,255,.7);">并发+递归+反复+迭代 = <strong>喷泉模型</strong>特徵。喷泉模型强调各阶段无缝隙、可并发、可回溯，正好匹配 DSSA 建立过程</span>
+      </div>
+    </div>
+
+    <!-- Q50 -->
+    <div class="q-card">
+      <span class="q-number">第 50 题</span>
+      <div class="q-stem">质量属性效用树按优先级排序，沿用的两个维度是"每个场景对系统成功的重要性"以及（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 从架构师角度来看的难易程度</div>
+        <div class="opt wrong">B. 从架构师角度来看的效益</div>
+        <div class="opt wrong">C. 从项目干系人来看的成本</div>
+        <div class="opt wrong">D. 从干系人来看的重要性</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">效用树</span>
+        <span style="color:rgba(255,255,255,.7);">效用树排序二维度：①<strong>场景对系统成功的重要性</strong>(干系人视角) ②<strong>架构师角度难易程度</strong>。不是效益、成本或干系人重要性</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 2026年上 ===== -->
+  <div class="year-section">
+    <div class="year-title">&#x25B6; 2026年 上半年 · 综合知识</div>
+
+    <!-- Q2 -->
+    <div class="q-card">
+      <span class="q-number">第 2 题</span>
+      <div class="q-stem">下列质量属性中，<strong>全部</strong>属于运行期质量属性的是（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 安全性、可修改性、性能</div>
+        <div class="opt correct">B. 安全性、可用性、性能</div>
+        <div class="opt wrong">C. 可测试性、可用性、可维护性</div>
+        <div class="opt wrong">D. 可扩展性、可移植性、可维护性</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 B</span>
+        <span class="kp-tag">质量属性分类</span>
+        <span style="color:rgba(255,255,255,.7);"><strong>运行期</strong>：性能、安全性、可用性、易用性、可靠性。<strong>开发期</strong>：可修改性、可测试性、可维护性、可扩展性、可移植性。A/C/D 均混入开发期属性</span>
+      </div>
+    </div>
+
+    <!-- Q10 -->
+    <div class="q-card">
+      <span class="q-number">第 10 题</span>
+      <div class="q-stem">黑板架构中调用多个（ ）构件进行数据处理和计算的。</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 知识源</div>
+        <div class="opt wrong">B. 黑板</div>
+        <div class="opt wrong">C. 控制器</div>
+        <div class="opt wrong">D. 数据源</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">黑板风格</span>
+        <span style="color:rgba(255,255,255,.7);">黑板架构中的"专家"组件 = <strong>知识源（Knowledge Source）</strong>。多个知识源共享黑板存储区，协作解决非结构化问题</span>
+      </div>
+    </div>
+
+    <!-- Q13 -->
+    <div class="q-card">
+      <span class="q-number">第 13 题</span>
+      <div class="q-stem">ABSD 方法经过递归细化后，最终可产生（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 用户手册和运行手册</div>
+        <div class="opt correct">B. 构件和类</div>
+        <div class="opt wrong">C. 需求基线和测试用例</div>
+        <div class="opt wrong">D. 数据仓库和数据集市</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 B</span>
+        <span class="kp-tag">ABSD 递归细化</span>
+        <span style="color:rgba(255,255,255,.7);">ABSD 自顶向下递归细化，最终产生<strong>构件和类</strong>。从架构→子系统→模块→构件→类，逐步细化到可编码实现粒度</span>
+      </div>
+    </div>
+
+    <!-- Q17 -->
+    <div class="q-card">
+      <span class="q-number">第 17 题</span>
+      <div class="q-stem">在两层 C/S 架构中，胖客户端通常负责（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 仅数据管理</div>
+        <div class="opt wrong">B. 仅用户界面展示</div>
+        <div class="opt correct">C. 用户界面交互和业务逻辑处理</div>
+        <div class="opt wrong">D. 仅消息队列转发</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 C</span>
+        <span class="kp-tag">层次架构</span>
+        <span style="color:rgba(255,255,255,.7);">两层C/S中客户端 = 展示 + 功能，称为<strong>"胖客户端"</strong>。三层C/S将功能层独立到应用服务器上，客户端变"瘦"</span>
+      </div>
+    </div>
+
+    <!-- Q18 -->
+    <div class="q-card">
+      <span class="q-number">第 18 题</span>
+      <div class="q-stem">在 DSSA 建立过程中，产生领域字典或领域术语表的阶段通常是（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 定义领域参考架构</div>
+        <div class="opt correct">B. 定义领域特定元素</div>
+        <div class="opt wrong">C. 进行领域实现编码</div>
+        <div class="opt wrong">D. 进行系统切换部署</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 B</span>
+        <span class="kp-tag">DSSA 领域分析</span>
+        <span style="color:rgba(255,255,255,.7);">领域字典/术语表在<strong>领域分析阶段</strong>（定义领域特定元素）产生。领域分析→领域模型+领域字典，领域设计→领域参考架构，领域实现→可复用构件</span>
+      </div>
+    </div>
+
+    <!-- Q41 -->
+    <div class="q-card">
+      <span class="q-number">第 41 题</span>
+      <div class="q-stem">最早形成文档并得到广泛应用的软件架构评估方法是（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. SAAM</div>
+        <div class="opt wrong">B. ATAM</div>
+        <div class="opt wrong">C. CBAM</div>
+        <div class="opt wrong">D. ARID</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">SAAM</span>
+        <span style="color:rgba(255,255,255,.7);"><strong>SAAM</strong>是最早的架构评估方法。演进顺序：SAAM→ATAM→CBAM→ARID。SAAM基于场景，ATAM加入效用树与权衡分析，CBAM加入经济成本视角</span>
+      </div>
+    </div>
+
+    <!-- Q43 -->
+    <div class="q-card">
+      <span class="q-number">第 43 题</span>
+      <div class="q-stem">在软件架构风格中，强调数据按顺序流经一系列处理构件、每个构件完成一类转换处理的是（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 分层风格</div>
+        <div class="opt correct">B. 管道-过滤器风格</div>
+        <div class="opt wrong">C. 事件驱动风格</div>
+        <div class="opt wrong">D. 仓库风格</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 B</span>
+        <span class="kp-tag">数据流风格</span>
+        <span style="color:rgba(255,255,255,.7);">"数据按顺序流经一系列处理构件" = 管道-过滤器。过滤器（构件）逐一处理数据流，管道（连接件）传递数据</span>
+      </div>
+    </div>
+
+    <!-- Q51 -->
+    <div class="q-card">
+      <span class="q-number">第 51 题</span>
+      <div class="q-stem">在子程序-返回架构风格中，最典型的连接机制是（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 过程调用</div>
+        <div class="opt wrong">B. 事件广播</div>
+        <div class="opt wrong">C. 发布订阅</div>
+        <div class="opt wrong">D. 共享黑板</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">调用/返回风格</span>
+        <span style="color:rgba(255,255,255,.7);">主程序/子程序风格的连接件 = <strong>过程调用（函数调用）</strong>。事件广播、发布订阅属于独立构件风格</span>
+      </div>
+    </div>
+
+    <!-- Q55 -->
+    <div class="q-card">
+      <span class="q-number">第 55 题</span>
+      <div class="q-stem">在进程通信架构风格中，构件通常是独立进程，连接件通常是（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 过程调用、消息传递或远程调用机制</div>
+        <div class="opt wrong">B. 类继承和对象实例化</div>
+        <div class="opt wrong">C. 表单与报表模板</div>
+        <div class="opt wrong">D. 黑板与控制器</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">独立构件风格</span>
+        <span style="color:rgba(255,255,255,.7);">进程通信风格：构件=独立进程，连接件=消息传递（点对点/异步/同步/远程调用）。属独立构件大类</span>
+      </div>
+    </div>
+
+    <!-- Q58（评估） -->
+    <div class="q-card">
+      <span class="q-number">第 58 题（评估）</span>
+      <div class="q-stem">关于软件架构评估的说法，<strong>错误</strong>的是（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong" style="text-decoration:line-through;text-decoration-color:rgba(248,113,113,.4);">A. 最终用户或其代表不应该参与主流架构评估活动</div>
+        <div class="opt correct">B. 敏感点一定只影响一个构件的特性</div>
+        <div class="opt correct">C. 系统购买者不一定需要参与架构评估</div>
+        <div class="opt correct">D. 架构评估关注质量属性场景与权衡分析</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">架构评估</span>
+        <span style="color:rgba(255,255,255,.7);">最终用户或其代表<strong>必须参与</strong>主流架构评估活动。ATAM/SAAm 等方法都要求关键干系人(含用户代表)参与，以保证评估结果客观全面</span>
+      </div>
+    </div>
+
+    <!-- Q58 -->
+    <div class="q-card">
+      <span class="q-number">第 58 题</span>
+      <div class="q-stem">系统的学习曲线和用户操作效率，主要体现的软件质量属性是（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 可用性</div>
+        <div class="opt correct">B. 易用性</div>
+        <div class="opt wrong">C. 可靠性</div>
+        <div class="opt wrong">D. 可维护性</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 B</span>
+        <span class="kp-tag">易用性</span>
+        <span style="color:rgba(255,255,255,.7);">学习曲线+操作效率 = <strong>易用性</strong>（Usability），属运行期质量属性。可用性是系统正常运行的时间比例，易用性关注用户体验</span>
+      </div>
+    </div>
+
+    <!-- Q61 -->
+    <div class="q-card">
+      <span class="q-number">第 61 题</span>
+      <div class="q-stem">关于隐式调用或事件驱动风格的表述，<strong>错误</strong>的是（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 事件触发者通常不知道会由谁处理</div>
+        <div class="opt correct">B. 一个构件既可能触发事件，也可能处理事件</div>
+        <div class="opt wrong" style="text-decoration:line-through;text-decoration-color:rgba(248,113,113,.4);">C. 事件触发后一定能预先确定完整处理流程</div>
+        <div class="opt correct">D. 该风格有利于松耦合扩展</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 C</span>
+        <span class="kp-tag">事件驱动/隐式调用</span>
+        <span style="color:rgba(255,255,255,.7);">事件触发后<strong>无法预先确定</strong>完整流程（哪些构件会响应不确定），这是隐式调用的核心特征也是其缺点</span>
+      </div>
+    </div>
+
+    <!-- Q64 -->
+    <div class="q-card">
+      <span class="q-number">第 64 题</span>
+      <div class="q-stem">A 微服务调用 B 微服务时，若 B 的接口只是偶尔出现响应延迟，为避免调用线程长时间阻塞，最直接合适的措施是（ ）</div>
+      <div class="options-grid">
+        <div class="opt wrong">A. 熔断</div>
+        <div class="opt wrong">B. 限流</div>
+        <div class="opt wrong">C. 服务降级</div>
+        <div class="opt correct">D. 设置超时时间</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 D</span>
+        <span class="kp-tag">微服务容错</span>
+        <span style="color:rgba(255,255,255,.7);">关键词"<strong>偶尔</strong>延迟"和"<strong>最直接</strong>"= 设置超时时间。熔断适合频繁失败场景，限流适合流量过载，降级适合系统压力大</span>
+      </div>
+    </div>
+
+    <!-- Q68 -->
+    <div class="q-card">
+      <span class="q-number">第 68 题</span>
+      <div class="q-stem">在软件质量属性评估中，下列通常<strong>不</strong>属于可用性度量指标的是（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. MTBF</div>
+        <div class="opt correct">B. MTTR</div>
+        <div class="opt correct">C. 可用率</div>
+        <div class="opt wrong" style="text-decoration:line-through;text-decoration-color:rgba(248,113,113,.4);">D. 故障发生的概率</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 D</span>
+        <span class="kp-tag">可用性指标</span>
+        <span style="color:rgba(255,255,255,.7);">可用性三指标：<strong>MTBF</strong>(平均故障间隔)、<strong>MTTR</strong>(平均修复时间)、<strong>可用率</strong>=MTBF/(MTBF+MTTR)。故障发生概率属于可靠性指标</span>
+      </div>
+    </div>
+
+    <!-- Q69 -->
+    <div class="q-card">
+      <span class="q-number">第 69 题</span>
+      <div class="q-stem">在运行中的系统上人为关闭一台节点或服务器，观察业务是否仍可继续提供服务，这种测试场景主要是在验证系统的（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 容错性</div>
+        <div class="opt wrong">B. 易用性</div>
+        <div class="opt wrong">C. 可测试性</div>
+        <div class="opt wrong">D. 可修改性</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">容错性</span>
+        <span style="color:rgba(255,255,255,.7);">模拟<strong>节点故障</strong>验证业务可否继续 → <strong>容错性</strong>（Fault Tolerance），即故障发生时的持续服务能力。典型混沌工程/故障演练场景</span>
+      </div>
+    </div>
+
+    <!-- Q70 -->
+    <div class="q-card">
+      <span class="q-number">第 70 题</span>
+      <div class="q-stem">统一支付系统，要求增加支付宝的方式，且在 5 人/天之内完成，体现的软件质量属性是（ ）</div>
+      <div class="options-grid">
+        <div class="opt correct">A. 可修改性</div>
+        <div class="opt wrong">B. 可靠性</div>
+        <div class="opt wrong">C. 兼容性</div>
+        <div class="opt wrong">D. 性能</div>
+      </div>
+      <div class="answer-bar">
+        <span class="answer-tag">答案 A</span>
+        <span class="kp-tag">可修改性</span>
+        <span style="color:rgba(255,255,255,.7);">新增功能+限制人天成本 → <strong>可修改性</strong>（Modifiability）。关注系统能否以最低成本、最快速度适应变更，属开发期质量属性</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== 知识点汇总 ===== -->
+  <div class="page-header" style="margin-top:16px;">
+    <div class="header-kicker">知识点速记</div>
+    <div class="header-title" style="font-size:20px;">高频考点标记</div>
+
+    <table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:16px;">
+      <thead>
+        <tr style="border-bottom:1px solid rgba(0,212,255,.1);">
+          <th style="text-align:left;padding:8px 12px;color:var(--cyan);font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;">考点</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--cyan);font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;">涉及题目</th>
+          <th style="text-align:left;padding:8px 12px;color:var(--cyan);font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;">核心要点</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">MVP 模式</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q27</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">View 不能直接访问 Model，必须通过 Presenter。一个 Presenter 可对应多个 View</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">C/S 属于层次风格</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q33</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">客户端服务器 = 调用/返回 → 层次，不是独立构件也不是数据流</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">解释器四要素</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q48</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">解释引擎 + 被解释代码存储区 + 引擎内部状态数据结构 + 执行进度记录</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">智能家居 = 规则系统</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q58</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">传感器+条件触发+动态调整参数 = 基于规则的系统，不是黑板也不是解释器</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">微服务部署</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q65</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">不需要统一环境，不同服务可不同语言/不同平台部署，通过网络API通信</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">黑板 = 知识源</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q10</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">黑板架构中多个"知识源"共享存储区协作。不是数据源也不是控制器</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">胖客户端</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q17</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">两层C/S客户端 = 展示层+业务逻辑处理。三层C/S将业务逻辑独立到应用服务器</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">管道-过滤器</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q43</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">数据按顺序流经构件 = 管道-过滤器（数据流风格），不是分层风格</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">过程调用</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q51</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">子程序-返回风格最典型连接机制 = 过程调用。事件广播/发布订阅属于独立构件</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">质量属性·运行期 vs 开发期</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q2</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);"><strong>运行期</strong>：性能、安全性、可用性、易用性、可靠性。<strong>开发期</strong>：可修改性、可测试性、可维护性、可扩展性、可移植性</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">可移植性</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q59</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">跨架构+跨OS+跨编译器+跨环境 → 可移植性（Portability），属开发期质量属性</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">易用性</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q58</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">学习曲线+操作效率 = 易用性（Usability）。区别于可用性（正常运行时间比例）</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">容错性</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q69</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">节点故障下业务仍可继续 = 容错性（Fault Tolerance），典型混沌工程场景</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">可修改性</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q70</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">新增功能+限制人天成本 = 可修改性（Modifiability），属开发期质量属性</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">效用树排序维度</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q50</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">优先级排序二维度：①场景对系统成功重要性(干系人) ②架构师角度难易程度。非效益或成本</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">CBAM = ROI</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q62</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">CBAM核心依据=投资回报(ROI)，在质量属性与成本间找最优权衡。不是单纯需求优先级</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">SAAM = 最早</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q41</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">SAAM是最早的架构评估方法。演进：SAAM→ATAM→CBAM→ARID</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">架构评估参与方</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q58(评估)</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">最终用户或其代表必须参与主流架构评估活动。所有关键干系人均应参与</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">可用性度量指标</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q68</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">可用性三指标：MTBF、MTTR、可用率=MTBF/(MTBF+MTTR)。故障发生概率属可靠性</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">ABSD 三核心</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q28</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">功能分解 + 架构风格驱动质量属性与商业需求 + 软件模板设计。项目管理不属于核心</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">ABSD 递归细化</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q13</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">自顶向下递归细化 → 最终产物 = 构件和类。架构→子系统→模块→构件→类</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">DSSA 领域模型</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q47</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">领域分析阶段产物 = 领域模型（含领域需求规约、领域字典/术语表）</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">DSSA 喷泉模型</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2025下-Q49</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">并发+递归+反复 = 喷泉模型特征。各阶段无缝隙、可并发、可回溯</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">DSSA 领域字典</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q18</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">领域字典/术语表产生于领域分析阶段（定义领域特定元素），非领域设计/实现阶段</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">进程通信连接件</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q55</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">构件=独立进程，连接件=过程调用/消息传递/远程调用（不是黑板也不是继承）</td>
+        </tr>
+        <tr style="border-bottom:1px solid rgba(255,255,255,.03);">
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">事件驱动特征</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q61</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);">无法预先确定完整流程。触发者不知谁处理、构件可发可收、有利于松耦合</td>
+        </tr>
+        <tr>
+          <td style="padding:10px 12px;color:var(--text-primary);font-weight:600;">超时 vs 熔断 vs 限流</td>
+          <td style="padding:10px 12px;color:var(--text-muted);">2026上-Q64</td>
+          <td style="padding:10px 12px;color:rgba(255,255,255,.7);"><strong>偶尔延迟</strong>→超时；<strong>频繁失败</strong>→熔断；<strong>流量过载</strong>→限流；<strong>系统压力大</strong>→降级</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

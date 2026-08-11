@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 并发控制 + 封锁协议</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+.page{max-width:900px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+.page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+.header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+.header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+.header-top{display:flex;align-items:flex-start;gap:16px}
+.header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;overflow:hidden}
+.header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+.header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+.header-title-group{flex:1}
+.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+.header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+.header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+.header-meta .meta-item{display:flex;align-items:center;gap:8px}
+.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+.cornell{display:grid;grid-template-columns:230px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+.cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+.cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+.cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+.cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+.cornell-notes{grid-area:notes;padding:24px 32px 20px}
+.notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+.note-section{margin-bottom:8px}
+.note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25);flex-shrink:0}
+.note-section p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+.note-section ul{list-style:none;padding-left:0}
+.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+.note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+.note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+.hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+.hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+.hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+.hl-rose{color:var(--rose);background:linear-gradient(180deg,transparent 58%,rgba(248,113,113,.12)58%);padding:0 2px;font-weight:600}
+.feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+.feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+.feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+.feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}
+.feynman p strong{color:var(--green)}
+.compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+.compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+.compare-table thead th:first-child{border-radius:var(--radius) 0 0 0}
+.compare-table thead th:last-child{border-radius:0 var(--radius) 0 0}
+.compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+.compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+.numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+.numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+.card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+.card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+.card-badge{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:4px;background:rgba(77,124,255,.15);border:1px solid rgba(77,124,255,.25);color:var(--blue);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-bottom:4px}
+.card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:3px}
+.card-list{list-style:none}
+.card-list li{font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;padding-left:10px;position:relative}
+.card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+.cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+.cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+.cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+.cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+.cornell-summary .summary-text strong{color:var(--cyan)}
+.cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+.tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+.three-col{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0}
+.lock-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+.lock-card.l1{border-color:rgba(0,212,255,.15);background:rgba(0,212,255,.04)}
+.lock-card.l2{border-color:rgba(77,124,255,.15);background:rgba(77,124,255,.04)}
+.lock-card.l3{border-color:rgba(52,211,153,.15);background:rgba(52,211,153,.04)}
+.lock-card .lock-title{font-size:12px;font-weight:700;margin-bottom:6px}
+.l1 .lock-title{color:var(--cyan)}
+.l2 .lock-title{color:var(--blue)}
+.l3 .lock-title{color:var(--green)}
+.lock-card ul{list-style:none}
+.lock-card ul li{font-size:11px;color:rgba(255,255,255,.7);line-height:1.5;padding-left:12px;position:relative}
+.lock-card ul li::before{content:'\2022';position:absolute;left:0;color:var(--text-muted)}
+.solve-list{font-size:11px;color:var(--text-secondary);margin-top:6px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}
+.solve-list .solved{color:var(--green);font-weight:600}
+.solve-list .unsolved{color:var(--text-muted);text-decoration:line-through;opacity:.5}
+.diagram{margin-top:10px;padding:12px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04)}
+.diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+.flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:3px 0}
+.flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:7px 12px;font-size:11px;font-weight:500;color:rgba(255,255,255,.7);text-align:center}
+.flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+.flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+.flow-arrow{display:flex;align-items:center;justify-content:center;width:22px;color:rgba(255,255,255,.15);font-size:14px;flex-shrink:0}
+@media(max-width:768px){
+.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}
+.page::before{display:none}
+.cornell{grid-template-columns:1fr;grid-template-areas:"cue" "notes" "summary"}
+.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}
+.cornell-notes,.cornell-summary{padding:16px}
+.card-grid,.three-col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="page">
+<div class="header">
+<div class="header-top">
+<div class="header-badge"><span class="header-badge-icon">&#x26BF;</span></div>
+<div class="header-title-group">
+<div class="header-kicker">康奈尔分析 / P54-P58（跳过P57）</div>
+<div class="header-title">数据库 — 事务 ACID · 并发三大问题 · 三级封锁协议</div>
+</div>
+</div>
+<div class="header-meta">
+<div class="meta-item"><span class="meta-dot"></span>2026-08-08</div>
+<div class="meta-item"><span class="meta-dot"></span>架构直播1 精华提炼</div>
+<div class="meta-item"><span class="meta-dot"></span>必考 · 事务与锁</div>
+</div>
+</div>
+
+<div class="cornell">
+<div class="cornell-cue">
+<div class="cue-header">&#x25B8; 线索</div>
+<div class="cue-item"><span class="q-mark">?</span> 事务 ACID 四大特性各是什么？分别侧重什么？</div>
+<div class="cue-item"><span class="q-mark">?</span> 并发不控制会产生哪三种问题？</div>
+<div class="cue-item"><span class="q-mark">?</span> X锁和S锁的区别？（读写权限+其他事务能否加锁）</div>
+<div class="cue-item"><span class="q-mark">?</span> 三级封锁协议各加什么锁？何时释放？各解决哪些问题？</div>
+</div>
+
+<div class="cornell-notes">
+<div class="notes-header">&#x25B8; 核心要点</div>
+
+<!-- 事务ACID -->
+<div class="numbered-header"><span class="num">1</span>事务 — ACID 四大特性（P54）</div>
+
+<div class="card-grid">
+<div class="card">
+<div class="card-badge">A</div>
+<div class="card-title"><span class="note-highlight">原子性 Atomicity</span>（操作）</div>
+<ul class="card-list"><li>要么<strong>全做</strong>，要么<strong>全不做</strong></li><li>银行转账：未完成前所有操作无效</li></ul>
+</div>
+<div class="card">
+<div class="card-badge">C</div>
+<div class="card-title"><span class="note-highlight">一致性 Consistency</span>（数据）</div>
+<ul class="card-list"><li>事务发生后<strong>数据一致</strong></li><li>不会A转出B没收到的状态</li></ul>
+</div>
+<div class="card">
+<div class="card-badge">I</div>
+<div class="card-title"><span class="hl-purple">隔离性 Isolation</span>（执行）</div>
+<ul class="card-list"><li>事务间<strong>互相隔离</strong>互不干涉</li><li>未提交的更新<strong>不可见</strong></li></ul>
+</div>
+<div class="card">
+<div class="card-badge">D</div>
+<div class="card-title"><span class="hl-green">持续性 Durability</span>（改变）</div>
+<ul class="card-list"><li>事务结果<strong>持续保存</strong></li><li>一旦提交，永远有效</li></ul>
+</div>
+</div>
+
+<div class="note-section" style="margin-top:4px;">
+<p>事务以 <strong>第一个 DML 操作</strong> 开始，以 <strong>rollback、commit 或 DDL 语句</strong> 结束。事务是并发控制的<strong>前提条件</strong>。</p>
+</div>
+
+<!-- 并发三大问题 -->
+<div class="numbered-header"><span class="num">2</span>并发控制 — 三大问题（P54-P55）</div>
+
+<table class="compare-table">
+<thead><tr><th style="width:14%">问题</th><th style="width:20%">场景</th><th>白话理解</th></tr></thead>
+<tbody>
+<tr>
+<td><span class="hl-orange">丢失更新</span></td>
+<td>T1修改A并写回 → T2也修改A并写回 → <strong>T2覆盖T1</strong></td>
+<td>两个人同时改同一格，<strong>后写的覆盖先写的</strong>，第一个人的修改白做了</td>
+</tr>
+<tr>
+<td><span class="hl-purple">不可重复读</span></td>
+<td>T2读A → T1修改A并写回 → T2<strong>再读A发现变了</strong></td>
+<td>前后两次读同一格，<strong>数据不一样</strong>（被中间改掉了）</td>
+</tr>
+<tr>
+<td><span class="hl-rose">读脏数据</span></td>
+<td>T1修改A → T2读A → <strong>T1回滚</strong> → T2读到的数据无效</td>
+<td>读了别人<strong>还没确认</strong>的草稿，结果人家撤销了，读到假数据</td>
+</tr>
+</tbody>
+</table>
+
+<!-- 封锁协议 -->
+<div class="numbered-header"><span class="num">3</span>封锁协议 — X锁 / S锁 + 三级协议（P56-P58）</div>
+
+<!-- 两把锁 -->
+<div class="note-section">
+<h4><span class="dot"></span>两种锁</h4>
+</div>
+
+<div class="card-grid">
+<div class="card" style="border-color:rgba(248,113,113,.15);background:rgba(248,113,113,.03);">
+<div class="card-badge" style="background:rgba(248,113,113,.15);border-color:rgba(248,113,113,.25);color:var(--rose);">X</div>
+<div class="card-title"><span class="hl-rose">X 锁 — 排它锁（写锁）</span></div>
+<ul class="card-list">
+<li>加锁事务：<strong>可读可写</strong></li>
+<li>其他事务：<strong>不能加任何锁</strong></li>
+<li>释放后才允许别人加</li>
+</ul>
+</div>
+<div class="card" style="border-color:rgba(52,211,153,.15);background:rgba(52,211,153,.03);">
+<div class="card-badge" style="background:rgba(52,211,153,.15);border-color:rgba(52,211,153,.25);color:var(--green);">S</div>
+<div class="card-title"><span class="hl-green">S 锁 — 共享锁（读锁）</span></div>
+<ul class="card-list">
+<li>加锁事务：<strong>只能读不能改</strong></li>
+<li>其他事务：<strong>只能加 S 锁</strong>（可读不可改）</li>
+<li>释放后才可加 X 锁</li>
+</ul>
+</div>
+</div>
+
+<!-- 三级封锁协议 -->
+<div class="note-section" style="margin-top:6px;">
+<h4><span class="dot"></span>三级封锁协议</h4>
+</div>
+
+<div class="three-col">
+<div class="lock-card l1">
+<div class="lock-title">&#x2460; 一级封锁协议</div>
+<ul>
+<li>修改前加 <strong>X 锁</strong></li>
+<li><strong>事务结束</strong>才释放</li>
+</ul>
+<div class="solve-list">
+<span class="solved">&#x2713; 丢失更新</span><br>
+<span class="unsolved">&#x2717; 不可重复读</span><br>
+<span class="unsolved">&#x2717; 读脏数据</span>
+</div>
+</div>
+<div class="lock-card l2">
+<div class="lock-title">&#x2461; 二级封锁协议</div>
+<ul>
+<li>一级基础上：<br>读前加 <strong>S 锁</strong>，<strong>读完释放</strong></li>
+</ul>
+<div class="solve-list">
+<span class="solved">&#x2713; 丢失更新</span><br>
+<span class="unsolved">&#x2717; 不可重复读</span><br>
+<span class="solved">&#x2713; 读脏数据</span>
+</div>
+</div>
+<div class="lock-card l3">
+<div class="lock-title">&#x2462; 三级封锁协议</div>
+<ul>
+<li>一级基础上：<br>读前加 <strong>S 锁</strong>，<strong>事务结束释放</strong></li>
+</ul>
+<div class="solve-list">
+<span class="solved">&#x2713; 丢失更新</span><br>
+<span class="solved">&#x2713; 不可重复读</span><br>
+<span class="solved">&#x2713; 读脏数据</span>
+</div>
+</div>
+</div>
+
+<div class="note-section" style="margin-top:4px;">
+<h4><span class="dot"></span>关键区别 — 二级 vs 三级</h4>
+<ul>
+<li>二级：S锁<strong>读完即释放</strong> → 读完后可能被改 → <strong>不解决不可重复读</strong></li>
+<li>三级：S锁<strong>事务结束才释放</strong> → 整个事务期间锁住 → <strong>三个全解决</strong></li>
+</ul>
+</div>
+
+<!-- 进阶对比表 -->
+<div class="numbered-header"><span class="num">&#x2605;</span>三级封锁协议对比总表</div>
+<table class="compare-table">
+<thead><tr><th style="width:6%">级别</th><th style="width:16%">加锁规则</th><th style="width:14%">释放时机</th><th style="width:12%">丢失更新</th><th style="width:12%">不可重复读</th><th style="width:12%">读脏数据</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>修改前加<strong>X锁</strong></td><td>事务结束</td><td><span class="hl-green">&#x2713;</span></td><td><span class="hl-rose">&#x2717;</span></td><td><span class="hl-rose">&#x2717;</span></td></tr>
+<tr><td>2</td><td>1 + 读前加<strong>S锁</strong></td><td>X:事务结束 / <strong>S:读完释放</strong></td><td><span class="hl-green">&#x2713;</span></td><td><span class="hl-rose">&#x2717;</span></td><td><span class="hl-green">&#x2713;</span></td></tr>
+<tr><td>3</td><td>1 + 读前加<strong>S锁</strong></td><td><strong>全部事务结束</strong></td><td><span class="hl-green">&#x2713;</span></td><td><span class="hl-green">&#x2713;</span></td><td><span class="hl-green">&#x2713;</span></td></tr>
+</tbody>
+</table>
+
+<!-- 真题速览 P59 -->
+<div class="numbered-header"><span class="num">&#x25CE;</span>真题速览（P59）</div>
+<div class="note-section">
+<p><strong>2025下 第49题：</strong>事务获取共享锁（S锁）后，对数据的操作权限是？<br>答案：<span class="note-highlight">A. 可读不可写</span></p>
+</div>
+
+<!-- 费曼 -->
+<div class="feynman">
+<div class="feynman-label">&#x25C6; 费曼</div>
+<p><strong>事务ACID</strong>就是"银行转账四承诺"：原子性=要么全转要么一分不动（不能转一半），一致性=A扣了B一定到账（不会凭空消失），隔离性=别人不能看到你转账到一半的过程（隐私），持续性=转完钱不会因为停电消失（永久生效）。<strong>并发三大问题</strong>想象几个人同时编辑同一个Excel：丢失更新=你改完不保存，同事覆盖了你的修改；不可重复读=你看了一下数据，同事中间改掉了，你再看时已经变了；读脏数据=同事改了一格还没保存就撤销了，你在这中间看了个假数字。<strong>三级封锁协议</strong>就像图书馆规则：一级=借走书才锁（写锁），二级=借走+阅览都锁但看完就解锁（别人可以插进来改），三级=阅览也锁到整个事务结束（最高级别，全保护）。</p>
+</div>
+
+</div>
+
+<div class="cornell-summary">
+<h3>&#x25B8; 总结</h3>
+<div class="summary-text">事务<strong>ACID</strong>（原子性/一致性/隔离性/持续性）是并发控制前提。并发不控制会引发<strong>丢失更新</strong>（覆盖）、<strong>不可重复读</strong>（前后不一致）、<strong>读脏数据</strong>（读到未提交回滚数据）三大问题。<strong>X锁只我改、S锁大家读</strong>。<strong>一级→二级→三级</strong>逐级增强：一级消丢失更新、二级加消读脏数据、三级全消。<strong>二级vs三级关键</strong>：S锁释放时机（读完/事务结束）。</div>
+<div class="summary-tags">
+<span class="tag primary">并发控制</span>
+<span class="tag">事务ACID</span>
+<span class="tag">丢失更新</span>
+<span class="tag">不可重复读</span>
+<span class="tag">读脏数据</span>
+<span class="tag">三级封锁协议</span>
+<span class="tag">X锁S锁</span>
+</div>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>

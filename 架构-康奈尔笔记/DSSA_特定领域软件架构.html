@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSSA — 特定领域软件架构</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-elevated: #1a2030; --bg-cue: #0d1320;
+    --border-default: rgba(255,255,255,.06); --border-subtle: rgba(255,255,255,.04);
+    --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --cyan-glow: rgba(0,212,255,.25); --blue: #4d7cff; --purple: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%);
+    line-height: 1.6; min-height: 100vh; padding: 36px 0;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+  .page-header {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 30px 36px 26px; margin-bottom: 24px;
+    box-shadow: 0 0 0 1px rgba(0,212,255,.04), 0 4px 32px rgba(0,0,0,.3);
+    position: relative; overflow: hidden;
+  }
+  .page-header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent);
+  }
+  .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 6px; }
+  .header-title { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; }
+  .header-sub { font-size: 13px; color: var(--text-muted); margin-top: 6px; }
+
+  .section-card {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 24px 28px; margin-bottom: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,.2);
+  }
+  .section-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 28px; height: 28px; padding: 0 8px;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    color: #fff; font-family: var(--font-mono); font-size: 14px; font-weight: 700;
+    border-radius: 4px; box-shadow: 0 0 12px var(--cyan-glow);
+    margin-right: 10px;
+  }
+  .section-title { font-size: 18px; font-weight: 800; color: var(--text-primary); display: flex; align-items: center; margin-bottom: 16px; }
+
+  .info-block { margin-bottom: 16px; }
+  .info-block h3 { font-size: 14px; font-weight: 700; color: var(--cyan); margin-bottom: 8px; border-bottom: 1px solid rgba(0,212,255,.08); padding-bottom: 6px; }
+  .info-block p { font-size: 13.5px; color: rgba(255,255,255,.78); line-height: 1.75; }
+  .info-block ul { list-style: none; padding-left: 0; margin-top: 4px; }
+  .info-block ul li { font-size: 13px; padding: 2px 0 2px 22px; position: relative; color: rgba(255,255,255,.75); line-height: 1.7; }
+  .info-block ul li::before { content: ''; position: absolute; left: 6px; top: 9px; width: 4px; height: 4px; border-radius: 50%; background: rgba(0,212,255,.4); }
+
+  .highlight { display: inline; background: linear-gradient(180deg, transparent 58%, rgba(0,212,255,.12) 58%); padding: 0 2px; font-weight: 600; color: var(--cyan); }
+  .hl-purple { color: var(--purple); background: linear-gradient(180deg, transparent 58%, rgba(167,139,250,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-green  { color: var(--green); background: linear-gradient(180deg, transparent 58%, rgba(52,211,153,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-orange { color: var(--amber); background: linear-gradient(180deg, transparent 58%, rgba(251,191,36,.15) 58%); padding: 0 2px; font-weight: 600; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0; }
+  .card-grid.col3 { grid-template-columns: repeat(3, 1fr); }
+  .mini-card {
+    background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius);
+    padding: 14px 16px;
+  }
+  .mini-card .badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 22px; height: 22px; border-radius: 4px;
+    background: rgba(77,124,255,.15); border: 1px solid rgba(77,124,255,.25);
+    color: var(--blue); font-family: var(--font-mono); font-size: 12px; font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .mini-card h4 { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+  .mini-card p, .mini-card li { font-size: 12.5px; color: rgba(255,255,255,.7); line-height: 1.65; }
+  .mini-card ul { list-style: none; }
+  .mini-card ul li { padding-left: 14px; position: relative; margin-bottom: 2px; }
+  .mini-card ul li::before { content: '\203A'; position: absolute; left: 0; color: var(--cyan); }
+
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 8px 0; }
+  .flow-box {
+    background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius);
+    padding: 10px 16px; font-size: 13px; font-weight: 500; color: rgba(255,255,255,.7); text-align: center; white-space: nowrap;
+  }
+  .flow-box.accent { border-color: rgba(0,212,255,.2); background: rgba(0,212,255,.06); color: var(--cyan); font-weight: 700; box-shadow: 0 0 16px rgba(0,212,255,.08); }
+  .flow-box.primary { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.08); color: var(--blue); font-weight: 700; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 30px; color: rgba(255,255,255,.15); font-size: 16px; flex-shrink: 0; }
+  .flow-v-arrow { display: flex; justify-content: center; color: rgba(255,255,255,.15); font-size: 16px; line-height: 1; margin: 4px 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin: 10px 0; }
+  thead th { background: rgba(255,255,255,.03); color: var(--text-secondary); font-weight: 600; text-align: left; padding: 10px 14px; font-size: 11px; font-family: var(--font-mono); letter-spacing: .06em; border-bottom: 1px solid rgba(0,212,255,.1); }
+  thead th:first-child { border-radius: var(--radius) 0 0 0; } thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+  tbody td { padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.03); color: rgba(255,255,255,.75); font-size: 13px; line-height: 1.6; }
+  tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius); } tbody tr:last-child td:last-child { border-radius: 0 0 var(--radius) 0; }
+  tbody tr:nth-child(even) td { background: rgba(255,255,255,.01); }
+
+  .exam-tip {
+    background: linear-gradient(135deg, rgba(0,212,255,.06), rgba(0,212,255,.01));
+    border: 1px solid rgba(0,212,255,.12); border-left: 2px solid var(--cyan);
+    border-radius: var(--radius); padding: 14px 18px; margin-top: 16px;
+  }
+  .exam-tip .tip-label { font-family: var(--font-mono); font-size: 10px; font-weight: 700; color: var(--cyan); letter-spacing: .14em; margin-bottom: 6px; }
+  .exam-tip p, .exam-tip li { font-size: 12.5px; color: rgba(255,255,255,.75); line-height: 1.7; }
+
+  @media (max-width: 768px) {
+    .header-title { font-size: 20px; }
+    .card-grid, .card-grid.col3 { grid-template-columns: 1fr; }
+    table { font-size: 11px; display: block; overflow-x: auto; }
+    .section-card { padding: 18px 16px; }
+    .flow-box { font-size: 12px; padding: 8px 12px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-kicker">P42-P48 · 详细笔记</div>
+    <div class="header-title">DSSA — 特定领域软件架构</div>
+    <div class="header-sub">Domain Specific Software Architecture · 软考必考核心知识</div>
+  </div>
+
+  <!-- 1. 定义与特征 -->
+  <div class="section-card">
+    <div class="section-title"><span class="section-num">1</span>DSSA 定义与四大特征</div>
+    <div class="info-block">
+      <p><span class="highlight">DSSA</span> = 专用于一类特定类型任务（领域）的、在整个领域中能有效使用的、为成功构造应用系统限定了标准的组合结构的<strong>软件构件集合</strong>。</p>
+    </div>
+    <div class="card-grid">
+      <div class="mini-card">
+        <div class="badge">1</div>
+        <h4>领域性</h4>
+        <p>针对特定问题领域，带有该领域专属的业务逻辑和规则</p>
+      </div>
+      <div class="mini-card">
+        <div class="badge">2</div>
+        <h4>普遍性</h4>
+        <p>在该领域中具有广泛的适用性，不只服务于单一系统</p>
+      </div>
+      <div class="mini-card">
+        <div class="badge">3</div>
+        <h4>抽象性</h4>
+        <p>高层次设计，不绑定具体实现细节，强调模式和框架</p>
+      </div>
+      <div class="mini-card">
+        <div class="badge">4</div>
+        <h4>可复用性</h4>
+        <p>用于支持领域中多个应用的生成，构件可跨系统复用</p>
+      </div>
+    </div>
+
+    <div class="info-block" style="margin-top:12px;">
+      <h3>垂直域 vs 水平域</h3>
+      <div class="card-grid">
+        <div class="mini-card">
+          <h4><span class="hl-purple">垂直域</span></h4>
+          <p>一个特定领域中<strong>完整</strong>的通用架构</p>
+          <ul><li>电子病历系统</li><li>医院信息系统</li><li>医学影像分析系统</li></ul>
+        </div>
+        <div class="mini-card">
+          <h4><span class="hl-green">水平域</span></h4>
+          <p>多个不同领域之间<strong>共用</strong>的小工具</p>
+          <ul><li>收费系统（购物/教育共用）</li><li>网络安全通用架构</li><li>用户认证模块</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-block">
+      <h3>举例：医疗电子病历系统</h3>
+      <p>采用 DSSA 设计电子病历系统 → 开发出适用于医疗保健领域的高度定制化、符合行业标准的系统。不同领域的 DSSA 可根据其特殊需求定制化。</p>
+    </div>
+  </div>
+
+  <!-- 2. 三个基本活动 -->
+  <div class="section-card">
+    <div class="section-title"><span class="section-num">2</span>DSSA 三个基本活动</div>
+
+    <div class="card-grid col3">
+      <div class="mini-card">
+        <div class="badge">1</div>
+        <h4><span class="highlight">领域分析</span></h4>
+        <p><strong>目标：</strong>获得<span class="hl-green">领域模型</span>（领域需求）</p>
+        <p style="margin-top:6px;"><strong>信息源：</strong></p>
+        <ul>
+          <li>现存系统</li>
+          <li>技术文献</li>
+          <li>领域专家</li>
+          <li>用户调查和市场分析</li>
+          <li>领域演化历史记录</li>
+        </ul>
+        <p style="margin-top:6px;"><strong>产出：</strong>领域模型（需求）</p>
+      </div>
+      <div class="mini-card">
+        <div class="badge">2</div>
+        <h4><span class="highlight">领域设计</span></h4>
+        <p><strong>目标：</strong>获得<span class="hl-green">DSSA</span>（高层次设计）</p>
+        <p style="margin-top:6px;">描述领域需求的<strong>解决方案</strong></p>
+        <p>不是单个系统的表示，而是<span class="hl-purple">适应多系统需求</span>的通用架构</p>
+        <p style="margin-top:6px;"><strong>产出：</strong>DSSA 架构</p>
+      </div>
+      <div class="mini-card">
+        <div class="badge">3</div>
+        <h4><span class="highlight">领域实现</span></h4>
+        <p><strong>目标：</strong>开发<span class="hl-green">可重用信息/构件</span></p>
+        <p style="margin-top:6px;">来源：</p>
+        <ul>
+          <li>从现有系统提取</li>
+          <li>新开发</li>
+        </ul>
+        <p style="margin-top:6px;"><strong>产出：</strong>可复用的构件</p>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:16px;">
+      <div class="flow-row">
+        <div class="flow-box accent">领域分析<br><small>确定需求</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box primary">领域设计<br><small>通用架构</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box accent">领域实现<br><small>可复用构件</small></div>
+      </div>
+    </div>
+
+    <div class="exam-tip">
+      <div class="tip-label">&#x26A0; 考点速记</div>
+      <p><strong>领域分析产物 = 领域模型</strong>。2025下半年第47题考过此考点。</p>
+    </div>
+  </div>
+
+  <!-- 3. 四种角色 -->
+  <div class="section-card">
+    <div class="section-title"><span class="section-num">3</span>参与 DSSA 的四种角色</div>
+
+    <table>
+      <thead>
+        <tr><th>角色</th><th>担任人员</th><th>核心职责</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="highlight">领域专家</span></td>
+          <td>有经验的用户、需求分析/设计/实现/项目管理人员</td>
+          <td>提供领域需求和实现知识、组织领域字典、选择样本系统、<strong>复审</strong>领域模型和DSSA</td>
+        </tr>
+        <tr>
+          <td><span class="highlight">领域分析人员</span></td>
+          <td>具有<strong>知识工程背景</strong>的系统分析员</td>
+          <td>控制整个领域分析过程、知识获取、将知识组织到领域模型中</td>
+        </tr>
+        <tr>
+          <td><span class="highlight">领域设计人员</span></td>
+          <td>有经验的<strong>软件设计人员</strong></td>
+          <td>根据领域模型和现有系统开发DSSA、验证DSSA的准确性和一致性</td>
+        </tr>
+        <tr>
+          <td><span class="highlight">领域实现人员</span></td>
+          <td>有经验的<strong>程序设计人员</strong></td>
+          <td>根据领域模型和DSSA，开发构件</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 4. 建立DSSA的五个步骤 -->
+  <div class="section-card">
+    <div class="section-title"><span class="section-num">4</span>建立 DSSA 的五个步骤（实现角度）</div>
+
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px;">
+      过程特点：<span class="hl-orange">并发、递归、反复、螺旋型</span>（2026上半年第49题考点：更接近螺旋式过程）
+    </p>
+
+    <table>
+      <thead>
+        <tr><th style="width:5%">#</th><th style="width:28%">步骤</th><th style="width:32%">做什么</th><th>示例（在线教育平台）</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="highlight">1</span></td>
+          <td><span class="highlight">定义领域范围</span></td>
+          <td>领域中的应用要满足用户一系列需求</td>
+          <td>涵盖：课程管理、学生管理、教师管理、在线考试</td>
+        </tr>
+        <tr>
+          <td><span class="highlight">2</span></td>
+          <td><span class="highlight">定义领域特定元素</span></td>
+          <td>建立领域字典/术语表，识别相同和不同元素</td>
+          <td>学生、分数、老师 等是领域特定元素</td>
+        </tr>
+        <tr>
+          <td><span class="highlight">3</span></td>
+          <td><span class="highlight">定义领域约束</span></td>
+          <td>识别领域中的设计和实现约束</td>
+          <td>支持同时在线10,000名学生；用户数据需加密存储</td>
+        </tr>
+        <tr>
+          <td><span class="highlight">4</span></td>
+          <td><span class="highlight">定义领域模型和架构</span></td>
+          <td>设计通用架构并描述其组件</td>
+          <td>课程模型 → MVC架构 → 处理课程发布/修改/删除</td>
+        </tr>
+        <tr>
+          <td><span class="highlight">5</span></td>
+          <td><span class="highlight">产生可复用产品单元</span></td>
+          <td>为DSSA增加复用构件，使可用于新系统</td>
+          <td>用户认证模块、课程模块 均可复用</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="exam-tip">
+      <div class="tip-label">&#x26A0; 考点速记</div>
+      <ul>
+        <li>第2步"定义领域特定元素"产生<span class="highlight">领域字典/领域术语表</span>（2026上半年第18题考点）</li>
+        <li>整个过程是<span class="highlight">并发、递归、反复</span>的，接近<strong>螺旋式过程</strong>（2026上半年第49题考点）</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 5. 三层次系统模型 -->
+  <div class="section-card">
+    <div class="section-title"><span class="section-num">5</span>三层次系统模型</div>
+
+    <div class="card-grid col3">
+      <div class="mini-card">
+        <h4><span class="highlight">领域开发环境</span></h4>
+        <p style="font-size:11px;color:var(--text-muted);">架构师 · 制定核心架构</p>
+        <ul>
+          <li>为特定领域创建<strong>通用框架</strong></li>
+          <li>定义参考结构、参考需求</li>
+          <li>定义架构、领域模型、开发工具</li>
+          <li>例：决定用分布式数据库，定义患者信息管理等领域需求</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h4><span class="highlight">领域特定的应用开发环境</span></h4>
+        <p style="font-size:11px;color:var(--text-muted);">应用工程师 · 实例化</p>
+        <ul>
+          <li>将核心架构<strong>实例化</strong>为具体应用程序</li>
+          <li>根据参考结构和模型创建医院A/B的具体实例</li>
+          <li>例：为医院A定制患者信息管理模块，为医院B做不同定制</li>
+        </ul>
+      </div>
+      <div class="mini-card">
+        <h4><span class="highlight">应用执行环境</span></h4>
+        <p style="font-size:11px;color:var(--text-muted);">操作员 · 运行维护</p>
+        <ul>
+          <li>系统<strong>最终运行</strong>的地方</li>
+          <li>已实例化的系统被部署和运行</li>
+          <li>关注实际运行和操作</li>
+          <li>例：医院A操作员使用系统记录患者信息</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="text-align:center; margin-top:16px;">
+      <div class="flow-box accent" style="display:inline-block;">领域开发环境<br><small>造图纸（架构师）</small></div>
+      <div class="flow-v-arrow" style="margin:4px 0;">↓</div>
+      <div class="flow-box primary" style="display:inline-block;">应用开发环境<br><small>按图纸建楼（应用工程师）</small></div>
+      <div class="flow-v-arrow" style="margin:4px 0;">↓</div>
+      <div class="flow-box accent" style="display:inline-block;">应用执行环境<br><small>入驻运营（操作员）</small></div>
+    </div>
+  </div>
+
+  <!-- 6. 知识总结 -->
+  <div class="section-card">
+    <div class="section-title"><span class="section-num">6</span>核心考点速记</div>
+
+    <table>
+      <thead><tr><th>考点</th><th>答案关键词</th><th>真题</th></tr></thead>
+      <tbody>
+        <tr><td>DSSA 四大特征</td><td>领域性、普遍性、抽象性、可复用性</td><td>—</td></tr>
+        <tr><td>领域分析阶段产物</td><td><span class="highlight">领域模型</span></td><td>2025下-Q47</td></tr>
+        <tr><td>产生领域字典的阶段</td><td><span class="highlight">定义领域特定元素</span>（第2步）</td><td>2026上-Q18</td></tr>
+        <tr><td>DSSA建立过程特征</td><td>并发、递归、反复 → <span class="highlight">螺旋式过程</span></td><td>2026上-Q49</td></tr>
+        <tr><td>垂直域 vs 水平域</td><td>垂直=完整架构（医疗）；水平=共用工具（收费）</td><td>—</td></tr>
+        <tr><td>四种角色</td><td>专家→分析→设计→实现</td><td>—</td></tr>
+        <tr><td>三层次模型</td><td>领域开发环境 → 应用开发环境 → 应用执行环境</td><td>—</td></tr>
+        <tr><td>类比：建医院</td><td>图纸体系 → 按图纸建具体医院 → 运营使用</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — ABSD — 基于架构的软件开发</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-surface: #161c28; --bg-elevated: #1a2030; --bg-cue: #0d1320;
+    --border-subtle: rgba(255,255,255,.04); --border-default: rgba(255,255,255,.06); --border-glow: rgba(0,212,255,.12);
+    --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --cyan-glow: rgba(0,212,255,.25); --cyan-soft: rgba(0,212,255,.08);
+    --blue: #4d7cff; --blue-glow: rgba(77,124,255,.3); --blue-soft: rgba(77,124,255,.08);
+    --purple: #a78bfa; --purple-soft: rgba(167,139,250,.08);
+    --green: #34d399; --green-soft: rgba(52,211,153,.08);
+    --amber: #fbbf24; --amber-soft: rgba(251,191,36,.08);
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body { font-family: var(--font-sans); color: var(--text-primary); background: #05080e; background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%); line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+  .page { max-width: 840px; margin: 36px auto; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 0 0 1px rgba(0,212,255,.04), 0 4px 32px rgba(0,0,0,.4), 0 24px 80px rgba(0,0,0,.3); position: relative; }
+  .page::before { content: ''; position: absolute; inset: -1px; border-radius: var(--radius-lg); padding: 1px; background: linear-gradient(135deg, rgba(0,212,255,.15), transparent 30%, transparent 70%, rgba(77,124,255,.1)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 0; }
+  .header { background: linear-gradient(180deg, rgba(0,212,255,.04) 0%, transparent 100%), var(--bg-elevated); padding: 30px 44px 26px; position: relative; border-bottom: 1px solid var(--border-default); z-index: 1; }
+  .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent); }
+  .header-top { display: flex; align-items: flex-start; gap: 16px; } .header-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .header-badge { width: 36px; height: 36px; background: linear-gradient(135deg, rgba(0,212,255,.15), rgba(77,124,255,.1)); border: 1px solid rgba(0,212,255,.2); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .header-badge::after { content: ''; position: absolute; inset: 2px; border-radius: 4px; border: 1px solid rgba(0,212,255,.1); }
+  .header-badge-icon { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); position: relative; z-index: 1; }
+  .header-title-group { flex: 1; } .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 4px; }
+  .header-title { font-size: 22px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; line-height: 1.3; }
+  .header-meta { display: flex; gap: 20px; margin-top: 14px; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: .04em; }
+  .header-meta .meta-item { display: flex; align-items: center; gap: 8px; } .header-meta .meta-dot { width: 5px; height: 5px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 6px var(--cyan-glow); }
+  .cornell { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto auto; grid-template-areas: "cue notes" "summary summary"; gap: 0; position: relative; z-index: 1; }
+  .cornell-cue { grid-area: cue; background: linear-gradient(180deg, rgba(0,212,255,.02), transparent 80%), var(--bg-cue); padding: 24px 18px; border-right: 1px solid rgba(0,212,255,.06); position: relative; }
+  .cue-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,212,255,.08); }
+  .cue-item { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.65; padding: 10px 12px; margin-bottom: 8px; border-radius: var(--radius); background: rgba(255,255,255,.02); border: 1px solid transparent; font-weight: 500; }
+  .cue-item .q-mark { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: rgba(0,212,255,.1); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-family: var(--font-mono); font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+  .cornell-notes { grid-area: notes; padding: 24px 32px 20px; }
+  .notes-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--blue); letter-spacing: .18em; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(77,124,255,.08); }
+  .note-section { margin-bottom: 14px; } .note-section:last-child { margin-bottom: 0; }
+  .note-section h4 { font-size: 14px; font-weight: 700; color: var(--text-primary); margin-bottom: 8px; display: flex; align-items: center; gap: 10px; letter-spacing: .01em; }
+  .note-section h4 .dot { width: 6px; height: 6px; border-radius: 1px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan-glow); flex-shrink: 0; }
+  .note-section > p { font-size: 13.5px; color: rgba(255,255,255,.78); line-height: 1.75; }
+  .note-section ul { list-style: none; padding-left: 0; } .note-section ul li { font-size: 13px; padding: 2px 0 2px 22px; position: relative; color: rgba(255,255,255,.75); line-height: 1.7; }
+  .note-section ul li::before { content: ''; position: absolute; left: 6px; top: 9px; width: 4px; height: 4px; border-radius: 50%; background: rgba(0,212,255,.4); }
+  .note-highlight { display: inline; background: linear-gradient(180deg, transparent 58%, rgba(0,212,255,.12) 58%); padding: 0 2px; font-weight: 600; color: var(--cyan); }
+  .feynman { margin-top: 16px; padding: 16px 18px; background: linear-gradient(135deg, rgba(52,211,153,.04), rgba(52,211,153,.01)); border-radius: var(--radius); border: 1px solid rgba(52,211,153,.1); border-left: 2px solid var(--green); position: relative; }
+  .feynman::before { content: '\2726'; position: absolute; right: 14px; top: 12px; font-size: 14px; color: var(--green); opacity: .5; }
+  .feynman-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--green); letter-spacing: .14em; margin-bottom: 6px; }
+  .feynman p { font-size: 13px; color: rgba(255,255,255,.7); line-height: 1.75; } .feynman p strong { color: var(--green); }
+  .diagram { margin-top: 16px; padding: 16px 18px; background: rgba(255,255,255,.01); border-radius: var(--radius); border: 1px solid rgba(255,255,255,.04); overflow-x: auto; }
+  .diagram-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--purple); letter-spacing: .14em; margin-bottom: 12px; }
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 6px 0; }
+  .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 9px 14px; font-size: 12.5px; font-weight: 500; color: rgba(255,255,255,.7); text-align: center; white-space: nowrap; }
+  .flow-box.accent { border-color: rgba(0,212,255,.2); background: rgba(0,212,255,.06); color: var(--cyan); font-weight: 700; box-shadow: 0 0 16px rgba(0,212,255,.08), inset 0 1px 0 rgba(255,255,255,.03); }
+  .flow-box.primary { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.08); color: var(--blue); font-weight: 700; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 28px; color: rgba(255,255,255,.15); font-size: 15px; flex-shrink: 0; }
+  .flow-v-arrow { display: flex; justify-content: center; color: rgba(255,255,255,.15); font-size: 15px; line-height: 1; margin: 3px 0; }
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .compare-table thead th { background: rgba(255,255,255,.03); color: var(--text-secondary); font-weight: 600; text-align: left; padding: 9px 14px; font-size: 11px; font-family: var(--font-mono); letter-spacing: .06em; border-bottom: 1px solid rgba(0,212,255,.1); }
+  .compare-table thead th:first-child { border-radius: var(--radius) 0 0 0; } .compare-table thead th:last-child  { border-radius: 0 var(--radius) 0 0; }
+  .compare-table tbody td { padding: 9px 14px; border-bottom: 1px solid rgba(255,255,255,.03); color: rgba(255,255,255,.75); font-size: 13px; line-height: 1.6; }
+  .compare-table tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius); } .compare-table tbody tr:last-child td:last-child  { border-radius: 0 0 var(--radius) 0; }
+  .compare-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.01); }
+  .cornell-summary { grid-area: summary; padding: 20px 44px 24px; background: linear-gradient(180deg, rgba(255,255,255,.01) 0%, transparent 100%); border-top: 1px solid rgba(255,255,255,.04); position: relative; }
+  .cornell-summary::before { content: ''; position: absolute; top: 0; left: 44px; right: 44px; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,.12), var(--cyan), transparent); }
+  .cornell-summary h3 { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 10px; }
+  .cornell-summary .summary-text { font-size: 15px; font-weight: 600; color: var(--text-primary); line-height: 1.7; letter-spacing: .01em; padding-left: 16px; border-left: 2px solid var(--cyan); box-shadow: -4px 0 12px rgba(0,212,255,.06); }
+  .cornell-summary .summary-text strong { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+  .cornell-summary .summary-tags { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .tag { font-size: 11px; padding: 4px 12px; border-radius: 3px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); color: var(--text-secondary); font-weight: 500; font-family: var(--font-mono); letter-spacing: .03em; }
+  .tag.primary { background: rgba(0,212,255,.08); border-color: rgba(0,212,255,.15); color: var(--cyan); font-weight: 600; }
+  .numbered-header { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 10px; }
+  .numbered-header .num { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: 700; border-radius: 4px; box-shadow: 0 0 12px var(--cyan-glow); }
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 10px 0; }
+  .card { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 12px 14px; }
+  .card-badge { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: rgba(77,124,255,.15); border: 1px solid rgba(77,124,255,.25); color: var(--blue); font-family: var(--font-mono); font-size: 11px; font-weight: 700; margin-bottom: 6px; }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+  .card-list { list-style: none; } .card-list li { font-size: 12px; color: rgba(255,255,255,.65); line-height: 1.65; padding-left: 12px; position: relative; }
+  .card-list li::before { content: '\203A'; position: absolute; left: 0; color: var(--cyan); }
+  .hl-orange { color: var(--amber); background: linear-gradient(180deg, transparent 58%, rgba(251,191,36,.15) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-green  { color: var(--green); background: linear-gradient(180deg, transparent 58%, rgba(52,211,153,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-purple { color: var(--purple); background: linear-gradient(180deg, transparent 58%, rgba(167,139,250,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0; }
+  .stat-item { text-align: center; padding: 10px 6px; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.05); border-radius: var(--radius); }
+  .stat-value { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--cyan); text-shadow: 0 0 10px var(--cyan-glow); }
+  .stat-label { font-size: 10.5px; color: var(--text-muted); margin-top: 2px; }
+  @media (max-width: 768px) {
+    body { min-height: auto; } .page { max-width: 100%; margin: 0; border-radius: 0; border: none; box-shadow: none; } .page::before { display: none; }
+    .header { padding: 20px 16px 16px; } .header-top { flex-direction: column; gap: 12px; } .header-title { font-size: 18px; }
+    .cornell { grid-template-columns: 1fr; grid-template-areas: "cue" "notes" "summary"; }
+    .cornell-cue { border-right: none; border-bottom: 1px solid rgba(0,212,255,.06); padding: 16px; } .cornell-notes { padding: 16px; } .cornell-summary { padding: 16px; }
+    .card-grid { grid-template-columns: 1fr; } .stat-row { grid-template-columns: repeat(2, 1fr); }
+    .compare-table { font-size: 11px; display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="header-badge"><span class="header-badge-icon">AB</span></div>
+      </div>
+      <div class="header-title-group">
+        <div class="header-kicker">康奈尔分析 / P51-P55</div>
+        <div class="header-title">ABSD — 基于架构的软件开发</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-dot"></span>2026-08-08</div>
+      <div class="meta-item"><span class="meta-dot"></span>架构直播3 精华提炼</div>
+      <div class="meta-item"><span class="meta-dot"></span>基于架构的软件开发</div>
+    </div>
+  </div>
+
+  <div class="cornell">
+
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span> ABSD是什么？它的核心理念是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span> ABBD 的三个基础分别是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span> ABSD 六步过程中每步做什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 架构复审由谁执行？不通过怎么办？</div>
+      <div class="cue-item"><span class="q-mark">?</span> ABSD 方法有什么关键特点（递归/迭代/极先开始）？</div>
+    </div>
+
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>ABSD 定义与核心理念</div>
+      <div class="note-section">
+        <p><span class="note-highlight">ABSD</span>（Architecturally Based Software Development）= 强调在开发过程中<strong>先定义系统的体系结构，再根据体系结构实现系统</strong>，确保系统结构和设计与业务需求保持一致。</p>
+      </div>
+      <div class="note-section">
+        <h4><span class="dot"></span>核心特点</h4>
+        <ul>
+          <li><span class="note-highlight">架构驱动</span>：由业务、质量和功能需求的组合驱动架构设计</li>
+          <li>采用<span class="hl-purple">视角和视图</span>描述软件架构</li>
+          <li>采用<span class="note-highlight">用例</span>描述功能需求、<span class="hl-green">质量属性场景</span>描述质量需求（非功能需求）</li>
+          <li>设计活动可从项目总体功能框架明确就<strong>开始</strong>——需求获取和分析还没完成，就可以开始软件设计</li>
+          <li><span class="hl-orange">递归且迭代</span>，每个步骤清晰定义，架构<strong>始终清晰</strong>，降低设计随意性</li>
+        </ul>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>ABSD 三个基础</div>
+      <div class="stat-row">
+        <div class="stat-item"><div class="stat-value">1</div><div class="stat-label">功能分解</div></div>
+        <div class="stat-item"><div class="stat-value">2</div><div class="stat-label">架构风格</div></div>
+        <div class="stat-item"><div class="stat-value">3</div><div class="stat-label">软件模板</div></div>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">1</div>
+          <div class="card-title"><span class="note-highlight">功能分解</span></div>
+          <ul class="card-list"><li>使用已有的基于模块的<strong>内聚和耦合</strong>技术</li><li>将系统按功能模块分解</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">2</div>
+          <div class="card-title"><span class="hl-purple">架构风格</span></div>
+          <ul class="card-list"><li>通过<strong>选择架构风格</strong>来实现质量和业务需求</li><li>如分层、事件驱动、微服务等</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">3</div>
+          <div class="card-title"><span class="hl-green">软件模板</span></div>
+          <ul class="card-list"><li><strong>软件模板</strong>利用已有系统结构进行复用</li><li>参考成熟系统的架构模式</li></ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">考点</div>
+          <div class="card-title">2025下-Q28</div>
+          <ul class="card-list"><li>ABSD三个核心<strong>不包括</strong>：项目管理</li><li>三个基础：功能分解 + 架构风格 + 软件模板</li></ul>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">3</span>ABSD 六步过程</div>
+
+      <table class="compare-table">
+        <thead><tr><th style="width:4%">步</th><th style="width:18%">阶段</th><th>核心内容</th><th>关键点</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><span class="note-highlight">架构需求</span></td>
+            <td>获取并分析架构需求，<strong>标识构件</strong></td>
+            <td>掌握标识构件的三步法</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><span class="note-highlight">架构设计</span></td>
+            <td>将需求阶段的标识构件<strong>映射成构件</strong>，进行分析</td>
+            <td>构件映射与分析</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><span class="hl-purple">架构文档化</span></td>
+            <td>产出两种文档：<strong>架构规格说明</strong> + <strong>质量设计说明书</strong></td>
+            <td>文档是所有人员通信的手段，<strong>关系开发成败</strong></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><span class="hl-orange">架构复审</span></td>
+            <td>由<strong>外部人员</strong>（用户代表、领域专家等）参加复审</td>
+            <td>审查需求满足、质量问题、构件划分合理性；<strong>不通过则返回设计阶段重新来</strong></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><span class="hl-green">架构实现</span></td>
+            <td>用实体展现架构：<strong>实现构件</strong>，构件组装成系统</td>
+            <td>可复用构件的组装</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td><span class="note-highlight">架构演化</span></td>
+            <td>对架构进行改变，按需求<strong>增删构件</strong>，使架构可复用</td>
+            <td>架构持续演进，适应需求变化</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="note-section" style="margin-top:8px;">
+        <h4><span class="dot"></span>电商购物网站案例</h4>
+        <ul>
+          <li><strong>定义架构</strong>：用户界面层 + 业务逻辑层 + 数据存储层，每层职责清晰</li>
+          <li><strong>关键决策</strong>：选技术堆栈、用户认证方式、库存管理、支付处理方案</li>
+          <li><strong>系统实施</strong>：按架构各层次编写代码</li>
+          <li><strong>持续演化</strong>：架构已定义，业务变化时可相对容易地扩展和修改</li>
+        </ul>
+      </div>
+
+      <div class="feynman">
+        <div class="feynman-label">&#x25C6; 费曼</div>
+        <p><strong>ABSD到底是干嘛的？</strong> 就是"先画骨架再填肉"。传统开发是边做边想怎么搭，ABSD 反过来——先把整个系统的骨架（架构）画清楚，然后再往里面填代码。<strong>三个基础</strong>就是：功能怎么拆（分模块）、用什么风格（分层？微服务？）、有没有现成的模板可以抄。<strong>六步过程</strong>就是从需求到设计到写文档到外部专家审核到落地实现再到持续改。最狠的一招是<strong>需求没做完就可以开始设计了</strong>，因为架构骨子里是清晰的，不怕后面补细节。复审不过就回去重来，确保地基不出问题。</p>
+      </div>
+
+      <div class="diagram">
+        <div class="diagram-label">&#x25C6; 逻辑关系</div>
+        <div style="text-align:center;">
+          <div class="flow-row">
+            <div class="flow-box accent">三个基础<br><small>功能分解 · 架构风格 · 软件模板</small></div>
+          </div>
+          <div class="flow-v-arrow">&#x2193;</div>
+          <div class="flow-row">
+            <div class="flow-box primary">1.架构需求</div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box primary">2.架构设计</div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box primary">3.文档化</div>
+          </div>
+          <div class="flow-row">
+            <div class="flow-box" style="font-size:11px;border-color:rgba(251,191,36,.2);color:var(--amber);">← 不通过返回</div>
+          </div>
+          <div class="flow-row">
+            <div class="flow-box primary">4.架构复审</div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box primary">5.架构实现</div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box primary">6.架构演化</div>
+          </div>
+          <div class="flow-row" style="margin-top:8px;">
+            <div class="flow-box" style="font-size:11px;border-color:rgba(0,212,255,.2);color:var(--cyan);">全过程：递归 · 迭代 · 架构始终清晰</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">ABSD 以<strong>架构驱动</strong>为核心，基于<strong>功能分解+架构风格+软件模板</strong>三个基础，通过<strong>需求→设计→文档化→复审→实现→演化</strong>六步递归迭代过程，在需求未完成时即可启动设计，确保架构始终清晰、降低开发随意性。</div>
+      <div class="summary-tags">
+        <span class="tag primary">ABSD</span>
+        <span class="tag">架构驱动</span>
+        <span class="tag">三个基础</span>
+        <span class="tag">六步过程</span>
+        <span class="tag">架构复审</span>
+        <span class="tag">软考高频考点</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

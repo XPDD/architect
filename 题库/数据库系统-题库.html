@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据库系统 题库</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #333; line-height: 1.8; padding: 40px 20px; }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { text-align: center; font-size: 28px; margin-bottom: 8px; color: #1a1a2e; }
+  .subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 8px; }
+  .nav { text-align: center; margin-bottom: 32px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+  .nav a { color: #0f3460; text-decoration: none; font-size: 13px; padding: 4px 12px; border-radius: 20px; border: 1px solid #d0d5dd; transition: all .2s; }
+  .nav a:hover { border-color: #e94560; color: #e94560; }
+
+  .year-section { margin-bottom: 32px; }
+  .year-title { font-size: 20px; font-weight: 700; color: #0f3460; border-left: 4px solid #e94560; padding-left: 12px; margin-bottom: 16px; }
+
+  .question-card { background: #fff; border-radius: 12px; padding: 24px 28px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,.06); transition: box-shadow .2s; }
+  .question-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.1); }
+
+  .q-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+  .q-num { background: #e94560; color: #fff; font-weight: 700; font-size: 14px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+  .q-stem { font-size: 16px; font-weight: 600; flex: 1; }
+
+  .options { margin-left: 38px; display: flex; flex-wrap: wrap; gap: 8px 32px; margin-bottom: 16px; }
+  .option { font-size: 15px; color: #555; white-space: nowrap; }
+
+  .answer-toggle { margin-left: 38px; background: none; border: 1px solid #d0d5dd; border-radius: 6px; padding: 6px 18px; font-size: 13px; color: #667085; cursor: pointer; transition: all .2s; }
+  .answer-toggle:hover { border-color: #e94560; color: #e94560; }
+
+  .answer-box { display: none; margin-top: 14px; margin-left: 38px; background: #f9fafb; border-radius: 8px; padding: 16px 20px; border-left: 3px solid #12b76a; }
+  .answer-box.show { display: block; }
+  .answer-label { font-weight: 700; color: #12b76a; font-size: 15px; }
+  .answer-text { color: #444; margin-top: 4px; font-size: 14px; }
+
+  .summary { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #fff; border-radius: 12px; padding: 24px 28px; margin-top: 40px; }
+  .summary h3 { font-size: 16px; margin-bottom: 12px; }
+  .summary table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .summary td { padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,.1); }
+  .summary tr:last-child td { border-bottom: none; }
+  .summary .ans { color: #12b76a; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>数据库系统 题库</h1>
+  <p class="subtitle">来源：架构直播1 · 数据库精讲 ｜ 共 12 题</p>
+  <div class="nav">
+    <a href="#relation-algebra">关系代数</a>
+    <a href="#decomposition">模式分解</a>
+    <a href="#concurrency">并发控制</a>
+    <a href="#summary">答案速查</a>
+  </div>
+
+  <!-- ==================== 关系代数 ==================== -->
+  <div class="year-section" id="relation-algebra">
+    <div class="year-title">关系代数</div>
+
+    <div class="year-section">
+      <div class="year-title" style="font-size:16px; border-left-color:#3b82f6;">2025 年</div>
+
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-num">1</span>
+          <span class="q-stem">关系代数运算不包括( )</span>
+        </div>
+        <div class="options">
+          <span class="option">A. 选择</span>
+          <span class="option">B. 投影</span>
+          <span class="option">C. 删除</span>
+          <span class="option">D. 连接</span>
+        </div>
+        <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+        <div class="answer-box">
+          <span class="answer-label">答案：C</span>
+          <div class="answer-text">关系代数基本运算：选择(σ)、投影(π)、并(∪)、差(−)、笛卡尔积(×)、重命名(ρ)。连接(⋈)是派生运算。"删除"属于 DML 操作，不在关系代数范畴。</div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-num">2</span>
+          <span class="q-stem">数据库 R−(R−S) 与( )等价。</span>
+        </div>
+        <div class="options">
+          <span class="option">A. R∩S</span>
+          <span class="option">B. R∪S</span>
+          <span class="option">C. R−S</span>
+          <span class="option">D. R×S</span>
+        </div>
+        <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+        <div class="answer-box">
+          <span class="answer-label">答案：A</span>
+          <div class="answer-text">
+            <strong>集合恒等式</strong>：R − (R − S) = R ∩ S<br>
+            推导：R − (R − S) = { x | x∈R ∧ x∉(R−S) } = { x | x∈R ∧ ¬(x∈R ∧ x∉S) } = { x | x∈R ∧ (x∉R ∨ x∈S) } = { x | x∈R ∧ x∈S } = R ∩ S。
+          </div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-num">3</span>
+          <span class="q-stem">在 SQL 中，SELECT 执行结果是( )</span>
+        </div>
+        <div class="options">
+          <span class="option">A. 元组</span>
+          <span class="option">B. 集合</span>
+          <span class="option">C. 属性值</span>
+          <span class="option">D. 序偶</span>
+        </div>
+        <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+        <div class="answer-box">
+          <span class="answer-label">答案：B</span>
+          <div class="answer-text">SQL 查询结果是一个<strong>结果集（集合）</strong>，即满足条件的元组的集合。在关系模型中，关系被定义为元组的集合（set），SELECT 返回的正是这样一个关系/集合。</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="year-section">
+      <div class="year-title" style="font-size:16px; border-left-color:#3b82f6;">2026 年</div>
+
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-num">4</span>
+          <span class="q-stem">关系 R(A,B) 有 5 个元组，且 B 是 R 的主键，S(B,C) 有 10 个元组，则 R 与 S 按属性 B 进行自然连接后，结果元组数的取值范围是( )</span>
+        </div>
+        <div class="options">
+          <span class="option">A. [0, 5]</span>
+          <span class="option">B. [0, 10]</span>
+          <span class="option">C. [5, 10]</span>
+          <span class="option">D. [0, 50]</span>
+        </div>
+        <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+        <div class="answer-box">
+          <span class="answer-label">答案：B</span>
+          <div class="answer-text">
+            <strong>关键</strong>：B 是 R 的主键 → 每个 B 值在 R 中<strong>唯一</strong>。因此，S 中每个元组最多与 R 中 1 个元组匹配。<br>
+            <strong>最小</strong>：S 的 B 值与 R 的 B 值完全不重合 → 0 个结果元组。<br>
+            <strong>最大</strong>：S 的 10 个元组的 B 值全部存在于 R 中 → 10 个结果元组。
+          </div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-num">5</span>
+          <span class="q-stem">某业务规则规定一个学生必须且只能属于一个班级；每个班级至少 10 人，至多 50 人。则学生实体参与该联系的基数应表示为( )</span>
+        </div>
+        <div class="options">
+          <span class="option">A. (10, 50)</span>
+          <span class="option">B. (0, 10)</span>
+          <span class="option">C. (0, 50)</span>
+          <span class="option">D. (1, 1)</span>
+        </div>
+        <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+        <div class="answer-box">
+          <span class="answer-label">答案：D</span>
+          <div class="answer-text">
+            <strong>学生→班级：多对一</strong>。学生"必须且只能属于一个班级"，即每个学生恰好参与 1 个班级 → 学生侧基数 (min, max) = <strong>(1, 1)</strong>。<br>
+            注意：(10,50) 是班级一侧的基数（每个班级至少 10 个学生、至多 50 个学生），不是学生侧。
+          </div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-num">6</span>
+          <span class="q-stem">在关系数据库中，实体与实体之间的联系通常通过表与表之间的( )来体现。</span>
+        </div>
+        <div class="options">
+          <span class="option">A. 公共属性</span>
+          <span class="option">B. 顺序号</span>
+          <span class="option">C. 页号</span>
+          <span class="option">D. 聚簇索引名</span>
+        </div>
+        <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+        <div class="answer-box">
+          <span class="answer-label">答案：A</span>
+          <div class="answer-text">关系模型中，实体间的联系通过<strong>外键 → 主键</strong>的引用体现。外键引用主键，本质上是两张表拥有<strong>公共属性</strong>（同名同域），通过等值连接来关联。</div>
+        </div>
+      </div>
+
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-num">7</span>
+          <span class="q-stem">倒排索引最主要的作用是( )</span>
+        </div>
+        <div class="options">
+          <span class="option">A. 加速文档内容搜索</span>
+          <span class="option">B. 优化数据的存储结构，降低存储开销</span>
+          <span class="option">C. 加快数据新增与修改的执行速度</span>
+          <span class="option">D. 梳理数据关联，简化多表查询逻辑</span>
+        </div>
+        <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+        <div class="answer-box">
+          <span class="answer-label">答案：A</span>
+          <div class="answer-text">倒排索引（Inverted Index）的核心思想是<strong>"词 → 文档位置"</strong>的映射，通过关键词快速定位包含该词的文档。典型应用：搜索引擎（Elasticsearch）、数据库全文索引。存储开销反而增大（需要额外索引空间），写入性能也会降低（需维护索引）。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 模式分解 ==================== -->
+  <div class="year-section" id="decomposition">
+    <div class="year-title">模式分解与规范化</div>
+
+    <div class="question-card">
+      <div class="q-header">
+        <span class="q-num">8</span>
+        <span class="q-stem">关系模式 R(U,F)，U={A,B,C}，F={A→B，B→C}。分解 ρ={R1({A,B}，F1)，R2({A,C}，F2)}，该分解( )</span>
+      </div>
+      <div class="options">
+        <span class="option">A. 有损连接但保持函数依赖</span>
+        <span class="option">B. 既无损连接又保持函数依赖</span>
+        <span class="option">C. 有损连接且不保持函数依赖</span>
+        <span class="option">D. 无损连接但不保持函数依赖</span>
+      </div>
+      <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+      <div class="answer-box">
+        <span class="answer-label">答案：D</span>
+        <div class="answer-text">
+          <strong>无损连接判定</strong>：R1 ∩ R2 = {A}，A 在 R1 中为超键（A→B）→ 无损 √<br>
+          <strong>函数依赖保持</strong>：A→B 在 R1 中保留 √，B→C 无法从投影的 FDs 推导 → 不保持 ✗<br>
+          结论：无损连接，但不保持函数依赖。
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-header">
+        <span class="q-num">9</span>
+        <span class="q-stem">关系模式 R(U,F)，U={A,B,C,D,E}，F={B→A，D→A，A→E，AC→B}，则 R 的候选关键字为( )</span>
+      </div>
+      <div class="options">
+        <span class="option">A. CD</span>
+        <span class="option">B. ABD</span>
+        <span class="option">C. ACD</span>
+        <span class="option">D. ADE</span>
+      </div>
+      <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+      <div class="answer-box">
+        <span class="answer-label">答案：C</span>
+        <div class="answer-text">
+          <strong>求闭包</strong>：(ACD)⁺ = {A,C,D} → A→E 得 E → AC→B 得 B → 全集 U。任意真子集闭包均 ≠ U。<br>
+          验证：CD⁺ = {C,D,A,E} 缺 B；AC⁺ = {A,C,E,B} 缺 D；AD⁺ = {A,D,E} 缺 B,C。<br>
+          ∴ ACD 是极小候选键。
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-header">
+        <span class="q-num">10</span>
+        <span class="q-stem">接上题，将 R 分解为 ρ={R1(ABCE)，R2(CD)}，该分解( )</span>
+      </div>
+      <div class="options">
+        <span class="option">A. 具有无损连接性，且保持函数依赖</span>
+        <span class="option">B. 不具有无损连接性，但保持函数依赖</span>
+        <span class="option">C. 具有无损连接性，但不保持函数依赖</span>
+        <span class="option">D. 不具有无损连接性，也不保持函数依赖</span>
+      </div>
+      <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+      <div class="answer-box">
+        <span class="answer-label">答案：D</span>
+        <div class="answer-text">
+          <strong>无损连接判定</strong>：R1 ∩ R2 = {C}，C 在 R1 和 R2 中均非超键 → 有损连接 ✗<br>
+          <strong>函数依赖保持</strong>：D→A 中 A 不在 R2 中，该 FD 丢失 → 不保持 ✗<br>
+          结论：有损连接，不保持函数依赖。
+        </div>
+      </div>
+    </div>
+
+    <div class="question-card">
+      <div class="q-header">
+        <span class="q-num">11</span>
+        <span class="q-stem">（2025上）关系模式 R(a,b,c,d)，函数依赖 a→cd，c→b，候选码是( )</span>
+      </div>
+      <div class="options">
+        <span class="option">A. a</span>
+        <span class="option">B. b</span>
+        <span class="option">C. c</span>
+        <span class="option">D. d</span>
+      </div>
+      <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+      <div class="answer-box">
+        <span class="answer-label">答案：A</span>
+        <div class="answer-text">
+          a⁺ = {a,c,d} → c→b 得 b → 全集 {a,b,c,d} = U。a 为单属性，自然极小。<br>
+          c⁺ = {c,b} ≠ U；b、d 更不可行。∴ 候选码为 a。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 并发控制 ==================== -->
+  <div class="year-section" id="concurrency">
+    <div class="year-title">并发控制</div>
+
+    <div class="year-section">
+      <div class="year-title" style="font-size:16px; border-left-color:#3b82f6;">2025 年下</div>
+
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-num">12</span>
+          <span class="q-stem">在封锁协议中，事务获取共享锁（S锁）后，对数据的操作权限是( )</span>
+        </div>
+        <div class="options">
+          <span class="option">A. 可读不可写</span>
+          <span class="option">B. 可读可写</span>
+          <span class="option">C. 不可读不可写</span>
+          <span class="option">D. 不可读可写</span>
+        </div>
+        <button class="answer-toggle" onclick="this.nextElementSibling.classList.toggle('show'); this.textContent=this.textContent.includes('查看')?'隐藏答案':'查看答案 ▼'">查看答案 ▼</button>
+        <div class="answer-box">
+          <span class="answer-label">答案：A</span>
+          <div class="answer-text">
+            <strong>S 锁（共享锁 / 读锁）</strong>：持有锁的事务可读不可写。多个事务可同时持有同一数据的 S 锁（共享），但不能与 X 锁（排他锁）并存。<br>
+            <strong>相容矩阵</strong>：S 与 S 相容 ✓，S 与 X 冲突 ✗。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 答案速查 ==================== -->
+  <div class="summary" id="summary">
+    <h3>答案速查（共 12 题）</h3>
+    <table>
+      <tr><td>1. 关系代数运算不包括</td><td class="ans">C. 删除</td></tr>
+      <tr><td>2. R−(R−S) 等价于</td><td class="ans">A. R∩S</td></tr>
+      <tr><td>3. SQL SELECT 结果</td><td class="ans">B. 集合</td></tr>
+      <tr><td>4. 自然连接元组数范围</td><td class="ans">B. [0, 10]</td></tr>
+      <tr><td>5. 学生参与联系基数</td><td class="ans">D. (1, 1)</td></tr>
+      <tr><td>6. 实体联系体现方式</td><td class="ans">A. 公共属性</td></tr>
+      <tr><td>7. 倒排索引作用</td><td class="ans">A. 加速文档内容搜索</td></tr>
+      <tr><td>8. 模式分解 ρ(R1,R2)</td><td class="ans">D. 无损但不保持函数依赖</td></tr>
+      <tr><td>9. 候选关键字</td><td class="ans">C. ACD</td></tr>
+      <tr><td>10. 分解 ρ(R1,R2) 性质</td><td class="ans">D. 有损且不保持函数依赖</td></tr>
+      <tr><td>11. 候选码 (2025上)</td><td class="ans">A. a</td></tr>
+      <tr><td>12. 共享锁操作权限</td><td class="ans">A. 可读不可写</td></tr>
+    </table>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架构直播3 · 知识大纲索引</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-elevated: #1a2030;
+    --border-default: rgba(255,255,255,.06); --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --blue: #4d7cff; --purple: #a78bfa; --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body { font-family: var(--font-sans); color: var(--text-primary); background: #05080e; background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%); line-height: 1.6; min-height: 100vh; padding: 36px 0; }
+  .container { max-width: 960px; margin: 0 auto; padding: 0 20px; }
+
+  .hero {
+    text-align: center; padding: 48px 20px 36px; position: relative;
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    margin-bottom: 32px; overflow: hidden;
+  }
+  .hero::after { content: ''; position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent); }
+  .hero-badge { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 8px; }
+  .hero-title { font-size: 32px; font-weight: 800; letter-spacing: -.02em; }
+  .hero-title .accent { color: var(--cyan); text-shadow: 0 0 20px rgba(0,212,255,.3); }
+  .hero-sub { font-size: 14px; color: var(--text-muted); margin-top: 10px; }
+  .hero-stats { display: flex; justify-content: center; gap: 24px; margin-top: 20px; flex-wrap: wrap; }
+  .hero-stat { padding: 6px 16px; border-radius: 4px; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.05); font-size: 13px; color: var(--text-secondary); }
+  .hero-stat strong { color: var(--cyan); }
+
+  .part-section { margin-bottom: 28px; }
+  .part-header {
+    display: flex; align-items: center; gap: 14px; padding: 16px 20px;
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius);
+    border-left: 3px solid var(--cyan); margin-bottom: 12px;
+  }
+  .part-num { font-family: var(--font-mono); font-size: 28px; font-weight: 800; color: var(--cyan); text-shadow: 0 0 16px rgba(0,212,255,.25); min-width: 40px; }
+  .part-info h2 { font-size: 18px; font-weight: 700; }
+  .part-info span { font-size: 12px; color: var(--text-muted); }
+
+  .note-card {
+    display: flex; align-items: center; gap: 16px;
+    padding: 16px 20px;
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius);
+    margin-bottom: 8px; cursor: pointer;
+    transition: border-color .2s, background .2s; text-decoration: none; color: inherit;
+  }
+  .note-card:hover { border-color: rgba(0,212,255,.15); background: rgba(0,212,255,.02); }
+  .note-icon {
+    width: 40px; height: 40px; border-radius: var(--radius); flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-mono); font-size: 16px; font-weight: 700;
+  }
+  .note-icon.cyan { background: rgba(0,212,255,.1); border: 1px solid rgba(0,212,255,.2); color: var(--cyan); }
+  .note-icon.blue { background: rgba(77,124,255,.1); border: 1px solid rgba(77,124,255,.2); color: var(--blue); }
+  .note-icon.green { background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.2); color: var(--green); }
+  .note-icon.purple { background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.2); color: var(--purple); }
+  .note-icon.amber { background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.2); color: var(--amber); }
+  .note-body { flex: 1; }
+  .note-body h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .note-body p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
+  .note-arrow { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
+
+  .relation-diagram {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 24px; margin-top: 28px; text-align: center;
+  }
+  .relation-diagram h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--cyan); }
+
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 6px 0; }
+  .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 8px 14px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,.75); text-align: center; white-space: nowrap; }
+  .flow-box.accent { border-color: rgba(0,212,255,.2); background: rgba(0,212,255,.06); color: var(--cyan); font-weight: 700; }
+  .flow-box.primary { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.08); color: var(--blue); font-weight: 700; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 24px; color: rgba(255,255,255,.15); font-size: 14px; flex-shrink: 0; }
+  .flow-v-arrow { display: flex; justify-content: center; color: rgba(255,255,255,.15); font-size: 14px; line-height: 1; margin: 4px 0; }
+
+  a.note-card:hover .note-arrow { color: var(--cyan); }
+
+  @media (max-width: 768px) {
+    .hero-title { font-size: 24px; }
+    .hero-stats { gap: 12px; } .hero-stat { font-size: 11px; padding: 4px 12px; }
+    .note-card { padding: 14px 16px; }
+    .note-icon { width: 34px; height: 34px; font-size: 14px; }
+    .note-body h3 { font-size: 14px; }
+    .flow-box { padding: 6px 10px; font-size: 11px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">ARCHITECTURE LIVE 3</div>
+    <div class="hero-title">架构设计 + 质量属性 + <span class="accent">架构评估</span></div>
+    <div class="hero-sub">软件架构师考试 · 核心知识体系大纲</div>
+    <div class="hero-stats">
+      <span class="hero-stat">共 <strong>11</strong> 份笔记</span>
+      <span class="hero-stat">覆盖 <strong>79</strong> 页教材</span>
+      <span class="hero-stat">标注 <strong>12+</strong> 道历年真题</span>
+      <span class="hero-stat">教材 <strong>P1-P79</strong></span>
+    </div>
+  </div>
+
+  <!-- ===== Part 1 ===== -->
+  <div class="part-section">
+    <div class="part-header">
+      <div class="part-num">01</div>
+      <div class="part-info">
+        <h2>架构设计基础理论</h2>
+        <span>SOA · DSSA · ABSD 三大核心方法</span>
+      </div>
+    </div>
+
+    <a class="note-card" href="架构基础知识_康奈尔笔记.html" target="_self">
+      <div class="note-icon cyan">SA</div>
+      <div class="note-body">
+        <h3>架构基础知识 — SOA · DSSA · ABSD</h3>
+        <p>三大基础理论速览：SOA 松耦合服务架构、DSSA 特定领域架构、ABSD 架构驱动开发</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="DSSA_特定领域软件架构_康奈尔笔记.html" target="_self">
+      <div class="note-icon blue">DS</div>
+      <div class="note-body">
+        <h3>DSSA — 特定领域软件架构（详细版）</h3>
+        <p>P42-P48：四大特征、三个基本活动、四种角色、五步建立过程、三层次系统模型</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="ABSD_基于架构的软件开发_康奈尔笔记.html" target="_self">
+      <div class="note-icon green">AB</div>
+      <div class="note-body">
+        <h3>ABSD — 基于架构的软件开发</h3>
+        <p>P51-P55：三个基础（功能分解/架构风格/软件模板）、六步过程（需求→设计→文档→复审→实现→演化）</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+  </div>
+
+  <!-- ===== Part 2 ===== -->
+  <div class="part-section">
+    <div class="part-header" style="border-left-color:var(--green);">
+      <div class="part-num" style="color:var(--green);text-shadow:0 0 16px rgba(52,211,153,.25);">02</div>
+      <div class="part-info">
+        <h2>构件（Component）</h2>
+        <span>构件的定义 · 组装 · 标准 · 与对象区别</span>
+      </div>
+    </div>
+
+    <a class="note-card" href="构件_Component_康奈尔笔记.html" target="_self">
+      <div class="note-icon green">Cp</div>
+      <div class="note-body">
+        <h3>构件 Component — 核心知识全解</h3>
+        <p>P4-P15：四大特征、vs对象对比、顺序/层次/叠加组装、不兼容问题、三大国际标准（CORBA/DCOM/EJB）</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+  </div>
+
+  <!-- ===== Part 3 ===== -->
+  <div class="part-section">
+    <div class="part-header" style="border-left-color:var(--amber);">
+      <div class="part-num" style="color:var(--amber);text-shadow:0 0 16px rgba(251,191,36,.25);">03</div>
+      <div class="part-info">
+        <h2>软件架构风格</h2>
+        <span>五大流派 · 层次架构 · SOA · C/S · B/S</span>
+      </div>
+    </div>
+
+    <a class="note-card" href="架构风格_康奈尔笔记.html" target="_self">
+      <div class="note-icon amber">AS</div>
+      <div class="note-body">
+        <h3>架构风格 — 五大流派全览</h3>
+        <p>P16-P35：数据流/调用返回/独立构件/虚拟机/数据中心 + 层次架构对比 + SOA/WebService/ESB</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="历年真题_架构风格.html" target="_self">
+      <div class="note-icon cyan">&#x2713;</div>
+      <div class="note-body">
+        <h3>历年真题 — 架构风格 12 题精解</h3>
+        <p>P36-P41：2025下 + 2026上 真题带答案与知识点标注</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+  </div>
+
+  <!-- ===== Part 4 ===== -->
+  <div class="part-section">
+    <div class="part-header" style="border-left-color:var(--purple);">
+      <div class="part-num" style="color:var(--purple);text-shadow:0 0 16px rgba(167,139,250,.25);">04</div>
+      <div class="part-info">
+        <h2>CBSD vs ABSD 对比</h2>
+        <span>基于构件 vs 基于架构 核心区别</span>
+      </div>
+    </div>
+
+    <a class="note-card" href="CBSD_vs_ABSD_康奈尔笔记.html" target="_self">
+      <div class="note-icon purple">CB</div>
+      <div class="note-body">
+        <h3>CBSD vs ABSD — 核心区别一页通</h3>
+        <p>目标/关注点/场景/复用单元/质量保障/变更影响六大维度对比 + 积木组装 vs 蓝图先行</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+  </div>
+
+  <!-- ===== Part 5 ===== -->
+  <div class="part-section">
+    <div class="part-header" style="border-left-color:var(--rose);">
+      <div class="part-num" style="color:var(--rose);text-shadow:0 0 16px rgba(248,113,113,.25);">05</div>
+      <div class="part-info">
+        <h2>软件质量属性</h2>
+        <span>开发期 · 运行期 · 架构评估 · 场景描述</span>
+      </div>
+    </div>
+
+    <a class="note-card" href="质量属性_康奈尔笔记.html" target="_self">
+      <div class="note-icon" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--rose);">QA</div>
+      <div class="note-body">
+        <h3>软件质量属性 — 开发期 · 运行期 · 场景描述</h3>
+        <p>P60-P66：6+7个属性、可靠性vs可用性、9大架构评估质量属性含设计策略、6要素场景描述法</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+  </div>
+
+  <!-- ===== Part 6 ===== -->
+  <div class="part-section">
+    <div class="part-header" style="border-left-color:var(--blue);">
+      <div class="part-num" style="color:var(--blue);text-shadow:0 0 16px rgba(77,124,255,.25);">06</div>
+      <div class="part-info">
+        <h2>架构评估方法</h2>
+        <span>SAAM · ATAM · CBAM 三大评估方法</span>
+      </div>
+    </div>
+
+    <a class="note-card" href="架构评估方法_康奈尔笔记.html" target="_self">
+      <div class="note-icon blue">AE</div>
+      <div class="note-body">
+        <h3>架构评估方法 — SAAM · ATAM · CBAM</h3>
+        <p>P70-P79：敏感点/权衡点/风险点、三种评估方式、SAAM(5步·可修改性)、ATAM(4阶段·效用树)、CBAM(8步·ROI)</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+  </div>
+
+  <!-- ===== 知识关系图 ===== -->
+  <div class="relation-diagram">
+    <h2>&#x25C6; 知识体系关系图</h2>
+
+    <div class="flow-row">
+      <div class="flow-box accent" style="font-size:14px;padding:10px 20px;">架构设计 + 质量属性 + 架构评估</div>
+    </div>
+    <div class="flow-v-arrow">&#x2193;</div>
+    <div class="flow-row">
+      <div class="flow-box primary">Part 1<br><small>架构基础理论<br>SOA · DSSA · ABSD</small></div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box primary">Part 2<br><small>构件<br>Component</small></div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box primary" style="border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.08);color:var(--amber);">Part 3<br><small>架构风格<br>五大流派</small></div>
+    </div>
+    <div class="flow-v-arrow">&#x2193;</div>
+    <div class="flow-row">
+      <div class="flow-box accent" style="font-size:11px;">CBSD vs ABSD<br><small>构件组装 vs 架构先行</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box" style="font-size:11px;border-color:rgba(248,113,113,.2);color:var(--rose);">质量属性<br><small>6+7+9 属性 · 场景</small></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-box accent" style="font-size:11px;">架构评估<br><small>SAAM→ATAM→CBAM</small></div>
+    </div>
+    <div class="flow-row" style="margin-top:8px;">
+      <div class="flow-box" style="font-size:10px;border:none;color:var(--text-muted);">理论 → 构件 → 风格 → 对比 → 质量 → 评估 → 真题验证</div>
+    </div>
+  </div>
+
+</div>
+
+<div style="text-align:center;padding:20px;font-size:12px;color:var(--text-muted);margin-top:8px;">
+<a href="../index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);">&#x2190; 返回总索引</a> &nbsp;&middot;&nbsp;
+<a href="../软件工程-康奈尔笔记/index.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.2);">软件工程笔记</a> &nbsp;&middot;&nbsp;
+<a href="../数据库-康奈尔笔记/index.html" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(251,191,36,.2);">数据库笔记</a>
+</div>
+
+</body>
+</html>
