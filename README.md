@@ -1,13 +1,11 @@
 # 2026年系统架构设计师备考笔记
 
-## 目录结构
+- **architecture-notes** — Architecture design, architectural styles, quality attributes, ATAM/SAAM, ABSD, DSSA, components
+- **software-engineering-notes** — Software process models, requirements, design patterns (GoF 23), testing, maintenance
+- **database-notes** — Functional dependency, normalization, ER model, concurrency control, distributed DB, NoSQL
+- **os-notes** — Key OS exam topics
+- **question-bank** — Practice exam questions
 
-- **架构-康奈尔笔记** — 架构设计、架构风格、质量属性、架构评估（ATAM/SAAM）、ABSD、DSSA、构件等
-- **软件工程-康奈尔笔记** — 软件过程模型、需求分析、设计模式（GoF 23）、系统测试、运行维护等
-- **数据库-康奈尔笔记** — 函数依赖、范式、ER模型、并发控制、分布式数据库、NoSQL 等
-- **操作系统-康奈尔笔记** — 常考知识点
-- **题库** — 历年真题练习
+## Usage
 
-## 使用方式
-
-每个目录下有 `index.html` 导航页，可直接在浏览器中打开浏览。
+Open `index.html` files in each directory with a browser.
