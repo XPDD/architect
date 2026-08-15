@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件工程 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--elevated:#1a2030;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)}
+  .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)}
+  .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)}
+  .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)}
+  .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px}
+  .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700}
+  .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>软件工程 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"软件过程模型", q:"以下关于 CMM 的叙述中，不正确的是（　）。",
+   options:["CMM 是指软件过程能力成熟度模型","CMM 根据软件过程的不同成熟度划分了 5 个等级，其中 1 级被认为成熟度最高，5 级最低","CMMI 的任务是将已有的几个 CMM 模型结合在一起，使之构造成为「集成模型」","采用更成熟的 CMM 模型，一般来说可以提高最终产品的质量"],
+   answer:1, explain:"CMM 五级中 <b>1 级（初始级）成熟度最低、5 级（优化级）最高</b>，B 项说反了。"},
+
+  {topic:"软件过程模型", q:"以下关于螺旋模型的叙述中，不正确的是（　）。",
+   options:["它是风险驱动的，要求开发人员必须具有丰富的风险评估知识和经验","它可以降低过多测试或测试不足带来的风险","它包含维护周期，因此维护和开发之间没有本质区别","它不适用于大型软件开发"],
+   answer:3, explain:"螺旋模型<strong>正适合大型、复杂、高风险</strong>的系统，D 项说反了。"},
+
+  {topic:"软件过程模型", q:"假设某软件公司与客户签订合同开发一个软件系统，系统的功能有较清晰的定义，且客户对交付时间有严格要求，则该系统的开发最适宜采用（　）。",
+   options:["瀑布模型","原型模型","V 模型","螺旋模型"],
+   answer:0, explain:"功能清晰定义 + 交付时间严格 → 适合<b>瀑布模型</b>（需求明确、按阶段推进）。"},
+
+  {topic:"系统设计", q:"流程设计的任务是设计出系统所有模块和它们之间的相互关系。以下关于流程设计的叙述，正确的是（　）。",
+   options:["任何复杂的程序流程图都应该由顺序、选择、循环结构构成","IPO 图不适合用来进行流程设计","PAD 图是一种支持原型化设计方法的图形工具","N-S 图容易表示嵌套关系和层次关系，特别适合于设计非常复杂的流程"],
+   answer:0, explain:"程序流程图（PFD）由<b>顺序、选择、循环</b>三种结构组合而成；IPO 可用于流程描述；PAD 支持结构化；N-S 不适合复杂流程。"},
+
+  {topic:"系统设计", q:"业务流程重组（BPR）是针对企业业务流程的基本问题进行回顾，其核心思路是对业务流程的（　）改造，BPR 过程通常以（　）为中心。",
+   options:["增量式、流程","根本性、流程","迭代式、组织","保守式、资源"],
+   answer:1, explain:"BPR 是<strong>根本性</strong>再思考和彻底性再设计，以<b>流程</b>为中心。"},
+
+  {topic:"系统设计", q:"某模块中各个处理元素都密切相关于同一功能且必须顺序执行，前一处理元素的输出就是下一处理元素的输入，则该模块的内聚类型为（　）内聚。",
+   options:["过程","时间","顺序","逻辑"],
+   answer:2, explain:"前一输出=后一输入、顺序执行 → <b>顺序内聚</b>。"},
+
+  {topic:"系统设计", q:"已知模块 A 给模块 B 传递数据结构 X，则这两个模块的耦合类型为（　）。",
+   options:["数据耦合","公共耦合","外部耦合","标记耦合"],
+   answer:3, explain:"传递<strong>数据结构</strong>（而非简单数据值）→ <b>标记耦合</b>；传简单值才是数据耦合。"},
+
+  {topic:"系统设计", q:"系统设计的主要内容包括（　）；系统总体结构设计的主要任务是将系统的功能需求分配给软件模块，确定每个模块的功能和调用关系，形成软件的（　）。",
+   options:["概要设计和详细设计、用例图","架构设计和对象设计、模块结构图","概要设计和详细设计、模块结构图","部署设计和用例设计、类图"],
+   answer:2, explain:"系统设计含<b>概要设计和详细设计</b>；概要设计产出<b>模块结构图</b>。"},
+
+  {topic:"系统设计", q:"以下关于软件系统模块结构设计的叙述中，正确的是（　）。",
+   options:["当模块扇出过大时，应把下级模块进一步分解为若干个子模块","当模块扇出过小时，应适当增加中间的控制模块","模块的扇入大，表示模块的复杂度较高","模块的扇入大，表示模块的复用程度高"],
+   answer:3, explain:"<b>扇入大 = 复用程度高</b>（被更多模块调用，说明复用性好），不是复杂度高。"},
+
+  {topic:"软件测试", q:"软件确认测试也称为有效性测试，主要验证（　）。根据用户的参与程度不同，软件确认测试通常包括（　）。",
+   options:["系统中各个单元模块之间的协作性、黑盒测试和白盒测试","软件与硬件在实际运行环境中能否有效集成、一次性组装测试和增量式组装测试","软件功能、性能及其它特性是否与用户需求一致、内部测试、Alpha、Beta 和验收测试","程序模块能否正确实现详细设计说明中的功能、性能和设计约束、功能测试、性能测试、用户界面测试和安全性测试"],
+   answer:2, explain:"确认测试验证<b>是否与用户需求一致</b>；按用户参与程度分<strong>内部确认、Alpha、Beta、验收测试</strong>。"},
+
+  {topic:"软件测试", q:"软件测试一般分为动态测试和静态测试两大类。前者通过运行程序发现错误，包括（　）等方法；后者采用人工和计算机辅助静态分析的手段对程序进行检测，包括（　）等方法。",
+   options:["边界值分析、逻辑覆盖、基本路径；桌面检查、代码审查、代码走查","桌面检查、逻辑覆盖、错误推测；边界值分析、逻辑覆盖、基本路径","桌面检查、代码审查、代码走查；错误推测、代码审查、基本路径","错误推测、代码审查、基本路径；桌面检查、代码审查、代码走查"],
+   answer:0, explain:"动态测试（黑盒/白盒）= 边界值、逻辑覆盖、基本路径等；静态测试 = <b>桌前检查、代码审查、代码走查</b>。"},
+
+  {topic:"软件测试", q:"以下关于测试的叙述中，正确的是（　）。",
+   options:["实际上，可以采用穷举测试来发现软件中的所有错误","错误很多的程序段在修改后错误一般会非常少","测试可以用来证明软件没有错误","白盒测试技术中，路径覆盖法往往能比语句覆盖法发现更多的错误"],
+   answer:3, explain:"穷举测试不现实；测试只能发现错误不能证明无错；<b>路径覆盖（最高）比语句覆盖发现更多错误</b>。"},
+
+  {topic:"软件测试", q:"采用白盒测试方法进行测试，设计了 4 个测试用例：①(x=0,y=3)、②(x=1,y=2)、③(x=-1,y=2)、④(x=3,y=1)。至少需要①②才能完成（　）覆盖，至少需要①②③或①②④才能完成（　）覆盖。",
+   options:["语句、路径","条件、判定","判定、语句","路径、条件"],
+   answer:0, explain:"①②执行了语句 A 和 B → <b>语句覆盖</b>；①②③或①②④走到所有分支 → <b>路径覆盖</b>。"},
+
+  {topic:"需求工程", q:"【2017】需求获取方式中，（　）方法具有良好的灵活性、较宽广的应用范围，但信息量大、记录困难、需要足够的领域知识；（　）方法基于数理统计原理，可减少数据收集偏差；（　）方法通过高度组织的群体会议来分析企业内的问题并获取需求。",
+   options:["用户访谈、采样、联合需求计划","问卷调查、用户访谈、采样","联合需求计划、问卷调查、用户访谈","采样、联合需求计划、问卷调查"],
+   answer:0, explain:"<b>用户访谈</b>灵活但信息量大；<b>采样</b>基于数理统计；<b>联合需求计划（JRP）</b>通过组织会议讨论需求。"},
+
+  {topic:"需求管理", q:"【2022】信息建模方法是从数据的角度对现实世界建立模型，模型是现实系统的一个抽象，信息建模方法的基本工具是（　）。",
+   options:["流程图","实体联系图","数据流图","数据字典"],
+   answer:1, explain:"信息建模的基本工具是<b>实体联系图（E-R 图）</b>。"},
+
+  {topic:"需求管理", q:"【2022】（　）通常为一个迭代过程，其中的活动包括需求发现、需求分类和组织、需求协商、需求文档化。",
+   options:["需求确认","需求管理","需求抽取","需求规格说明"],
+   answer:2, explain:"<b>需求抽取</b>（需求获取）是迭代过程：发现→分类组织→协商→文档化。"},
+
+  {topic:"需求管理", q:"【2021】需求管理的主要活动包括（　）。",
+   options:["变更控制、版本控制、需求跟踪、需求状态跟踪","需求获取、变更控制、版本控制、需求跟踪","需求获取、需求建模、变更控制、版本控制","需求获取、需求建模、需求评审、需求跟踪"],
+   answer:0, explain:"需求管理四大活动：<b>变更控制、版本控制、需求跟踪、需求状态跟踪</b>（需求获取属于需求开发）。"},
+
+  {topic:"需求管理", q:"【2021】（　）包括编制每个需求与系统元素之间的联系文档，这些元素包括其它需求、体系结构、设计部件、源代码模块、测试、帮助文件和文档等。",
+   options:["需求描述","需求分析","需求获取","需求跟踪"],
+   answer:3, explain:"编制需求与系统元素联系文档的是<b>需求跟踪</b>。"},
+
+  {topic:"需求管理", q:"【2020】软件需求开发的最终文档经过评审批准后，就定义了开发工作的（　），它在客户和开发者之间构筑了产品功能需求和非功能需求的一个（　），是需求开发和需求管理之间的桥梁。",
+   options:["需求基线、需求约定","需求标准、需求管理标准","需求用例、需求变更","需求分析、需求用例"],
+   answer:0, explain:"评审批准后形成<b>需求基线</b>，它是需求开发与需求管理之间的<b>需求约定</b>。"},
+
+  {topic:"系统维护", q:"对于遗留系统的评价框架，处于「高水平、低价值」区的遗留系统适合采用的演化策略为（　）。",
+   options:["淘汰","继承","改造","集成"],
+   answer:3, explain:"遗留系统演化策略：<b>高水平+高价值→继承</b>；<b>高水平+低价值→集成</b>（技术好但业务不重要，集成复用）；<b>低水平+高价值→改造</b>（业务重要但技术落后）；<b>低水平+低价值→淘汰</b>。本题高水平低价值 → 集成。"},
+
+  {topic:"系统维护", q:"以下关于软件维护和可维护性的叙述中，不正确的是（　）。",
+   options:["软件维护要解决软件产品交付用户之后运行中发生的各种问题","软件的维护期通常比开发期长得多，其投入也大得多","进行质量保证审查可以提高软件产品的可维护性","提高可维护性是在软件维护阶段考虑的问题"],
+   answer:3, explain:"可维护性应在<b>开发阶段</b>就考虑，而不是到维护阶段才考虑，D 项错误。"},
+
+  {topic:"系统维护", q:"某企业由于外部市场环境和管理需求的变化对现有软件系统提出新的需求，则对该软件系统进行的维护属于（　）维护。",
+   options:["正确性","完善性","适应性","预防性"],
+   answer:1, explain:"因用户<b>提出新的需求</b>而增加/改进功能 → <b>完善性维护</b>（适应性维护是环境变化被迫修改）。"},
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好，继续保持！' : pct >= 60 ? '基本掌握，错题建议回顾对应笔记。' : '还需加强，建议重看软件工程笔记后再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

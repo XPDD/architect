@@ -4,3 +4,6 @@
 .*
 !README.md
 !.gitignore
+!.claude/
+!.claude/skills/
+!.claude/skills/**

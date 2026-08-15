@@ -96,28 +96,185 @@
 
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-badge">ARCHITECTURE LIVE 3</div>
-    <div class="hero-title">架构设计 + 质量属性 + <span class="accent">架构评估</span></div>
-    <div class="hero-sub">软件架构师考试 · 核心知识体系大纲</div>
+    <div class="hero-badge">SYS ARCHITECT · KNOWLEDGE BASE</div>
+    <div class="hero-title">架构 · 质量 · 安全 · <span class="accent">软件工程</span></div>
+    <div class="hero-sub">软件架构师考试 · 核心知识体系大纲（按学习计划章节顺序：第10章信息安全 → 第11章软件工程 → 第15-16章架构与质量）</div>
     <div class="hero-stats">
-      <span class="hero-stat">共 <strong>11</strong> 份笔记</span>
-      <span class="hero-stat">覆盖 <strong>79</strong> 页教材</span>
-      <span class="hero-stat">标注 <strong>12+</strong> 道历年真题</span>
-      <span class="hero-stat">教材 <strong>P1-P79</strong></span>
+      <span class="hero-stat">共 <strong>23</strong> 份笔记</span>
+      <span class="hero-stat">架构质量 <strong>11</strong> 篇</span>
+      <span class="hero-stat">信息安全 <strong>5</strong> 篇</span>
+      <span class="hero-stat">软件工程 <strong>7</strong> 篇</span>
     </div>
   </div>
 
-  <!-- ===== Part 1 ===== -->
+  <!-- ===== Part 1：信息安全 ===== -->
   <div class="part-section">
-    <div class="part-header">
-      <div class="part-num">01</div>
+    <div class="part-header" style="border-left-color:var(--rose);">
+      <div class="part-num" style="color:var(--rose);text-shadow:0 0 16px rgba(248,113,113,.25);">01</div>
       <div class="part-info">
-        <h2>架构设计基础理论</h2>
-        <span>SOA · DSSA · ABSD 三大核心方法</span>
+        <h2>信息安全技术（第 10 章）</h2>
+        <span>第 6 周 · 8/3–8/9 · 五要素 · 加密 · 抗攻击 · 网络安全 · 保证体系</span>
       </div>
     </div>
 
-    <a class="note-card" href="架构基础知识_康奈尔笔记.html" target="_self">
+    <a class="note-card" href="security-quiz.html" target="_self" style="border-color:rgba(52,211,153,.3);">
+      <div class="note-icon green">&#x2713;</div>
+      <div class="note-body">
+        <h3>信息安全 · 真题练习（18 题 · 交互做题）</h3>
+        <p>点选判分 · 带解析 · 覆盖基础/加密/抗攻击/安全协议</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="security-basics.html" target="_self">
+      <div class="note-icon" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--rose);">SE</div>
+      <div class="note-body">
+        <h3>信息安全基础 — 五要素 + 防范体系</h3>
+        <p>机密性/完整性/可用性/可控性/可审查性 · 物理/系统/网络/应用/管理五层 · 组成框架</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="security-crypto.html" target="_self">
+      <div class="note-icon blue">CR</div>
+      <div class="note-body">
+        <h3>信息安全技术 — 加密 · 摘要 · 签名 · 访问控制</h3>
+        <p>对称/非对称加密 · 数字信封 · MD5/SHA-1 · 数字签名 · PKI/CA · 访问控制</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="security-attacks.html" target="_self">
+      <div class="note-icon purple">AT</div>
+      <div class="note-body">
+        <h3>抗攻击技术 — DoS · 欺骗 · 扫描</h3>
+        <p>DoS/DDoS · ARP/DNS/IP 欺骗 · 端口扫描 · SYN Flooding · 漏洞扫描</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="security-network.html" target="_self">
+      <div class="note-icon green">NW</div>
+      <div class="note-body">
+        <h3>网络安全技术 + 安全协议</h3>
+        <p>防火墙 · IDS/IPS · 蜜罐 · SSL/SSH/SET/Kerberos/PGP/S-MIME</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="security-assurance.html" target="_self">
+      <div class="note-icon amber">AS</div>
+      <div class="note-body">
+        <h3>保证体系与评估方法</h3>
+        <p>GB17859 五等级 · 风险评估五要素 · 风险计算五步 · 安全管理</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+  </div>
+
+  <!-- ===== Part 2：软件工程 ===== -->
+  <div class="part-section">
+    <div class="part-header" style="border-left-color:var(--purple);">
+      <div class="part-num" style="color:var(--purple);text-shadow:0 0 16px rgba(167,139,250,.25);">02</div>
+      <div class="part-info">
+        <h2>软件工程（第 11 章）</h2>
+        <span>第 7 周 · 8/10–8/16 · 过程模型 · 系统设计 · 测试 · 需求 · 逆向 · 维护</span>
+      </div>
+    </div>
+
+    <a class="note-card" href="se-quiz.html" target="_self" style="border-color:rgba(52,211,153,.3);">
+      <div class="note-icon green">&#x2713;</div>
+      <div class="note-body">
+        <h3>软件工程 · 真题练习（22 题 · 交互做题）</h3>
+        <p>点选判分 · 带解析 · 覆盖过程模型/系统设计/测试/需求/维护</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="se-knowledge-map.html" target="_self" style="border-color:rgba(0,212,255,.3);">
+      <div class="note-icon cyan">&#x25C6;</div>
+      <div class="note-body">
+        <h3>软件工程 · 知识体系与实体关系图</h3>
+        <p>生命周期主线（需求→设计→测试→维护）+ 过程模型底座 + 支撑模块</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="se-process-models.html" target="_self">
+      <div class="note-icon purple">SP</div>
+      <div class="note-body">
+        <h3>软件过程 · CMM/CMMI · 开发模型</h3>
+        <p>生命周期 · 瀑布/原型/螺旋/V/增量 · 敏捷 · RUP · 4+1 视图</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="se-system-design.html" target="_self">
+      <div class="note-icon cyan">SD</div>
+      <div class="note-body">
+        <h3>系统设计 — 流程设计 · 内聚耦合</h3>
+        <p>PFD/IPO/N-S/PAD · 概要/详细设计 · 高内聚低耦合</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="se-testing.html" target="_self">
+      <div class="note-icon green">TS</div>
+      <div class="note-body">
+        <h3>软件测试 — 原则 · 方法 · 用例设计</h3>
+        <p>静态/动态 · 黑盒/白盒 · 测试阶段 · 边界值 · McCabe</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="se-requirements.html" target="_self">
+      <div class="note-icon amber">RQ</div>
+      <div class="note-body">
+        <h3>需求工程 — 获取 · 分析 · 定义 · 验证</h3>
+        <p>需求分类 · DFD · 数据字典 · SRS · 需求验证</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="se-requirements-management.html" target="_self">
+      <div class="note-icon blue">RM</div>
+      <div class="note-body">
+        <h3>需求管理 — 基线 · 变更 · 跟踪</h3>
+        <p>需求基线 · CCB 变更控制 · 双向跟踪</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="se-reverse-engineering.html" target="_self">
+      <div class="note-icon purple">RE</div>
+      <div class="note-body">
+        <h3>逆向工程 — 四级 · 重构 · 再工程</h3>
+        <p>软件复用 · 实现/结构/功能/领域四级 · 重构 vs 再工程</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+
+    <a class="note-card" href="se-maintenance.html" target="_self">
+      <div class="note-icon cyan">MN</div>
+      <div class="note-body">
+        <h3>系统维护 · 遗留系统 · 净室 · CBSE</h3>
+        <p>系统转换 · 四类维护 · 构件组装 · 净室工程</p>
+      </div>
+      <span class="note-arrow">&#x2197;</span>
+    </a>
+  </div>
+
+  <!-- ===== Part 3 ===== -->
+  <div class="part-section">
+    <div class="part-header">
+      <div class="part-num">03</div>
+      <div class="part-info">
+        <h2>架构设计基础理论（第 15 章）</h2>
+        <span>第 9 周 · 8/24–8/30 · SOA · DSSA · ABSD 三大核心方法</span>
+      </div>
+    </div>
+
+    <a class="note-card" href="arch-basics.html" target="_self">
       <div class="note-icon cyan">SA</div>
       <div class="note-body">
         <h3>架构基础知识 — SOA · DSSA · ABSD</h3>
@@ -126,7 +283,7 @@
       <span class="note-arrow">&#x2197;</span>
     </a>
 
-    <a class="note-card" href="DSSA_特定领域软件架构_康奈尔笔记.html" target="_self">
+    <a class="note-card" href="dssa.html" target="_self">
       <div class="note-icon blue">DS</div>
       <div class="note-body">
         <h3>DSSA — 特定领域软件架构（详细版）</h3>
@@ -135,7 +292,7 @@
       <span class="note-arrow">&#x2197;</span>
     </a>
 
-    <a class="note-card" href="ABSD_基于架构的软件开发_康奈尔笔记.html" target="_self">
+    <a class="note-card" href="absd.html" target="_self">
       <div class="note-icon green">AB</div>
       <div class="note-body">
         <h3>ABSD — 基于架构的软件开发</h3>
@@ -145,17 +302,17 @@
     </a>
   </div>
 
-  <!-- ===== Part 2 ===== -->
+  <!-- ===== Part 4 ===== -->
   <div class="part-section">
     <div class="part-header" style="border-left-color:var(--green);">
-      <div class="part-num" style="color:var(--green);text-shadow:0 0 16px rgba(52,211,153,.25);">02</div>
+      <div class="part-num" style="color:var(--green);text-shadow:0 0 16px rgba(52,211,153,.25);">04</div>
       <div class="part-info">
-        <h2>构件（Component）</h2>
+        <h2>构件（Component · 第 15 章）</h2>
         <span>构件的定义 · 组装 · 标准 · 与对象区别</span>
       </div>
     </div>
 
-    <a class="note-card" href="构件_Component_康奈尔笔记.html" target="_self">
+    <a class="note-card" href="component.html" target="_self">
       <div class="note-icon green">Cp</div>
       <div class="note-body">
         <h3>构件 Component — 核心知识全解</h3>
@@ -165,17 +322,17 @@
     </a>
   </div>
 
-  <!-- ===== Part 3 ===== -->
+  <!-- ===== Part 5 ===== -->
   <div class="part-section">
     <div class="part-header" style="border-left-color:var(--amber);">
-      <div class="part-num" style="color:var(--amber);text-shadow:0 0 16px rgba(251,191,36,.25);">03</div>
+      <div class="part-num" style="color:var(--amber);text-shadow:0 0 16px rgba(251,191,36,.25);">05</div>
       <div class="part-info">
-        <h2>软件架构风格</h2>
+        <h2>软件架构风格（第 15 章）</h2>
         <span>五大流派 · 层次架构 · SOA · C/S · B/S</span>
       </div>
     </div>
 
-    <a class="note-card" href="架构风格_康奈尔笔记.html" target="_self">
+    <a class="note-card" href="arch-styles.html" target="_self">
       <div class="note-icon amber">AS</div>
       <div class="note-body">
         <h3>架构风格 — 五大流派全览</h3>
@@ -184,7 +341,7 @@
       <span class="note-arrow">&#x2197;</span>
     </a>
 
-    <a class="note-card" href="历年真题_架构风格.html" target="_self">
+    <a class="note-card" href="../question-bank/exam-arch-styles.html" target="_self">
       <div class="note-icon cyan">&#x2713;</div>
       <div class="note-body">
         <h3>历年真题 — 架构风格 12 题精解</h3>
@@ -194,17 +351,17 @@
     </a>
   </div>
 
-  <!-- ===== Part 4 ===== -->
+  <!-- ===== Part 6 ===== -->
   <div class="part-section">
     <div class="part-header" style="border-left-color:var(--purple);">
-      <div class="part-num" style="color:var(--purple);text-shadow:0 0 16px rgba(167,139,250,.25);">04</div>
+      <div class="part-num" style="color:var(--purple);text-shadow:0 0 16px rgba(167,139,250,.25);">06</div>
       <div class="part-info">
-        <h2>CBSD vs ABSD 对比</h2>
+        <h2>CBSD vs ABSD 对比（第 15 章）</h2>
         <span>基于构件 vs 基于架构 核心区别</span>
       </div>
     </div>
 
-    <a class="note-card" href="CBSD_vs_ABSD_康奈尔笔记.html" target="_self">
+    <a class="note-card" href="cbsd-vs-absd.html" target="_self">
       <div class="note-icon purple">CB</div>
       <div class="note-body">
         <h3>CBSD vs ABSD — 核心区别一页通</h3>
@@ -214,17 +371,17 @@
     </a>
   </div>
 
-  <!-- ===== Part 5 ===== -->
+  <!-- ===== Part 7 ===== -->
   <div class="part-section">
     <div class="part-header" style="border-left-color:var(--rose);">
-      <div class="part-num" style="color:var(--rose);text-shadow:0 0 16px rgba(248,113,113,.25);">05</div>
+      <div class="part-num" style="color:var(--rose);text-shadow:0 0 16px rgba(248,113,113,.25);">07</div>
       <div class="part-info">
-        <h2>软件质量属性</h2>
+        <h2>软件质量属性（第 16 章）</h2>
         <span>开发期 · 运行期 · 架构评估 · 场景描述</span>
       </div>
     </div>
 
-    <a class="note-card" href="质量属性_康奈尔笔记.html" target="_self">
+    <a class="note-card" href="quality-attributes.html" target="_self">
       <div class="note-icon" style="background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--rose);">QA</div>
       <div class="note-body">
         <h3>软件质量属性 — 开发期 · 运行期 · 场景描述</h3>
@@ -234,17 +391,17 @@
     </a>
   </div>
 
-  <!-- ===== Part 6 ===== -->
+  <!-- ===== Part 8 ===== -->
   <div class="part-section">
     <div class="part-header" style="border-left-color:var(--blue);">
-      <div class="part-num" style="color:var(--blue);text-shadow:0 0 16px rgba(77,124,255,.25);">06</div>
+      <div class="part-num" style="color:var(--blue);text-shadow:0 0 16px rgba(77,124,255,.25);">08</div>
       <div class="part-info">
-        <h2>架构评估方法</h2>
+        <h2>架构评估方法（第 16 章）</h2>
         <span>SAAM · ATAM · CBAM 三大评估方法</span>
       </div>
     </div>
 
-    <a class="note-card" href="架构评估方法_康奈尔笔记.html" target="_self">
+    <a class="note-card" href="arch-evaluation.html" target="_self">
       <div class="note-icon blue">AE</div>
       <div class="note-body">
         <h3>架构评估方法 — SAAM · ATAM · CBAM</h3>
@@ -286,8 +443,8 @@
 
 <div style="text-align:center;padding:20px;font-size:12px;color:var(--text-muted);margin-top:8px;">
 <a href="../index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);">&#x2190; 返回总索引</a> &nbsp;&middot;&nbsp;
-<a href="../软件工程-康奈尔笔记/index.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.2);">软件工程笔记</a> &nbsp;&middot;&nbsp;
-<a href="../数据库-康奈尔笔记/index.html" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(251,191,36,.2);">数据库笔记</a>
+<a href="../software-engineering-notes/index.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.2);">软件工程笔记</a> &nbsp;&middot;&nbsp;
+<a href="../database-notes/index.html" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(251,191,36,.2);">数据库笔记</a>
 </div>
 
 </body>

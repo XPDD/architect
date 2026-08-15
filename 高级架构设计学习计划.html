@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高级架构设计 · 学习计划</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a1622;
+    --bg-deep: #060e17;
+    --panel: #0f2236;
+    --panel-2: #122a42;
+    --line: rgba(122, 178, 211, 0.16);
+    --line-strong: rgba(122, 178, 211, 0.32);
+    --grid: rgba(122, 178, 211, 0.05);
+    --ink: #e9f1f8;
+    --ink-dim: #93a9bd;
+    --ink-faint: #5c7086;
+    --blueprint: #6fc7e8;
+    --blueprint-dim: rgba(111, 199, 232, 0.5);
+    --amber: #f2b84b;
+    --p1: #4cd7a0;
+    --p2: #f2b84b;
+    --p3: #f0804a;
+    --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+    --serif: "Noto Serif SC", "Songti SC", serif;
+    --sans: "Noto Sans SC", "PingFang SC", sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 70px; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* ── 蓝图网格背景 ── */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── 噪点纹理 ── */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+    opacity: 0.035;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; position: relative; z-index: 2; }
+
+  /* ═══ 顶部标题栏 ═══ */
+  .masthead {
+    padding: 64px 0 40px;
+    border-bottom: 1px solid var(--line-strong);
+    position: relative;
+  }
+  .masthead::after {
+    content: "";
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 140px;
+    height: 1px;
+    background: var(--blueprint);
+    box-shadow: 0 0 12px var(--blueprint);
+  }
+  .kicker {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--blueprint);
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .kicker::before {
+    content: "◆";
+    font-size: 9px;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+  .kicker .k-line { flex: 1; height: 1px; background: var(--line-strong); }
+  h1 {
+    font-family: var(--serif);
+    font-weight: 900;
+    font-size: clamp(38px, 6vw, 64px);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  h1 .accent { color: var(--amber); }
+  .subtitle {
+    margin-top: 18px;
+    font-size: 15px;
+    color: var(--ink-dim);
+    max-width: 620px;
+  }
+  .meta-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 28px;
+    margin-top: 34px;
+  }
+  .meta-item { display: flex; flex-direction: column; gap: 2px; }
+  .meta-item .label {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  .meta-item .value {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  /* ── 概览统计 ── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--line);
+    border: 1px solid var(--line-strong);
+    margin-top: 44px;
+    position: relative;
+  }
+  .stat {
+    background: var(--panel);
+    padding: 26px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s;
+  }
+  .stat:hover { background: var(--panel-2); }
+  .stat .num {
+    font-family: var(--serif);
+    font-size: 46px;
+    font-weight: 900;
+    line-height: 1;
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+  }
+  .stat .num .unit { font-size: 16px; font-weight: 600; color: var(--ink-dim); }
+  .stat .cap {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--ink-dim);
+    letter-spacing: 0.06em;
+  }
+  .stat .corner {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--ink-faint);
+    opacity: 0.7;
+  }
+
+  /* ── 核心策略 ── */
+  .strategy {
+    margin-top: 40px;
+    padding: 22px 26px;
+    border: 1px solid var(--line-strong);
+    background: linear-gradient(180deg, rgba(111,199,232,0.06), rgba(111,199,232,0.01));
+    display: flex;
+    gap: 18px;
+    align-items: flex-start;
+    position: relative;
+  }
+  .strategy .ico {
+    font-family: var(--mono);
+    color: var(--blueprint);
+    font-size: 15px;
+    padding-top: 2px;
+  }
+  .strategy p { font-size: 14.5px; color: var(--ink-dim); }
+  .strategy strong { color: var(--ink); font-weight: 600; }
+
+  /* ═══ 时间轴 ═══ */
+  .timeline {
+    margin: 64px 0 10px;
+  }
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 26px;
+  }
+  .section-head .idx {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--blueprint);
+    letter-spacing: 0.1em;
+  }
+  .section-head h2 {
+    font-family: var(--serif);
+    font-size: 26px;
+    font-weight: 700;
+  }
+  .section-head .rule { flex: 1; height: 1px; background: var(--line-strong); }
+
+  .week-bar {
+    display: grid;
+    grid-template-columns: repeat(11, 1fr);
+    gap: 6px;
+  }
+  .week-cell {
+    position: relative;
+    height: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+  }
+  .week-cell .fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 0;
+    transition: width 1.4s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .week-cell .wk-label {
+    position: absolute;
+    top: 18px;
+    left: 0;
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--ink-faint);
+  }
+  .week-bar.p1 .fill { background: var(--p1); }
+  .week-bar.p2 .fill { background: var(--p2); }
+  .week-bar.p3 .fill { background: var(--p3); }
+
+  /* ═══ 阶段 ═══ */
+  .phase { margin-top: 72px; }
+  .phase-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .phase-tag {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    padding: 7px 16px;
+    border: 1px solid;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .phase-title {
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 700;
+  }
+  .phase-dates {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--ink-faint);
+  }
+  .phase-head .rule { flex: 1; height: 1px; }
+
+  .ph1 { --pc: var(--p1); }
+  .ph2 { --pc: var(--p2); }
+  .ph3 { --pc: var(--p3); }
+  .phase-tag { color: var(--pc); border-color: var(--pc); background: color-mix(in srgb, var(--pc) 8%, transparent); }
+  .phase-head .rule { background: color-mix(in srgb, var(--pc) 30%, transparent); }
+
+  /* ── 周卡片 ── */
+  .weeks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .week {
+    background: var(--panel);
+    border: 1px solid var(--line-strong);
+    position: relative;
+    padding: 24px 22px 22px;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(24px);
+    animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .week:hover {
+    transform: translateY(-4px);
+    border-color: var(--pc);
+    box-shadow: 0 18px 40px -20px color-mix(in srgb, var(--pc) 50%, transparent);
+  }
+  .week::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--pc);
+  }
+  .week-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .week-no {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--pc);
+  }
+  .week-hours {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--ink);
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+  }
+  .week-hours .u { font-size: 10px; color: var(--ink-faint); font-weight: 400; }
+  .week-date {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+  .week-chapter {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 12px;
+    line-height: 1.35;
+  }
+  .week-block { margin-bottom: 12px; }
+  .week-block .t {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .week-block .c { font-size: 13.5px; color: var(--ink-dim); }
+  .week-tip {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--line-strong);
+    font-size: 13px;
+    color: var(--ink-dim);
+  }
+  .week-tip .mark { color: var(--pc); font-weight: 600; }
+
+  /* ═══ 贴士 ═══ */
+  .tips { margin-top: 84px; padding-bottom: 80px; }
+  .tips-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .tip {
+    background: var(--panel);
+    border: 1px solid var(--line-strong);
+    padding: 24px 26px;
+    position: relative;
+  }
+  .tip .tip-no {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--amber);
+    margin-bottom: 10px;
+    letter-spacing: 0.08em;
+  }
+  .tip h3 {
+    font-family: var(--serif);
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+  .tip p { font-size: 14px; color: var(--ink-dim); }
+  .tip.highlight {
+    border-color: color-mix(in srgb, var(--amber) 45%, transparent);
+    background: linear-gradient(160deg, rgba(242,184,75,0.08), rgba(242,184,75,0.01));
+  }
+
+  footer {
+    border-top: 1px solid var(--line-strong);
+    padding: 28px 0 44px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.06em;
+  }
+
+  /* ═══ 顶部导航栏 ═══ */
+  .topnav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 50;
+    height: 52px;
+    display: flex; align-items: center; gap: 18px;
+    padding: 0 24px;
+    background: rgba(6,14,23,0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--line-strong);
+    font-family: var(--mono);
+  }
+  .topnav .tn-brand { font-size: 13px; color: var(--ink); text-decoration: none; font-weight: 700; letter-spacing: .03em; white-space: nowrap; }
+  .topnav .tn-brand b { color: var(--blueprint); }
+  .topnav .tn-now { flex: 1; text-align: center; font-size: 12px; color: var(--ink-dim); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+  .topnav .tn-now b { color: var(--amber); font-weight: 700; }
+  .topnav .tn-links { display: flex; gap: 8px; align-items: center; }
+  .topnav .tn-links a, .topnav .tn-links button {
+    font-family: var(--mono); font-size: 12px; color: var(--ink-dim); text-decoration: none;
+    padding: 5px 12px; border: 1px solid var(--line-strong); border-radius: 2px; background: transparent; cursor: pointer;
+    transition: .2s; white-space: nowrap;
+  }
+  .topnav .tn-links a:hover, .topnav .tn-links button:hover { color: var(--blueprint); border-color: var(--blueprint); }
+  .topnav .tn-progress { position: absolute; bottom: -1px; left: 0; height: 2px; width: 0; background: linear-gradient(90deg, var(--p1), var(--p2), var(--p3)); transition: width .9s cubic-bezier(.22,1,.36,1); }
+
+  /* ═══ 周卡片日期状态 ═══ */
+  .week.is-current {
+    border-color: var(--pc);
+    box-shadow: 0 0 0 1px var(--pc), 0 18px 48px -18px color-mix(in srgb, var(--pc) 55%, transparent);
+  }
+  .week.is-current::before { width: 4px; }
+  .week.is-past { filter: grayscale(0.5) brightness(0.72); }
+  .week.is-past:hover { filter: grayscale(0.15) brightness(0.9); }
+
+  .status-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: var(--mono); font-size: 10px; letter-spacing: .12em;
+    padding: 3px 10px; border-radius: 2px; margin-bottom: 12px; line-height: 1.4;
+  }
+  .status-badge.done { color: var(--ink-faint); border: 1px solid var(--line); }
+  .status-badge.now { color: #06121c; background: var(--pc); font-weight: 700; box-shadow: 0 0 22px color-mix(in srgb, var(--pc) 55%, transparent); }
+  .status-badge.now .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 1.4s ease-in-out infinite; }
+  .status-badge.todo { color: var(--ink-dim); border: 1px solid var(--line); }
+
+  /* ═══ 周卡片资料链接 ═══ */
+  .week-links { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; padding-top: 12px; border-top: 1px dashed var(--line-strong); align-items: center; }
+  .week-links .wl-cap { font-family: var(--mono); font-size: 10px; letter-spacing: .1em; color: var(--ink-faint); margin-right: 4px; }
+  .week-links a { font-family: var(--mono); font-size: 11px; color: var(--ink-dim); text-decoration: none; padding: 3px 9px; border: 1px solid var(--line-strong); border-radius: 2px; transition: .18s; }
+  .week-links a:hover { color: var(--pc); border-color: var(--pc); }
+  .week-links .wl-empty { font-size: 11px; color: var(--ink-faint); font-family: var(--mono); }
+
+  /* ═══ 知识索引 ═══ */
+  .kindex { margin-top: 40px; }
+  .kindex-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .kcard { background: var(--panel); border: 1px solid var(--line-strong); padding: 20px 20px 16px; position: relative; transition: border-color .2s; }
+  .kcard:hover { border-color: var(--kc); }
+  .kcard .kc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+  .kcard .kc-icon { font-family: var(--mono); font-weight: 800; font-size: 15px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 2px; color: var(--kc); background: color-mix(in srgb, var(--kc) 12%, transparent); border: 1px solid color-mix(in srgb, var(--kc) 30%, transparent); flex-shrink: 0; }
+  .kcard .kc-title { font-family: var(--serif); font-size: 15px; font-weight: 700; line-height: 1.3; }
+  .kcard .kc-title a { color: var(--ink); text-decoration: none; }
+  .kcard .kc-title a:hover { color: var(--kc); }
+  .kcard .kc-links { display: flex; flex-wrap: wrap; gap: 5px; }
+  .kcard .kc-links a { font-family: var(--mono); font-size: 10.5px; color: var(--ink-dim); text-decoration: none; padding: 2px 7px; border: 1px solid var(--line); border-radius: 2px; transition: .18s; }
+  .kcard .kc-links a:hover { color: var(--kc); border-color: var(--kc); }
+
+  /* ── 动画 ── */
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .reveal { opacity: 0; animation: fadeUp 0.9s cubic-bezier(0.22,1,0.36,1) forwards; }
+
+  /* ── 响应式 ── */
+  @media (max-width: 900px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .weeks { grid-template-columns: repeat(2, 1fr); }
+    .tips-grid { grid-template-columns: 1fr; }
+    .kindex-grid { grid-template-columns: repeat(2, 1fr); }
+    .topnav .tn-now { display: none; }
+  }
+  @media (max-width: 560px) {
+    .weeks { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .week-bar { gap: 4px; }
+    .phase-head { flex-wrap: wrap; }
+    .kindex-grid { grid-template-columns: 1fr; }
+    .topnav { padding: 0 14px; gap: 10px; }
+    .topnav .tn-brand { font-size: 11px; }
+    .topnav .tn-links a, .topnav .tn-links button { font-size: 11px; padding: 4px 9px; }
+  }
+</style>
+</head>
+<body>
+  <!-- ═══ 顶部固定导航 ═══ -->
+  <nav class="topnav">
+    <a class="tn-brand" href="#top"><b>◆</b> 高级架构设计</a>
+    <div class="tn-now" id="tnNow">加载中…</div>
+    <div class="tn-links">
+      <a href="#kindex">知识索引</a>
+      <button id="tnJump">跳到本周</button>
+    </div>
+    <div class="tn-progress" id="tnProgress"></div>
+  </nav>
+
+  <div class="wrap" id="top">
+
+    <!-- ═══ 顶部 ═══ -->
+    <header class="masthead">
+      <div class="kicker"><span class="k-line"></span>System Architect · Study Blueprint</div>
+      <h1>高级架构设计<br><span class="accent">学习计划</span></h1>
+      <p class="subtitle">系统架构设计师备考蓝图 · 覆盖 23 章核心内容，按阶段拆解为 11 周可执行时间表，总时长约 120 小时。</p>
+      <div class="meta-strip">
+        <div class="meta-item"><span class="label">周期</span><span class="value">2026.07.06 — 09.18</span></div>
+        <div class="meta-item"><span class="label">总时长</span><span class="value">≈ 120 小时</span></div>
+        <div class="meta-item"><span class="label">阶段</span><span class="value">3 阶段 / 11 周</span></div>
+        <div class="meta-item"><span class="label">章节</span><span class="value">第 3 — 23 章</span></div>
+      </div>
+    </header>
+
+    <!-- ═══ 概览统计 ═══ -->
+    <section class="stats reveal">
+      <div class="stat"><span class="corner">01</span><div class="num">11<span class="unit">周</span></div><div class="cap">完整复习周期</div></div>
+      <div class="stat"><span class="corner">02</span><div class="num">23<span class="unit">章</span></div><div class="cap">核心知识章节</div></div>
+      <div class="stat"><span class="corner">03</span><div class="num">120<span class="unit">小时</span></div><div class="cap">预计学习时长</div></div>
+      <div class="stat"><span class="corner">04</span><div class="num">3<span class="unit">阶段</span></div><div class="cap">渐进式递进</div></div>
+    </section>
+
+    <!-- ═══ 核心策略 ═══ -->
+    <section class="strategy reveal">
+      <div class="ico">⛭ 策略</div>
+      <p><strong>工作日</strong>每天抽 40 分钟—1 小时看视频（平均 45 分钟），<strong>周末</strong>集中多花时间（每天 3—5 小时）攻克难点。按此节奏，约 3 个月可完成第一轮复习。</p>
+    </section>
+
+    <!-- ═══ 知识索引 ═══ -->
+    <section class="kindex" id="kindex">
+      <div class="section-head"><span class="idx">▸ INDEX</span><h2>知识索引 · 快速跳转</h2><span class="rule"></span></div>
+      <div class="kindex-grid">
+
+        <div class="kcard" style="--kc:var(--p1)">
+          <div class="kc-head"><div class="kc-icon">▣</div><div class="kc-title"><a href="architecture-notes/index.html">架构设计 & 质量属性</a></div></div>
+          <div class="kc-links">
+            <a href="architecture-notes/arch-basics.html">架构基础</a>
+            <a href="architecture-notes/dssa.html">DSSA</a>
+            <a href="architecture-notes/absd.html">ABSD</a>
+            <a href="architecture-notes/component.html">构件</a>
+            <a href="architecture-notes/arch-styles.html">架构风格</a>
+            <a href="architecture-notes/cbsd-vs-absd.html">CBSD vs ABSD</a>
+            <a href="architecture-notes/quality-attributes.html">质量属性</a>
+            <a href="architecture-notes/arch-evaluation.html">架构评估</a>
+          </div>
+        </div>
+
+        <div class="kcard" style="--kc:#f87171">
+          <div class="kc-head"><div class="kc-icon">◈</div><div class="kc-title"><a href="architecture-notes/index.html">信息安全（第10章）</a></div></div>
+          <div class="kc-links">
+            <a href="architecture-notes/security-basics.html">基础</a>
+            <a href="architecture-notes/security-crypto.html">加密·签名</a>
+            <a href="architecture-notes/security-attacks.html">抗攻击</a>
+            <a href="architecture-notes/security-network.html">网络安全</a>
+            <a href="architecture-notes/security-assurance.html">保证评估</a>
+          </div>
+        </div>
+
+        <div class="kcard" style="--kc:var(--p2)">
+          <div class="kc-head"><div class="kc-icon">⚙</div><div class="kc-title"><a href="architecture-notes/index.html">软件工程（第11章）</a></div></div>
+          <div class="kc-links">
+            <a href="architecture-notes/se-process-models.html">过程模型</a>
+            <a href="architecture-notes/se-system-design.html">系统设计</a>
+            <a href="architecture-notes/se-testing.html">测试</a>
+            <a href="architecture-notes/se-requirements.html">需求工程</a>
+            <a href="architecture-notes/se-requirements-management.html">需求管理</a>
+            <a href="architecture-notes/se-reverse-engineering.html">逆向工程</a>
+            <a href="architecture-notes/se-maintenance.html">维护</a>
+          </div>
+        </div>
+
+        <div class="kcard" style="--kc:#a78bfa">
+          <div class="kc-head"><div class="kc-icon">❖</div><div class="kc-title"><a href="software-engineering-notes/index.html">软件工程 & 面向对象</a></div></div>
+          <div class="kc-links">
+            <a href="software-engineering-notes/software-process-models.html">过程模型</a>
+            <a href="software-engineering-notes/cbse-component-based.html">CBSE</a>
+            <a href="software-engineering-notes/requirements-analysis.html">需求分析</a>
+            <a href="software-engineering-notes/system-design.html">系统设计</a>
+            <a href="software-engineering-notes/system-testing.html">系统测试</a>
+            <a href="software-engineering-notes/maintenance-legacy.html">运行维护</a>
+            <a href="software-engineering-notes/oo-uml-patterns.html">OO · UML</a>
+            <a href="software-engineering-notes/gof-23-patterns.html">GoF 23 设计模式</a>
+          </div>
+        </div>
+
+        <div class="kcard" style="--kc:var(--p3)">
+          <div class="kc-head"><div class="kc-icon">▦</div><div class="kc-title"><a href="database-notes/index.html">数据库精讲</a></div></div>
+          <div class="kc-links">
+            <a href="database-notes/db-basics.html">数据库基础</a>
+            <a href="database-notes/db-design-er-algebra.html">设计 · ER · 关系代数</a>
+            <a href="database-notes/functional-dependency-nf.html">函数依赖 · 范式</a>
+            <a href="database-notes/armstrong-decomposition.html">公理 · 模式分解</a>
+            <a href="database-notes/concurrency-locking.html">并发控制</a>
+            <a href="database-notes/distributed-nosql.html">分布式 · NoSQL</a>
+          </div>
+        </div>
+
+        <div class="kcard" style="--kc:#22d3ee">
+          <div class="kc-head"><div class="kc-icon">▥</div><div class="kc-title"><a href="os-notes/index.html">操作系统</a></div></div>
+          <div class="kc-links">
+            <a href="os-notes/os-key-points.html">操作系统常考知识点</a>
+          </div>
+        </div>
+
+        <div class="kcard" style="--kc:#f97316">
+          <div class="kc-head"><div class="kc-icon">☑</div><div class="kc-title"><a href="question-bank/index.html">题库练习</a></div></div>
+          <div class="kc-links">
+            <a href="question-bank/exam-arch-styles.html">真题 · 架构风格</a>
+            <a href="question-bank/exam-software-engineering.html">软件工程题库</a>
+            <a href="question-bank/exam-database.html">数据库题库</a>
+          </div>
+        </div>
+
+        <div class="kcard" style="--kc:var(--blueprint)">
+          <div class="kc-head"><div class="kc-icon">◆</div><div class="kc-title"><a href="index.html">知识库总索引</a></div></div>
+          <div class="kc-links">
+            <a href="index.html">康奈尔笔记知识库</a>
+            <a href="#">本学习计划</a>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ═══ 时间轴 ═══ -->
+    <section class="timeline reveal">
+      <div class="section-head"><span class="idx">▸ TIMELINE</span><h2>11 周全景</h2><span class="rule"></span></div>
+      <div class="week-bar p1">
+        <div class="week-cell"><div class="fill" style="animation-delay:.2s"></div><span class="wk-label">W1</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:.3s"></div><span class="wk-label">W2</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:.4s"></div><span class="wk-label">W3</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:.5s"></div><span class="wk-label">W4</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:.6s"></div><span class="wk-label">W5</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:.7s"></div><span class="wk-label">W6</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:.8s"></div><span class="wk-label">W7</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:.9s"></div><span class="wk-label">W8</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:1s"></div><span class="wk-label">W9</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:1.1s"></div><span class="wk-label">W10</span></div>
+        <div class="week-cell"><div class="fill" style="animation-delay:1.2s"></div><span class="wk-label">W11</span></div>
+      </div>
+    </section>
+
+    <!-- ═══ 第一阶段 ═══ -->
+    <section class="phase ph1">
+      <div class="phase-head">
+        <span class="phase-tag">PHASE 01</span>
+        <div class="phase-title">基础与核心</div>
+        <span class="phase-dates">7月上旬 — 8月中旬</span>
+        <span class="rule"></span>
+      </div>
+      <div class="weeks">
+        <!-- 第一周 -->
+        <article class="week" id="week-1" data-start="2026-07-06" data-end="2026-07-12" style="animation-delay:.1s">
+          <div class="week-top"><span class="week-no">WEEK 01</span><span class="week-hours">6.5<span class="u">h</span></span></div>
+          <div class="week-date">07.06 — 07.12</div>
+          <div class="week-chapter">第 3 章 · 操作系统</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">操作系统概述、进程 / 线程 / 死锁、内存管理、文件系统</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 进程与死锁是常考点，重点理解概念；周末集中看最后两节（进程和章节总结）。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><a href="os-notes/os-key-points.html">操作系统常考知识点</a></div>
+        </article>
+        <!-- 第二周 -->
+        <article class="week" id="week-2" data-start="2026-07-13" data-end="2026-07-19" style="animation-delay:.2s">
+          <div class="week-top"><span class="week-no">WEEK 02</span><span class="week-hours">7.5<span class="u">h</span></span></div>
+          <div class="week-date">07.13 — 07.19</div>
+          <div class="week-chapter">第 4-5 章 · 计算机网络 & 计算知识</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">网络协议、网络规划、OSI 模型；计算机基础知识</div></div>
+          <div class="week-tip"><span class="mark">▸</span> TCP/IP 协议栈是重中之重，务必吃透；计算机基础可穿插在周末一次性刷完。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><span class="wl-empty">暂无对应笔记，建议看教材视频</span></div>
+        </article>
+        <!-- 第三周 -->
+        <article class="week" id="week-3" data-start="2026-07-20" data-end="2026-07-26" style="animation-delay:.3s">
+          <div class="week-top"><span class="week-no">WEEK 03</span><span class="week-hours">12<span class="u">h</span></span></div>
+          <div class="week-date">07.20 — 07.26</div>
+          <div class="week-chapter">第 6 章 · 嵌入式技术</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">嵌入式基础、微处理、系统、操作系统</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 内容较厚重，工作日每天 1.5 小时、周末 4 小时；嵌入式偏记忆，可快速过。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><span class="wl-empty">暂无对应笔记，建议看教材视频</span></div>
+        </article>
+        <!-- 第四周 -->
+        <article class="week" id="week-4" data-start="2026-07-27" data-end="2026-08-02" style="animation-delay:.4s">
+          <div class="week-top"><span class="week-no">WEEK 04</span><span class="week-hours">8<span class="u">h</span></span></div>
+          <div class="week-date">07.27 — 08.02</div>
+          <div class="week-chapter">第 7-8 章 · 系统配置 & 信息系统</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">性能评估、信息系统基础、EAI 及 SOA 基础</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 信息系统的生命周期理论是重点，建议整理笔记。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><span class="wl-empty">暂无对应笔记，建议看教材视频</span></div>
+        </article>
+        <!-- 第五周 -->
+        <article class="week" id="week-5" data-start="2026-08-03" data-end="2026-08-09" style="animation-delay:.5s">
+          <div class="week-top"><span class="week-no">WEEK 05</span><span class="week-hours">14<span class="u">h</span></span></div>
+          <div class="week-date">08.03 — 08.09</div>
+          <div class="week-chapter">第 9 章 · 数据库技术</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">数据库模型、关系代数、范式、SQL</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 考试重头戏！"规范化理论"和"并发控制"易搞混，建议做思维导图。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><a href="database-notes/db-basics.html">数据库基础</a><a href="database-notes/db-design-er-algebra.html">设计·ER·关系代数</a><a href="database-notes/functional-dependency-nf.html">函数依赖·范式</a><a href="database-notes/armstrong-decomposition.html">公理·模式分解</a><a href="database-notes/concurrency-locking.html">并发控制</a><a href="database-notes/distributed-nosql.html">分布式·NoSQL</a></div>
+        </article>
+        <!-- 第六周 -->
+        <article class="week" id="week-6" data-start="2026-08-10" data-end="2026-08-16" style="animation-delay:.6s">
+          <div class="week-top"><span class="week-no">WEEK 06</span><span class="week-hours">18<span class="u">h</span></span></div>
+          <div class="week-date">08.10 — 08.16</div>
+          <div class="week-chapter">第 10-11 章 · 安全 & 软件工程</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">信息安全、安全攻击技术；软件工程、需求分析、系统设计（软件工程占 10h）</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 软件工程偏管理流程，需对比记忆瀑布、敏捷等模型；建议分两天周末攻坚。</div>
+          <div class="week-links"><span class="wl-cap">安全</span><a href="architecture-notes/security-basics.html">基础</a><a href="architecture-notes/security-crypto.html">加密技术</a><a href="architecture-notes/security-attacks.html">抗攻击</a><a href="architecture-notes/security-network.html">网络安全</a><a href="architecture-notes/security-assurance.html">保证评估</a><a href="architecture-notes/security-quiz.html" style="color:#34d399;border-color:rgba(52,211,153,.4);">▶ 做题</a></div>
+          <div class="week-links"><span class="wl-cap">软件工程</span><a href="architecture-notes/se-process-models.html">过程模型</a><a href="architecture-notes/se-system-design.html">系统设计</a><a href="architecture-notes/se-testing.html">测试</a><a href="architecture-notes/se-requirements.html">需求工程</a><a href="architecture-notes/se-requirements-management.html">需求管理</a><a href="architecture-notes/se-reverse-engineering.html">逆向工程</a><a href="architecture-notes/se-maintenance.html">维护</a></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ 第二阶段 ═══ -->
+    <section class="phase ph2">
+      <div class="phase-head">
+        <span class="phase-tag">PHASE 02</span>
+        <div class="phase-title">深化与架构</div>
+        <span class="phase-dates">8月下旬 — 9月初</span>
+        <span class="rule"></span>
+      </div>
+      <div class="weeks">
+        <!-- 第七周 -->
+        <article class="week" id="week-7" data-start="2026-08-17" data-end="2026-08-23" style="animation-delay:.1s">
+          <div class="week-top"><span class="week-no">WEEK 07</span><span class="week-hours">11<span class="u">h</span></span></div>
+          <div class="week-date">08.17 — 08.23</div>
+          <div class="week-chapter">第 12-14 章 · 工程扩展 & 面向对象 & 项目管理</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">软件维护、面向对象设计、项目管理、风险管理</div></div>
+          <div class="week-tip"><span class="mark">▸</span> OO 设计模式（单例、工厂等）是重点，务必理解 UML 图；PM 部分偏记忆，可快速过。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><a href="software-engineering-notes/oo-uml-patterns.html">OO · UML</a><a href="software-engineering-notes/gof-23-patterns.html">GoF 23 设计模式</a></div>
+        </article>
+        <!-- 第八周 -->
+        <article class="week" id="week-8" data-start="2026-08-24" data-end="2026-08-30" style="animation-delay:.2s">
+          <div class="week-top"><span class="week-no">WEEK 08</span><span class="week-hours">19<span class="u">h</span></span></div>
+          <div class="week-date">08.24 — 08.30</div>
+          <div class="week-chapter">第 15 章 · 系统架构设计</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">架构设计概念、风格、Web 应用、SOA</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 重中之重！架构风格（管道过滤器、分层、事件驱动等）是考试绝对核心，务必学透。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><a href="architecture-notes/arch-basics.html">架构基础</a><a href="architecture-notes/dssa.html">DSSA</a><a href="architecture-notes/absd.html">ABSD</a><a href="architecture-notes/component.html">构件</a><a href="architecture-notes/arch-styles.html">架构风格</a><a href="architecture-notes/cbsd-vs-absd.html">CBSD vs ABSD</a></div>
+        </article>
+        <!-- 第九周 -->
+        <article class="week" id="week-9" data-start="2026-08-31" data-end="2026-09-06" style="animation-delay:.3s">
+          <div class="week-top"><span class="week-no">WEEK 09</span><span class="week-hours">10<span class="u">h</span></span></div>
+          <div class="week-date">08.31 — 09.06</div>
+          <div class="week-chapter">第 16-18 章 · 质量属性 & 架构维护</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">质量属性、可靠性架构、架构演化维护、信息物理系统</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 质量属性场景（可用性、安全性、性能等）是论文与案例的重要素材，多看案例。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><a href="architecture-notes/quality-attributes.html">质量属性</a><a href="architecture-notes/arch-evaluation.html">架构评估</a></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ 第三阶段 ═══ -->
+    <section class="phase ph3">
+      <div class="phase-head">
+        <span class="phase-tag">PHASE 03</span>
+        <div class="phase-title">前沿拓展与案例冲刺</div>
+        <span class="phase-dates">9月中旬</span>
+        <span class="rule"></span>
+      </div>
+      <div class="weeks">
+        <!-- 第十周 -->
+        <article class="week" id="week-10" data-start="2026-09-07" data-end="2026-09-13" style="animation-delay:.1s">
+          <div class="week-top"><span class="week-no">WEEK 10</span><span class="week-hours">8<span class="u">h</span></span></div>
+          <div class="week-date">09.07 — 09.13</div>
+          <div class="week-chapter">第 19-21 章 · 新技术 & 数学 & 法律法规</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">人工智能 / 大数据 / 云计算、数学与经济管理、知识产权</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 新技术是近年热点，易考选择题；数学和 IP 法规偏死记硬背，周六一天可刷完。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><span class="wl-empty">暂无对应笔记，建议看教材视频</span></div>
+        </article>
+        <!-- 第十一周 -->
+        <article class="week" id="week-11" data-start="2026-09-14" data-end="2026-09-18" style="animation-delay:.2s">
+          <div class="week-top"><span class="week-no">WEEK 11</span><span class="week-hours">13<span class="u">h</span></span></div>
+          <div class="week-date">09.14 — 09.18</div>
+          <div class="week-chapter">第 22-23 章 · 案例专题分析</div>
+          <div class="week-block"><div class="t">重点内容</div><div class="c">架构、质量属性、数据库、嵌入式、Web、云原生、大数据等案例</div></div>
+          <div class="week-tip"><span class="mark">▸</span> 最后一公里冲刺！目标不是学新知识，而是培养"解题思路"。</div>
+          <div class="week-links"><span class="wl-cap">资料</span><a href="question-bank/exam-arch-styles.html">真题·架构风格</a><a href="question-bank/exam-software-engineering.html">软件工程题库</a><a href="question-bank/exam-database.html">数据库题库</a></div>
+        </article>
+      </div>
+    </section>
+
+    <!-- ═══ 学习贴士 ═══ -->
+    <section class="tips reveal">
+      <div class="section-head"><span class="idx">▸ TIPS</span><h2>学习小贴士</h2><span class="rule"></span></div>
+      <div class="tips-grid">
+        <div class="tip highlight">
+          <div class="tip-no">T-01</div>
+          <h3>二八原则 · 抓重点</h3>
+          <p>时间不够时，优先保证 <strong>数据库（第 9 章）、软件工程（第 11 章）、系统架构设计（第 15 章）、案例分析（第 22-23 章）</strong>，这几章分值最高、占比最大。</p>
+        </div>
+        <div class="tip">
+          <div class="tip-no">T-02</div>
+          <h3>不要快进"章节总结"</h3>
+          <p>计划中反复出现的"章节总结"非常关键，它能帮你把零散知识点串联成完整体系。</p>
+        </div>
+        <div class="tip">
+          <div class="tip-no">T-03</div>
+          <h3>周末集中爆发</h3>
+          <p>数据库 15 节、系统架构 20 多节等内容，工作日断断续续学容易忘，周末连续学习效果更好。</p>
+        </div>
+        <div class="tip">
+          <div class="tip-no">T-04</div>
+          <h3>预留缓冲期</h3>
+          <p>建议在 09.14 前完成所有视频，留出最后 1-2 周专门做题和论文练习（而非看视频），通过率更高。</p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <span>高级架构设计 · 备考蓝图</span>
+      <span>2026 · 备考顺利</span>
+    </footer>
+
+  </div>
+
+  <script>
+    // 时间轴进度条动画
+    const maxHours = 19;
+    document.querySelectorAll('.week-cell .fill').forEach(el => {
+      const hours = [6.5,7.5,12,8,14,18,11,19,10,8,13][
+        [...document.querySelectorAll('.week-cell .fill')].indexOf(el)
+      ];
+      el.style.width = (hours / maxHours * 100) + '%';
+    });
+
+    // 滚动触发卡片入场
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('reveal');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    document.querySelectorAll('.week:not(.reveal)').forEach(w => io.observe(w));
+
+    // ═══ 按系统时间高亮当前学习周 ═══
+    (function highlightByDate() {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const weeks = [...document.querySelectorAll('.week')];
+      const total = weeks.length;
+      let current = null;
+
+      weeks.forEach(w => {
+        const s = new Date(w.dataset.start + 'T00:00:00');
+        const e = new Date(w.dataset.end + 'T00:00:00');
+        let badge;
+        if (today < s) {
+          w.classList.add('is-future');
+          badge = '<span class="status-badge todo">○ 待学习</span>';
+        } else if (today > e) {
+          w.classList.add('is-past');
+          badge = '<span class="status-badge done">✓ 已完成</span>';
+        } else {
+          w.classList.add('is-current');
+          current = w;
+          const dayNo = Math.floor((today - s) / 86400000) + 1;
+          const dayTotal = Math.floor((e - s) / 86400000) + 1;
+          const remain = dayTotal - dayNo;
+          const remainTxt = remain > 0 ? ' · 剩 ' + remain + ' 天' : ' · 今日最后一天';
+          badge = '<span class="status-badge now"><span class="dot"></span>本周学习 · 第 ' + dayNo + '/' + dayTotal + ' 天' + remainTxt + '</span>';
+        }
+        w.insertAdjacentHTML('afterbegin', badge);
+      });
+
+      // 顶部导航实时状态
+      const tnNow = document.getElementById('tnNow');
+      const tnProgress = document.getElementById('tnProgress');
+      const pad = n => String(n).padStart(2, '0');
+      const fmt = d => (d.getMonth() + 1) + '.' + pad(d.getDate());
+      const doneCount = document.querySelectorAll('.week.is-past').length;
+
+      if (current) {
+        const ch = current.querySelector('.week-chapter').textContent;
+        const wno = current.querySelector('.week-no').textContent.trim();
+        tnNow.innerHTML = '今天 <b>' + now.getFullYear() + '.' + fmt(today) + '</b> · <b>' + wno + '</b> ' + ch + ' · 已完成 ' + doneCount + '/' + total + ' 周';
+      } else if (today < new Date(weeks[0].dataset.start + 'T00:00:00')) {
+        const days = Math.ceil((new Date(weeks[0].dataset.start + 'T00:00:00') - today) / 86400000);
+        tnNow.innerHTML = '今天 <b>' + now.getFullYear() + '.' + fmt(today) + '</b> · 计划尚未开始 · 距 W01 还有 ' + days + ' 天';
+      } else {
+        tnNow.innerHTML = '今天 <b>' + now.getFullYear() + '.' + fmt(today) + '</b> · 计划已全部完成 · 进入冲刺复习';
+      }
+      tnProgress.style.width = Math.round(doneCount / total * 100) + '%';
+
+      // 跳到本周
+      document.getElementById('tnJump').addEventListener('click', () => {
+        const pastWeeks = document.querySelectorAll('.week.is-past');
+        const target = current || pastWeeks[pastWeeks.length - 1] || weeks[0];
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+
+      // 时间轴标注当前周
+      const cells = [...document.querySelectorAll('.week-cell')];
+      if (current) {
+        const idx = weeks.indexOf(current);
+        if (cells[idx]) {
+          cells[idx].style.outline = '2px solid var(--amber)';
+          cells[idx].style.outlineOffset = '1px';
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

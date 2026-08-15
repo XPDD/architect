@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息安全 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--elevated:#1a2030;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text)}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)}
+  .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)}
+  .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)}
+  .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)}
+  .btn:disabled{opacity:.3;cursor:not-allowed}
+
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px}
+  .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700}
+  .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>信息安全 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"信息安全基础", q:"网络安全体系设计可从物理线路安全、网络安全、系统安全、应用安全等方面来进行。其中，数据库容灾属于（　）。",
+   options:["物理线路安全和网络安全","应用安全和网络安全","系统安全和网络安全","系统安全和应用安全"],
+   answer:3, explain:"数据库属于应用系统，又与操作系统相关，因此属于<b>系统安全和应用安全</b>。"},
+
+  {topic:"信息安全基础", q:"在进行软件系统安全性分析时，（　）保证信息不泄露给未授权的用户、实体或过程；完整性保证信息的完整和准确，防止信息被非法修改；（　）保证对信息的传播及内容具有控制的能力。",
+   options:["完整性、完整性","不可否认性、安全审计","可控性、加密性","机密性、可控性"],
+   answer:3, explain:"<b>机密性</b>保证信息不泄露给未授权实体/过程；<b>可控性</b>保证对信息的传播及内容具有控制能力。"},
+
+  {topic:"信息安全基础", q:"完整的信息安全系统至少包含三类措施，即技术方面的安全措施、管理方面的安全措施和相应的（　）。其中信息安全的技术措施主要有：信息加密、数字签名、身份鉴别、访问控制、网络控制技术、反病毒技术、（　）。",
+   options:["用户需求、数据备份和数据测试","政策法律、数据备份和灾难恢复","市场需求、数据迁移和数据备份","领域需求、数据迁移和数据测试"],
+   answer:1, explain:"三类措施：技术措施、管理措施和<b>政策法律</b>；技术措施还包括<b>数据备份和灾难恢复</b>。"},
+
+  {topic:"信息安全技术", q:"为保障数据的存储和运输安全，防止信息泄露，需对数据进行加密。由于对称密码算法（　），所以特别适合对大量的数据进行加密。",
+   options:["比非对称密码算法更安全","比非对称密码算法密钥更长","比非对称密码算法效率更高","还能同时用于身份认证"],
+   answer:2, explain:"对称加密加密速度快、<b>效率更高</b>，适合加密大数据；缺点是强度不高、密钥分发难。"},
+
+  {topic:"信息安全技术", q:"DES 是一种（　），其密钥长度为 56 位；3DES 是利用 DES 的加密方式，对明文进行 3 次加密以提高加密强度，其密钥长度是（　）位。",
+   options:["共享密钥、56","共享密钥、112","公开密钥、128","报文摘要、168"],
+   answer:1, explain:"DES 是<b>对称（共享密钥）</b>算法；3DES 用两个 56 位密钥（K1、K2），共 <b>112</b> 位。"},
+
+  {topic:"信息安全技术", q:"要对消息明文进行加密传送，当前通常使用的加密算法是（　）。",
+   options:["RSA","SHA-1","MD5","RC5"],
+   answer:3, explain:"RSA 效率低一般不直接用于明文加密；SHA-1 与 MD5 属于<b>信息摘要</b>算法，不能加密数据；<b>RC5</b> 是对称密码算法，适合加密明文。"},
+
+  {topic:"信息安全技术", q:"数字签名技术属于信息系统安全管理中保证信息（　）的技术。",
+   options:["保密性","可用性","完整性","可靠性"],
+   answer:2, explain:"数字签名保证信息传输的<b>完整性</b>、发送者的身份认证、防止交易中的抵赖，但不保证机密性。"},
+
+  {topic:"信息安全技术", q:"甲向乙发送其数据签名，要验证该签名，乙可使用（　）对该签名进行解密。",
+   options:["甲的私钥","甲的公钥","乙的私钥","乙的公钥"],
+   answer:1, explain:"数字签名用<b>发送者私钥加密</b>，接收者用<b>发送者公钥</b>解密验证。"},
+
+  {topic:"信息安全技术", q:"假设 A 和 B 之间要进行加密通信，正确的非对称加密流程是（　）。\n①A 和 B 都要产生一对加密/解密密钥\n②A 将公钥传给 B、私钥自留；B 将公钥传给 A、私钥自留\n③A 发消息时先用 B 的公钥加密\n④B 收到后用自己的私钥解密",
+   options:["①②③④","①③④②","③①②④","②③①④"],
+   answer:0, explain:"正确流程：产生密钥对 → 交换公钥、私钥自留 → 用<b>对方公钥</b>加密 → 用<b>自己私钥</b>解密。"},
+
+  {topic:"抗攻击技术", q:"SYN Flooding 攻击的原理是（　）。",
+   options:["利用TCP三次握手，恶意造成大量TCP半连接，耗尽服务器资源，导致系统拒绝服务","操作系统在实现TCP/IP协议栈时，不能很好地处理TCP报文的序列号紊乱问题，导致系统崩溃","操作系统在实现TCP/IP协议栈时，不能很好地处理IP分片包的重叠情况，导致系统崩溃","操作系统协议栈在处理IP分片时，对于重组后超大的IP数据包不能很好地处理，导致缓存溢出"],
+   answer:0, explain:"SYN Flooding 利用 TCP 三次握手只进行两次，制造大量<b>半连接</b>占满连接队列，使服务器拒绝服务。"},
+
+  {topic:"网络安全协议", q:"下面可提供安全电子邮件服务的是（　）。",
+   options:["RSA","SSL","SET","S/MIME"],
+   answer:3, explain:"<b>S/MIME</b> 是对 MIME 的安全扩展，提供安全电子邮件服务。"},
+
+  {topic:"网络安全协议", q:"网络管理员通过命令行方式对路由器进行管理，要确保 ID、口令和会话内容的保密性，应采取的访问方式是（　）。",
+   options:["控制台","AUX","TELNET","SSH"],
+   answer:3, explain:"<b>SSH</b>（安全外壳协议）加强 Telnet/FTP 的传输安全，保证口令与会话保密。"},
+
+  {topic:"网络安全协议", q:"以下关于第三方认证服务的叙述中，正确的是（　）。",
+   options:["Kerberos 认证服务中保存数字证书的服务器叫 CA","第三方认证服务的两种体制分别是 Kerberos 和 PKI","PKI 体制中保存数字证书的服务器叫 KDC","Kerberos 的中文全称是「公钥基础设施」"],
+   answer:1, explain:"第三方认证两种体制为 <b>Kerberos</b>（基于信任第三方/KDC）和 <b>PKI</b>（保存证书的服务器叫 CA）。"},
+
+  {topic:"保证体系评估", q:"GB17859 规定计算机系统安全保护能力共五个等级，其中第五级是（　），其特征是访问监控器仲裁主体对客体的全部访问，且访问监控器本身抗篡改、足够小。",
+   options:["系统审计保护级","安全标记保护级","结构化保护级","访问验证保护级"],
+   answer:3, explain:"第五级为<b>访问验证保护级</b>，由访问监控器仲裁全部访问。"},
+
+  {topic:"保证体系评估", q:"在五级安全保护等级中，实施强制访问控制、提供安全策略模型和数据标记的是（　）。",
+   options:["用户自主保护级","系统审计保护级","安全标记保护级","结构化保护级"],
+   answer:2, explain:"<b>安全标记保护级</b>（第三级）具备系统审计保护级所有功能，并提供安全策略模型、数据标记与强制访问控制。"},
+
+  {topic:"保证体系评估", q:"风险评估的基本要素不包括（　）。",
+   options:["脆弱性","资产","安全措施","业务战略"],
+   answer:3, explain:"基本要素是<b>脆弱性、资产、威胁、风险、安全措施</b>；业务战略、资产价值、安全需求、安全事件、残余风险属于相关属性，不是要素。"},
+
+  {topic:"保证体系评估", q:"风险计算的过程中，第一步是（　）。",
+   options:["对威胁进行分析并赋值","对信息资产进行识别并赋值","识别脆弱性并赋值","结合资产重要性计算风险值"],
+   answer:1, explain:"风险计算 5 步：①<b>识别信息资产并赋值</b> → ②分析威胁赋值 → ③识别脆弱性赋值 → ④计算安全事件可能性 → ⑤结合资产重要性计算风险值。"},
+
+  {topic:"保证体系评估", q:"第一级「用户自主保护级」损害的客体是公民、法人和其他组织，主要适用于（　）。",
+   options:["国家重要领域的核心系统","地市级以上国家机关的重要信息系统","小微企业、乡镇单位一般的信息系统","中型企业、县市级单位一般的信息系统"],
+   answer:2, explain:"第一级适用于<b>小微企业、乡镇单位</b>一般的信息系统；第二级为中型企业、县市级单位。"},
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q.replace(/\n/g,'<br>')}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+
+  document.querySelectorAll('.opt').forEach(opt=>{
+    opt.addEventListener('click', ()=>onAnswer(opt, q));
+  });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{
+    o.classList.add('locked');
+    if (oIdx === q.answer) o.classList.add('correct');
+    else o.classList.add('dim');
+  });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好，继续保持！' : pct >= 60 ? '基本掌握，错题建议回顾对应笔记。' : '还需加强，建议重看信息安全笔记后再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+// 支持 URL 锚点跳转到指定知识点：security-quiz.html#信息安全技术 或 #4
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else {
+    for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } }
+  }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>
