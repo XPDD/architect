@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>层次架构 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>层次架构 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"N层架构", q:"软件层次式体系结构（N 层架构模式）中，大部分应用通常分为四层，自上而下正确的是（　）。",
+   options:["表现层、业务层、数据访问层、数据层","业务层、表现层、数据层、数据访问层","数据层、数据访问层、业务层、表现层","表现层、数据层、业务层、数据访问层"],
+   answer:0, explain:"N 层架构自上而下：<b>表现层（展示层）→ 业务层（中间层）→ 数据访问层（持久层）→ 数据层</b>。"},
+
+  {topic:"业务层", q:"在层次架构的业务容器中，业务逻辑按 Domain Model—Service—Control 思想实现，其中充当「服务之间的纽带、实现不同服务之间切换」的是（　）。",
+   options:["Domain Model","Service","Control","DTO"],
+   answer:2, explain:"<b>Control（服务控制器）</b>是服务之间的纽带，不同服务的切换通过它实现；Domain Model 只含业务属性，Service 是功能单元。"},
+
+  {topic:"业务层", q:"业务框架中，仅包含业务相关的属性、属于领域层业务对象的是（　）。",
+   options:["Control","Service","Domain Model","DAO"],
+   answer:2, explain:"<b>Domain Model</b> 是领域层业务对象，仅仅包含业务相关的属性。"},
+
+  {topic:"数据访问模式", q:"下列数据访问模式中，属于「标准 J2EE 设计模式之一，用于将底层数据访问操作与高层业务逻辑分离」的是（　）。",
+   options:["在线访问","Data Access Object（DAO）","离线数据模式","对象/关系映射（O/R Mapping）"],
+   answer:1, explain:"<b>DAO</b> 是标准 J2EE 设计模式，将底层数据访问与高层业务逻辑分离；DTO 是经典 EJB 模式，跨进程/网络传输数据。"},
+
+  {topic:"数据访问模式", q:"关于 DTO（Data Transfer Object）的叙述，正确的是（　）。",
+   options:["DTO 内部应包含丰富的业务逻辑处理","DTO 通常只能进行内部一致性检查和基本验证，不应包含业务逻辑","DTO 只能在同一个进程内使用","DTO 是数据库连接对象"],
+   answer:1, explain:"<b>DTO</b> 是跨进程/网络边界传输数据的容器，<b>不应包含具体业务逻辑</b>，只能进行内部一致性检查和基本验证，且最好不调用其他对象行为。"},
+
+  {topic:"数据访问模式", q:"在数据访问层设计中，采用「以数据为中心，数据从数据源获取后按预定义结构存放，对数据的操作独立于与后台数据源的连接或事务」的是（　）。",
+   options:["在线访问","DAO","离线数据模式","工厂模式"],
+   answer:2, explain:"<b>离线数据模式</b>以数据为中心，操作独立于后台数据源连接/事务；在线访问会占用连接不断交互。"},
+
+  {topic:"工厂模式", q:"在数据访问层用工厂模式实现数据库切换时，通常先定义操纵数据库的接口（　），再根据数据库类型由类工厂实例化对应实现类。",
+   options:["DataAccess","AbstractDataAccess","Factory","Connection"],
+   answer:0, explain:"先定义接口 <b>DataAccess</b>，再从它实现抽象类 AbstractDataAccess（公用方法），最后写 SQL Server/Oracle/MySQL 三个具体实现，由 <b>Factory 类</b>按数据库类型返回对应操纵类。"},
+
+  {topic:"事务处理", q:"使用 JDBC 进行事务处理时，要将多个 SQL 语句组合成一个事务，正确的做法是（　）。",
+   options:["保持 auto-commit 开启并依次执行","屏蔽 auto-commit 模式，最后统一调用 commit() 确认","每执行一条 SQL 就调用一次 commit()","使用 rollback() 代替 commit()"],
+   answer:1, explain:"JDBC 连接默认 <b>auto-commit</b>（每条 SQL 单独提交），要组合多 SQL 需<b>屏蔽 auto-commit</b>，最后统一调用 <b>commit()</b> 确认。"},
+
+  {topic:"物联网", q:"物联网三层架构中，负责「识别物体、采集信息，解决人类世界和物理世界数据获取问题」，其作用类似人体「皮肤和五官」的是（　）。",
+   options:["应用层","网络层","感知层","数据层"],
+   answer:2, explain:"<b>感知层</b>（二维码、RFID、摄像头、GPS、传感器等）负责采集信息，类比<b>皮肤和五官</b>；网络层类比神经中枢和大脑，应用层类比社会分工。"},
+
+  {topic:"物联网", q:"电子小票服务系统采用物联网三层架构，其中「电子小票云平台基础服务（数据传输处理、存储、商家/会员/商品管理）」属于（　）。",
+   options:["感知层","网络层","应用层","数据层"],
+   answer:1, explain:"电子小票云平台基础服务属于<b>网络层</b>；小票智能硬件（采集收银机小票）属于感知层；云平台小票服务/数据服务属于应用层。"},
+
+  {topic:"连接池", q:"数据库连接池（连接对象管理设计）解决的核心问题是（　）。",
+   options:["提高 SQL 执行速度","解决资源频繁分配、释放所造成的问题","实现跨数据库切换","保证事务的 ACID 特性"],
+   answer:1, explain:"连接池通过<b>资源池</b>解决资源频繁分配/释放造成的问题：请求时找空闲连接，无空闲则复用，释放时放回连接池而非关闭。"},
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好，继续保持！' : pct >= 60 ? '基本掌握，错题建议回顾层次架构笔记。' : '还需加强，建议重看层次架构笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

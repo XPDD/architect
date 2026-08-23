@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>操作系统基础 · 康奈尔笔记索引</title>
+<title>信息系统基础知识 · 康奈尔笔记索引</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -65,101 +65,95 @@
 <div class="container">
 
   <div class="hero">
-    <div class="hero-badge">OPERATING SYSTEM · KNOWLEDGE BASE</div>
-    <div class="hero-title">操作系统<span class="accent">基础</span></div>
-    <div class="hero-sub">概述 · 进程 · PV 操作 · 死锁 · 存储 · 文件 · 设备 · 8 篇笔记 + 22 道自测题</div>
+    <div class="hero-badge">INFORMATION SYSTEM · KNOWLEDGE BASE</div>
+    <div class="hero-title">信息系统<span class="accent">基础知识</span></div>
+    <div class="hero-sub">概述 · 专家系统 · OAS · ERP · 电子政务 · 开发方法 · TPS/MIS/DSS · 7 篇笔记 + 22 道自测题</div>
     <div class="hero-stats">
-      <span class="hero-stat">共 <strong>8</strong> 篇笔记</span>
+      <span class="hero-stat">共 <strong>7</strong> 篇笔记</span>
       <span class="hero-stat">自测 <strong>22</strong> 题</span>
-      <span class="hero-stat">常考 <strong>3-5 分</strong></span>
+      <span class="hero-stat">常考 <strong>选择 1 分</strong></span>
     </div>
   </div>
 
   <div class="part-header">
-    <div class="part-num">03</div>
-    <div class="part-info"><h2>操作系统基础</h2><span>第三章 · 高频考点 · 进程/存储/文件/设备四模块</span></div>
+    <div class="part-num">01</div>
+    <div class="part-info"><h2>信息系统基础知识</h2><span>章节权重低（约 1 分）· 名词记忆为主 · 熟悉即可</span></div>
   </div>
 
-  <a class="note-card" href="os-quiz.html" style="border-color:rgba(52,211,153,.3);">
+  <a class="note-card" href="is-quiz.html" style="border-color:rgba(52,211,153,.3);">
     <div class="note-icon green">&#x2713;</div>
-    <div class="note-body"><h3>真题 · 自测练习（22 题 · 交互做题）</h3><p>点选判分 · 带解析 · 覆盖概述/进程/PV/死锁/存储/文件/设备</p></div>
+    <div class="note-body"><h3>真题 · 自测练习（22 题 · 交互做题）</h3><p>点选判分 · 带解析 · 覆盖概述/ES/OAS/ERP/电子政务/开发方法/TPS/MIS/DSS</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-overview.html">
-    <div class="note-icon cyan">OS</div>
-    <div class="note-body"><h3>操作系统概述 — 作用 · 特征 · 功能 · 分类 · 微内核</h3><p>并共虚不 · 进存文设作 · BIOS 启动 · 微内核 vs 单体内核 · 嵌入式</p></div>
+  <a class="note-card" href="is-overview.html">
+    <div class="note-icon cyan">IS</div>
+    <div class="note-body"><h3>信息系统概述 — 五功能 · 诺兰模型 · 分类 · 生命周期</h3><p>人机一体化 · 输存处出控 · 诺兰 6 阶段 · TPS→MIS→DSS→ES→OAS · 建设原则</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-process.html">
-    <div class="note-icon blue">PR</div>
-    <div class="note-body"><h3>进程管理基础 — 组成 · 三态五态 · 线程 · 前趋图 · 资源图</h3><p>PCB · 就绪/运行/等待 · 线程共享代码不共享栈 · 全阻塞即死锁</p></div>
+  <a class="note-card" href="is-es.html">
+    <div class="note-icon purple">ES</div>
+    <div class="note-body"><h3>专家系统 ES — 概念 · 三要素 · 六组成 · 特点</h3><p>AI 分支 · 知识库/推理机/综合数据库 · 专用性强通用性差</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-pv.html">
-    <div class="note-icon purple">PV</div>
-    <div class="note-body"><h3>PV 操作与信号量 — P/V 语义 · 生产者消费者</h3><p>P 申请减一 S&lt;0 阻塞 · V 释放加一 S≤0 唤醒 · 尾 V 头 P</p></div>
+  <a class="note-card" href="is-oas.html">
+    <div class="note-icon green">OA</div>
+    <div class="note-body"><h3>办公自动化系统 OAS — 四大支柱 · 三大功能</h3><p>行为科学主导 · 事务处理/信息管理/辅助决策</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-deadlock.html">
-    <div class="note-icon rose">DL</div>
-    <div class="note-body"><h3>死锁与银行家算法 — 四条件 · 四措施 · 资源计算</h3><p>互斥+占有等待+不可剥夺+环路 · n×(R−1)+1 · 银行家安全序列</p></div>
+  <a class="note-card" href="is-erp.html">
+    <div class="note-icon amber">EP</div>
+    <div class="note-body"><h3>企业资源规划 ERP — 演变 · 资源 · 模块</h3><p>MRP→MRPⅡ→ERP · 四大资源 · 11 模块 · 三层理解</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-memory.html">
-    <div class="note-icon amber">MM</div>
-    <div class="note-body"><h3>存储管理 — 页式 · 段式 · 段页式 · 快表 · 页面置换</h3><p>块号×块大小+偏移 · 段基址+偏移 · OPT/FIFO/LRU</p></div>
+  <a class="note-card" href="is-egovernment.html">
+    <div class="note-icon blue">EG</div>
+    <div class="note-body"><h3>电子政务 + 企业信息化 — 阶段 · 模式 · 方法</h3><p>4 阶段 · G2G/G2B/G2C/B2G/C2G · 企业信息化 6 方法</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-file.html">
-    <div class="note-icon green">FL</div>
-    <div class="note-body"><h3>文件管理 — 索引文件 · 目录结构 · 位示图</h3><p>直接 40KB / 一级 4MB / 二级 4GB · 相对/绝对路径 · 位示图计算</p></div>
+  <a class="note-card" href="is-dev-methods.html">
+    <div class="note-icon rose">DV</div>
+    <div class="note-body"><h3>信息系统开发方法 — 结构化 · 原型化 · OO · SOA</h3><p>SA/SD/SP · 水平/垂直原型 · 松耦合 · 四方法对比</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-device.html">
-    <div class="note-icon purple">DV</div>
-    <div class="note-body"><h3>设备管理 — I/O 技术 · SPOOLING</h3><p>程序控制→中断→DMA 效率递增 · 输入井输出井 · 设备虚拟化</p></div>
-    <span class="note-arrow">&#x2197;</span>
-  </a>
-
-  <a class="note-card" href="os-key-points.html">
-    <div class="note-icon cyan">KP</div>
-    <div class="note-body"><h3>操作系统常考知识点（旧版汇总）</h3><p>进程/存储/文件/设备四大模块一页速览 · 直播精华提炼</p></div>
+  <a class="note-card" href="is-tps-mis-dss.html">
+    <div class="note-icon purple">TD</div>
+    <div class="note-body"><h3>TPS · MIS · DSS — 三层台阶</h3><p>信息产生器 · 四大部件 · 两库结构 · 数据挖掘 4 类</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
   <div class="relation-diagram">
     <h2>&#x25C6; 知识体系关系图</h2>
     <div class="flow-row">
-      <div class="flow-box accent" style="font-size:14px;padding:10px 20px;">操作系统概述<br><small>并共虚不 · 进存文设作 · 微内核</small></div>
+      <div class="flow-box accent" style="font-size:14px;padding:10px 20px;">信息系统概述<br><small>五功能 · 诺兰模型 · 生命周期</small></div>
     </div>
     <div class="flow-v-arrow">&#x2193;</div>
     <div class="flow-row">
-      <div class="flow-box primary">进程管理<br><small>三态五态 · PV · 死锁</small></div>
-      <div class="flow-arrow">+</div>
-      <div class="flow-box primary">存储管理<br><small>页式 · 段式 · 段页式</small></div>
+      <div class="flow-box primary">分类体系<br><small>TPS → MIS → DSS → ES → OAS</small></div>
     </div>
     <div class="flow-v-arrow">&#x2193;</div>
     <div class="flow-row">
-      <div class="flow-box">文件管理<br><small>索引 · 位示图</small></div>
+      <div class="flow-box">典型系统<br><small>ES · OAS · ERP</small></div>
       <div class="flow-arrow">+</div>
-      <div class="flow-box">设备管理<br><small>DMA · SPOOLING</small></div>
+      <div class="flow-box">政府/企业<br><small>电子政务 · 企业信息化</small></div>
       <div class="flow-arrow">+</div>
-      <div class="flow-box" style="border-color:rgba(248,113,113,.2);color:var(--rose);">真题自测<br><small>22 题</small></div>
+      <div class="flow-box" style="border-color:rgba(248,113,113,.2);color:var(--rose);">开发方法<br><small>结构化·原型·OO·SOA</small></div>
     </div>
     <div class="flow-row" style="margin-top:8px;">
-      <div class="flow-box" style="font-size:10px;border:none;color:var(--text-muted);">概述 → 进程 + 存储 → 文件 + 设备 → 真题自测</div>
+      <div class="flow-box" style="font-size:10px;border:none;color:var(--text-muted);">概述 → 分类 → 典型系统 + 开发方法 → 真题自测</div>
     </div>
   </div>
 
   <div style="text-align:center;padding:20px;font-size:12px;color:var(--text-muted);margin-top:8px;">
-    <a href="../index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);">&#x2190; 返回总索引</a>
+    <a href="../index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);">&#x2190; 返回总索引</a> &nbsp;&middot;&nbsp;
+    <a href="../architecture-notes/index.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.2);">架构·安全·软工笔记</a> &nbsp;&middot;&nbsp;
+    <a href="../database-notes/index.html" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(251,191,36,.2);">数据库笔记</a>
   </div>
 
 </div>

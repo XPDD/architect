@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算机系统知识 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>计算机系统知识 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+{ topic:"radix", q:"将二进制 1100.101 转化为十进制，结果是（　）。",
+    options:["12.625","12.75","24.625","24.75"],
+    answer:0, explain:"<b>解析：</b>1100 = 8+4 = 12，.101 = 0.5+0+0.125 = 0.625，合计 12.625。选 12.75 是把 .101 错当 0.75（0.75 应为 .11）；选 24 开头是整数部分算成 16+8。" },
+{ topic:"radix", q:"将十进制 11.75 转化为二进制，结果是（　）。",
+    options:["1011.11","1010.11","1010.01","1011.01"],
+    answer:0, explain:"<b>解析：</b>整数 11 除 2 取余倒序 = 1011，小数 0.75 乘 2 取整正序 = .11，故 1011.11。1010 是 10、.01 是 0.25、.11 是 0.75，注意别把整数和小数搞反。" },
+{ topic:"datacode", q:"如果「2X」的补码是 90H，那么 X 的真值是（　）。",
+    options:["56","-56","72","-72"],
+    answer:1, explain:"<b>解析：</b>90H = 10010000B，符号位 1 为负。补码转原码：取反加 1 → 01101111 + 1 = 01110000 = 112，故 2X = −112，X = −56。直接当 90H=144 或用错符号位会得 72/−72。" },
+{ topic:"datacode", q:"两个浮点数相加时，需要先对阶，即（　）（n 为阶差的绝对值）。",
+    options:["将大阶向小阶对齐，同时将尾数左移 n 位","将大阶向小阶对齐，同时将尾数右移 n 位","将小阶向大阶对齐，同时将尾数左移 n 位","将小阶向大阶对齐，同时将尾数右移 n 位"],
+    answer:3, explain:"<b>解析：</b>对阶原则「小数向大数看齐」：小阶向大阶对齐，通过较小数尾数右移 n 位实现。方向（小→大）和移位（右移）两个维度都容易设反成坑。" },
+{ topic:"checkcode", q:"给出编码 1001101 的奇校验码和偶校验码（　）。",
+    options:["10011011，10011010","10011011，10011011","10011010，10011010","10011010，10011011"],
+    answer:0, explain:"<b>解析：</b>1001101 中 1 的个数为 4（偶）。奇校验加 1 凑成奇数（5 个 1）→ 10011011；偶校验加 0 保持偶数 → 10011010。B/C/D 都把奇偶校验位的方向搞反了。" },
+{ topic:"checkcode", q:"设数据位是 n 位、校验位是 k 位，则海明码中 n 与 k 必须满足（　）。",
+    options:["2^k − 1 ≥ n + k","2^n − 1 ≥ n + k","2^k − 1 ≤ n + k","k ≥ n"],
+    answer:0, explain:"<b>解析：</b>海明码要求 2^k − 1 ≥ n + k，即 k 个校验位能覆盖全部 n+k 位的出错位置。其余是干扰公式（指数位置、不等号方向都易错）。" },
+{ topic:"memory", q:"某计算机 Cache 命中率为 90%，Cache 访问时间为 1ns，主存访问时间为 100ns，则平均访问时间约为（　）。",
+    options:["10.9ns","0.9ns","10ns","100ns"],
+    answer:0, explain:"<b>解析：</b>平均访问时间 = h·t_c + (1−h)·t_m = 0.9×1 + 0.1×100 = 0.9 + 10 = 10.9ns。0.9 是只算命中部分、10 是漏了命中部分、100 是当成全部未命中。" },
+{ topic:"memory", q:"在程序执行过程中，Cache 与主存的地址映射是由（　）完成的。",
+    options:["操作系统","程序员调度","硬件自动","用户软件"],
+    answer:2, explain:"<b>解析：</b>Cache 与主存的地址映射由硬件自动完成，对程序员和操作系统透明。其余选项都不正确。" },
+{ topic:"cache", q:"Cache 的地址映像方式中，发生块冲突次数最小的是（　）。",
+    options:["全相联映像","组相联映像","直接映像","无法确定"],
+    answer:0, explain:"<b>解析：</b>全相联映像允许主存任一块调入 Cache 任意块，冲突率最低（但电路复杂、速度慢）。直接映像冲突率最高，组相联居中。" },
+{ topic:"cache", q:"Cache 的替换算法中，（　）算法计数器位数多，实现困难。",
+    options:["FIFO","LFU","LRU","RAND"],
+    answer:1, explain:"<b>解析：</b>LFU（最不频繁使用）需为每块记录访问次数，计数器位数多、实现最困难。LRU 记访问时间、FIFO 记进入顺序、RAND 无需计数，都比 LFU 简单。" },
+{ topic:"disk", q:"在磁盘调度管理中，通常（　）。",
+    options:["先进行旋转调度，再进行移臂调度","在访问不同柱面的信息时，只需要进行旋转调度","先进行移臂调度，再进行旋转调度","在访问同一磁道的信息时，只需要进行移臂调度"],
+    answer:2, explain:"<b>解析：</b>磁盘调度先移臂（寻道找柱面）后旋转（找扇区）。A 顺序颠倒；B 访问不同柱面必须移臂；D 访问同一磁道只需旋转调度、不需要移臂（表述错误）。" },
+{ topic:"io", q:"DMA 控制方式是在（　）之间直接建立数据通路进行数据的交换处理。",
+    options:["CPU 与主存","CPU 与外设","主存与外设","外设与外设"],
+    answer:2, explain:"<b>解析：</b>DMA 在主存与 I/O 设备（外设）之间直接建立数据通路，传送过程无需 CPU 干预。CPU 与外设、CPU 与主存的交换都需经过 CPU，不是 DMA 的直接通路。" },
+{ topic:"io", q:"CPU 需要与外设进行数据交换，采用（　）控制技术时，CPU 与外设可并行工作。",
+    options:["程序查询方式和中断方式","中断方式和 DMA 方式","程序查询方式和 DMA 方式","程序查询方式、中断方式和 DMA 方式"],
+    answer:1, explain:"<b>解析：</b>中断方式（外设就绪发中断）和 DMA 方式（数据传送不经 CPU）下 CPU 与外设可并行工作；程序查询方式下 CPU 需不停查询等待，不能并行。" },
+{ topic:"reliability", q:"某系统由 3 个部件构成，每个部件的千小时可靠度都为 R，该系统的千小时可靠度为 (1−(1−R)²)R，则该系统的构成方式是（　）。",
+    options:["3 个部件串联","3 个部件并联","前两个部件并联后与第三个部件串联","第一个部件与后两个部件并联构成的子系统串联"],
+    answer:2, explain:"<b>解析：</b>(1−(1−R)²) 是前两个部件并联的可靠度，再乘 R 是与第三个部件串联。所以是「前两个并联后与第三个串联」，注意区分并联/串联的组合顺序。" },
+{ topic:"crypto", q:"下列算法中属于非对称加密算法的是（　）。",
+    options:["DES","RSA","AES","MD5"],
+    answer:1, explain:"<b>解析：</b>RSA 是非对称（公钥）加密算法。DES、AES 是对称加密算法；MD5 是消息摘要（哈希），根本不是加密算法，是最常见陷阱。" },
+{ topic:"radix", q:"二进制数 1011010 对应的十六进制数是（　）。",
+    options:["5AH","5BH","DAH","B5H"],
+    answer:0, explain:"<b>解析：</b>从右往左每 4 位一组：0101 1010 → 5 A，故 5AH。0101=5、1010=A；其余选项是分组或转换出错。" },
+{ topic:"datacode", q:"移码（增码）通常用于表示浮点数中的（　）。",
+    options:["尾数","阶码","符号","校验位"],
+    answer:1, explain:"<b>解析：</b>移码 = 补码的符号位取反，用于表示浮点数的阶码，好处是便于直接比较大小。尾数用原码或补码表示。" },
+{ topic:"datacode", q:"浮点数中，决定其表示精度的是（　）。",
+    options:["阶码","尾数","符号位","基数"],
+    answer:1, explain:"<b>解析：</b>阶码决定数值范围（大小），尾数决定精度（有效位数），符号位只定正负，基数是进制。口诀「阶码管范围、尾数管精度」。" },
+{ topic:"checkcode", q:"CRC 循环冗余校验码编码时采用的主要运算是（　）。",
+    options:["模2加法（异或）","模2除法","普通二进制除法","模2乘法"],
+    answer:1, explain:"<b>解析：</b>CRC 用「模2除法」（无借位、无进位的除法，其减/加即异或）求余数作为校验码。注意是模2除法，不是单纯异或加法。" },
+{ topic:"memory", q:"关于 SRAM 和 DRAM，下列叙述正确的是（　）。",
+    options:["SRAM 需要周期刷新","DRAM 速度比 SRAM 快","SRAM 速度比 DRAM 快，DRAM 需要周期刷新","两者都需要周期刷新"],
+    answer:2, explain:"<b>解析：</b>SRAM 用触发器、速度快、无需刷新、成本高（用作 Cache）；DRAM 用电容、速度慢、需周期刷新、成本低（用作主存）。" },
+{ topic:"memory", q:"虚拟存储器是建立在（　）之间的存储层次结构。",
+    options:["主存与 Cache","主存与外存","Cache 与外存","寄存器与主存"],
+    answer:1, explain:"<b>解析：</b>虚拟存储器利用「主存 + 外存」构成逻辑上更大的地址空间，靠硬件 + 操作系统管理。主存与 Cache 是高速缓冲（不是虚拟存储）。" },
+{ topic:"cache", q:"Cache 写策略中，写回法（Write Back）是指（　）。",
+    options:["CPU 每次写都同时写 Cache 和主存","CPU 写数据时只写 Cache，被替换时才写回主存","CPU 写数据时只写主存","CPU 写数据时只写 Cache，永不写回"],
+    answer:1, explain:"<b>解析：</b>写回法：数据只写入 Cache，Cache 行被替换时才写回主存（需「脏位」标记）；写直达法：每次同时写 Cache 与主存。两者别混淆。" },
+{ topic:"disk", q:"磁盘的存取时间（访问时间）由（　）组成。",
+    options:["寻道时间、旋转延迟、传输时间","寻道时间、旋转延迟","旋转延迟、传输时间","寻道时间、传输时间"],
+    answer:0, explain:"<b>解析：</b>访问时间 = 寻道时间（磁头移动找柱面）+ 旋转延迟（找扇区）+ 传输时间（读写数据）。三项缺一不可。" },
+{ topic:"io", q:"在 I/O 控制方式中，CPU 与 I/O 设备并行程度最高的是（　）。",
+    options:["程序查询方式","中断方式","DMA 方式","通道方式"],
+    answer:3, explain:"<b>解析：</b>通道是专用的 I/O 处理器，独立管理 I/O 全流程，CPU 并行度最高；DMA 仅数据传送不经 CPU（仍需 CPU 启停），并行度次之；中断、程序查询更低。" },
+{ topic:"reliability", q:"系统的可用性（可用率）可用（　）表示。",
+    options:["MTBF/(MTBF+MTTR)","MTTR/(MTBF+MTTR)","MTBF/MTTR","MTTR/MTBF"],
+    answer:0, explain:"<b>解析：</b>可用性 = MTBF/(MTBF+MTTR)，即平均无故障时间占总时间的比例。分子分母颠倒、用比值 MTBF/MTTR 都是常见陷阱。" }
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

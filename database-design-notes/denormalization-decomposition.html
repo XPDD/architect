@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 反规范化与模式分解</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:860px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+  .header-badge-icon{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--cyan)}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}.note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .hl-red{color:var(--rose);background:linear-gradient(180deg,transparent 58%,rgba(248,113,113,.12)58%);padding:0 2px;font-weight:600}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green)}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px}
+  .tip{font-size:11.5px;color:var(--amber);background:rgba(251,191,36,.06);border-left:2px solid var(--amber);padding:8px 12px;border-radius:4px;margin:8px 0;line-height:1.6}
+  .warn{font-size:11.5px;color:var(--rose);background:rgba(248,113,113,.06);border-left:2px solid var(--rose);padding:8px 12px;border-radius:4px;margin:8px 0;line-height:1.6}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-family:var(--font-mono)}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  .tag.warn{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2);color:var(--amber)}
+  .footer-nav{grid-column:1/-1;display:flex;justify-content:space-between;padding:14px 44px;border-top:1px solid var(--border-default);font-size:12px;font-family:var(--font-mono);position:relative;z-index:1}
+  .footer-nav a{color:var(--cyan);text-decoration:none}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.footer-nav{padding:14px 16px;flex-direction:column;gap:8px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">⧉</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">数据库设计 · 第 7 篇</div>
+        <div class="header-title">反规范化 · 模式分解</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item">2026.08</div>
+      <div class="meta-item">软考高级架构师 · 规范化与反规范化</div>
+      <div class="meta-item">难点 ★★★★</div>
+    </div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>反规范化的益处与代价？</div>
+      <div class="cue-item"><span class="q-mark">?</span>反规范化 5 种具体方式？</div>
+      <div class="cue-item"><span class="q-mark">?</span>无损分解 / 保持函数依赖怎么判？</div>
+    </div>
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>反规范化（牺牲规范化换性能）</div>
+      <div class="note-section">
+        <table class="compare-table">
+          <thead><tr><th>维度</th><th>内容</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hl-green">益处</span></td><td>降低连接操作需求、降低外码和索引数目、可能减少表数、<b>提高查询效率</b></td></tr>
+            <tr><td><span class="hl-red">代价</span></td><td>数据重复存储、浪费磁盘、可能破坏数据完整性、<b>增加维护复杂性、降低修改速度</b></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>反规范化 5 种方式</div>
+      <div class="note-section">
+        <table class="compare-table">
+          <thead><tr><th>方式</th><th>做法</th></tr></thead>
+          <tbody>
+            <tr><td>增加冗余列</td><td>多表保留相同列，减少连接</td></tr>
+            <tr><td>增加派生列</td><td>增加可计算生成的列，避免计算/集合函数</td></tr>
+            <tr><td>重新组表</td><td>把常一起查询的两表合成一张表</td></tr>
+            <tr><td><span class="hl-purple">水平分割表</span></td><td>按行（列值）拆到多个表；用于数据规模大、数据相对独立、多介质存储</td></tr>
+            <tr><td><span class="hl-purple">垂直分割表</span></td><td>按列拆（主键+部分列 / 主键+其他列），减少 I/O 次数</td></tr>
+          </tbody>
+        </table>
+        <div class="tip">&#x26A0; 区分：<b>水平分割=按行拆</b>（如按年份/地区），<b>垂直分割=按列拆</b>（如常用列与不常用列）。</div>
+      </div>
+
+      <div class="numbered-header"><span class="num">3</span>模式分解的两个判定</div>
+      <div class="note-section">
+        <table class="compare-table">
+          <thead><tr><th>判定</th><th>含义</th><th>要点</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hl-green">保持函数依赖</span></td><td>分解后各子模式保持原依赖集不变</td><td>注意消除<b>冗余依赖</b>（如传递依赖）</td></tr>
+            <tr><td><span class="hl-orange">无损分解</span></td><td>分解后能还原原关系模式</td><td>不能还原 = 有损</td></tr>
+          </tbody>
+        </table>
+        <p><b>两关系模式无损判定定理</b>：分解 p={R1,R2} 无损 ⇔ <span class="note-highlight">R1∩R2 → R1−R2 或 R1∩R2 → R2−R1</span>（公共属性能决定某一方的"独有属性"）。三个及以上用表格法。</p>
+        <div class="warn">&#x26A0; 例：U={A,B,C}，F={A→B，B→C}，分解 R1(A,B)、R2(A,C)。公共属性 A，R1−R2=B，A→B 成立 → <b>无损</b>；但 B→C 在 R2 中无法保持（B 不在 R2）→ <b>不保持函数依赖</b>。故"无损但不保持"。</div>
+      </div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>规范化是"拆表避免异常"，反规范化是"故意合表提速"。</strong>两者方向相反：报表查询要快就多冗余；写入要一致就多拆分。<b>模式分解两个标准</b>——"无损"是拆了还能拼回原样（不丢数据），"保持依赖"是原约束一个都不少。理想是两者兼得，但常需取舍。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">反规范化用冗余换查询性能（5 方式：增冗余列/增派生列/重组表/水平分割/垂直分割）。模式分解看两点：<strong>无损分解（R1∩R2→R1−R2 或 →R2−R1）</strong>与<strong>保持函数依赖</strong>。</div>
+      <div class="summary-tags"><span class="tag primary">反规范化</span><span class="tag warn">无损分解</span><span class="tag">保持依赖</span></div>
+    </div>
+  </div>
+  <div class="footer-nav">
+    <a href="normalization.html">← 上一篇：范式</a>
+    <a href="quiz.html#模式分解">真题练习 →</a>
+  </div>
+</div>
+</body>
+</html>

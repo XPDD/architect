@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redis · 案例场景题</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--elevated:#1a2030;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.7;padding:32px 16px}
+  .wrap{max-width:760px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .sub{color:var(--muted);font-size:12px;margin-bottom:22px;padding-left:2px}
+  .case{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px 24px;margin-bottom:16px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+  .case-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+  .case-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:5px;flex-shrink:0;white-space:nowrap}
+  .case-title{font-size:16px;font-weight:700;line-height:1.4}
+  .scene-label{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--purple);letter-spacing:.1em;margin-bottom:6px}
+  .scene{font-size:13.5px;color:var(--text2);background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.04);border-left:2px solid var(--purple);border-radius:6px;padding:12px 14px;margin-bottom:12px;line-height:1.7}
+  .case-q{font-size:14px;font-weight:600;color:var(--text);display:flex;gap:8px;margin-bottom:6px}
+  .case-q .qn{color:var(--amber);font-family:var(--mono);font-weight:700;flex-shrink:0}
+  .ans-btn{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--green);border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.06);padding:6px 16px;border-radius:6px;cursor:pointer;transition:.15s;margin-top:8px}
+  .ans-btn:hover{background:rgba(52,211,153,.14)}
+  .ans{display:none;margin-top:12px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:6px}
+  .ans.show{display:block}
+  .ans-label{font-family:var(--mono);font-size:10px;font-weight:700;color:var(--green);letter-spacing:.12em;margin-bottom:8px}
+  .ans p,.ans li{font-size:13px;color:var(--text2);line-height:1.75;margin-bottom:4px}
+  .ans strong{color:var(--green)}
+  .ans ul{padding-left:18px}
+  .ans ul li::marker{color:var(--green)}
+  .back{text-align:center;margin-top:8px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.case{padding:16px}.case-q{font-size:13px}.scene{font-size:12.5px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar"><div class="brand"><span class="dot"></span>Redis · 案例场景题</div></div>
+  <div class="sub">基于真实场景的高频案例 · 点击「查看参考答案」展开</div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 1</span><div class="case-title">电商「商品详情」接口——缓存三兄弟</div></div>
+    <div class="scene">某电商商品详情接口逻辑：先查 Redis → 未命中查 MySQL → 查到写回 Redis。上线后出现三种情况：A) 黑客用脚本批量请求不存在的商品 ID（如 9999999），Redis 无缓存，所有请求直达 MySQL 打爆 DB；B) 一款秒杀爆款商品的缓存正好过期，瞬间 10 万并发请求冲 DB 导致连接超时；C) 为保证数据新鲜，所有生鲜商品缓存都设「0 点整过期」，0 点秒杀时几千万请求同时打到 MySQL。</div>
+    <div class="case-q"><span class="qn">问题 1</span>分别判断 A、B、C 各属于哪种缓存问题？</div>
+    <div class="case-q"><span class="qn">问题 2</span>分别说明对应的解决方案。</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p><strong>A＝缓存穿透</strong>（查询不存在的数据、直达 DB）→ ①缓存空对象（设短期过期）②布隆过滤器前置拦截（元素肯定不存在直接返回，有误判≈5%、不支持删除）。</p>
+      <p><strong>B＝缓存击穿</strong>（单个热点 key 过期、高并发打 DB）→ ①互斥锁（分布式锁，强一致但性能差）②逻辑过期（先把过期时间字段存进缓存、不给 key 设真实过期，另开线程异步更新，高可用但数据可能非最新）。</p>
+      <p><strong>C＝缓存雪崩</strong>（大量 key 同时过期或 Redis 宕机）→ ①过期时间加随机值（如 10±2 秒）②多级缓存（本地 Caffeine + Redis）③限流降级（Nginx/Gateway，作为保底）④集群高可用（哨兵/分片）规避单节点宕机。</p>
+      <p>口诀：<strong>穿透无中生有、击穿独木难支、雪崩全军覆没</strong>。</p>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 2</span><div class="case-title">抢优惠券库存——防超卖</div></div>
+    <div class="scene">某抢券接口并发扣减优惠券库存：先 get 库存 → 判断 >0 → 减 1 → set 回写。上线后发现库存被扣成负数（超卖）。开发组先加 Java <code>synchronized</code> 仍没解决。</div>
+    <div class="case-q"><span class="qn">问题 1</span>为什么 <code>synchronized</code> 解决不了？</div>
+    <div class="case-q"><span class="qn">问题 2</span>Redis 层如何防止超卖？</div>
+    <div class="case-q"><span class="qn">问题 3</span>悲观锁和乐观锁方案分别怎么落地？</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p><strong>问题 1</strong>：<code>synchronized</code> 只在本机 JVM 内生效，<strong>服务集群部署</strong>后多个节点各自加锁互不感知，依旧会并发扣减导致超卖。</p>
+      <p><strong>问题 2</strong>：利用 Redis <code>setnx</code> 实现分布式锁（<code>SET lock value NX EX 10</code>），或用 <code>incr/decr</code> 原子指令 / <strong>Lua 脚本</strong>保证「读取-判断-扣减」原子执行，杜绝超卖。</p>
+      <p><strong>问题 3</strong>：<strong>悲观锁</strong>＝抢券接口加 Redisson 排他锁（先锁后干、强一致、适合写多高冲突），底层 setnx+Lua；<strong>乐观锁</strong>＝WATCH + MULTI/EXEC（提交时校验库存是否被改、被改则重试，性能高、适合读多写少，如文章点赞）。口诀：<strong>悲观先锁后干、乐观放手去干提交把关</strong>。</p>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 3</span><div class="case-title">高并发秒杀系统架构设计</div></div>
+    <div class="scene">某平台要做「618 秒杀」：一款 9.9 元爆款耳机，需要在短时间内承受百万级并发抢购，同时要保证不超卖、不过度压垮数据库。</div>
+    <div class="case-q"><span class="qn">问题</span>请给出秒杀系统的核心处理链路，并说明每一步对应的 Redis 能力。</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p>核心链路（论文/面试常用闭环）：<strong>热点预热 → Redis 限流 → 分布式锁放行 → MQ 削峰 → 落库 → Canal 异步同步缓存</strong>。</p>
+      <ul>
+        <li><strong>预热</strong>：提前把秒杀商品加载进 Redis 缓存（防击穿）。</li>
+        <li><strong>限流</strong>：网关层 Nginx 限流 + 业务层 Redis 限流（固定窗口 INCR+EXPIRE / 滑动窗口 Zset / 令牌桶 / 漏桶），把超量请求挡在门外。</li>
+        <li><strong>分布式锁</strong>：setnx/Redisson 只放一个请求真正扣库存，防超卖。</li>
+        <li><strong>MQ 削峰</strong>：把订单写入 Kafka/RabbitMQ 排队慢慢消费，保护 DB。</li>
+        <li><strong>落库</strong>：消费端最终写 MySQL。</li>
+        <li><strong>Canal 同步</strong>：监听 MySQL binlog 自动更新缓存，保证最终一致。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 4</span><div class="case-title">Redis 与 MySQL 双写一致性</div></div>
+    <div class="scene">某司用 Redis 缓存 + MySQL 落库。两块业务：①文章热点数据（允许秒级延迟）②抢券库存（必须实时强一致）。</div>
+    <div class="case-q"><span class="qn">问题 1</span>两套业务分别应采用什么同步方案？</div>
+    <div class="case-q"><span class="qn">问题 2</span>为什么不用「延迟双删」？</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p><strong>问题 1</strong>：①<strong>允许延迟（文章热点）</strong>→ 异步方案：基于 MQ 更新（改完 DB 发消息、消费者更新缓存、有重试兜底），或 <strong>Canal 监听 MySQL binlog</strong>（伪装成从节点读取 binlog 自动更新缓存，无侵入、实时性高、一致性最好）。②<strong>强一致（抢券库存）</strong>→ <strong>Redisson 读写锁</strong>：读加共享锁（读读不互斥、读写互斥）、写加排他锁（全互斥），保证写数据时其他线程读不到脏数据；读写须用同一把锁。</p>
+      <p><strong>问题 2</strong>：<strong>延迟双删</strong>（先删缓存→改 DB→延迟几秒再删一次）的<strong>延迟时长不好确定</strong>，且延迟期间可能读到旧数据回写，<strong>不能保证强一致性</strong>，所以强一致场景不采用。</p>
+      <p>补充：<strong>强一致场景干脆不用缓存</strong>直接查库；最终一致仅适用于接受短期不一致的业务。</p>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 5</span><div class="case-title">系统要求「数据不能丢 + 快速恢复」</div></div>
+    <div class="scene">某订单计数系统重启后不能丢失数据，同时要求宕机后能尽快恢复服务。领导问 DBA 该怎么配置 Redis 持久化。</div>
+    <div class="case-q"><span class="qn">问题</span>请给出持久化配置方案并说明理由。</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p>采用 <strong>RDB + AOF 混合持久化</strong>（最佳实践）：</p>
+      <ul>
+        <li>开启 AOF（<code>appendonly yes</code>），设 <code>appendfsync everysec</code> 每秒刷盘——性能与安全兼顾，最多丢 1 秒数据。</li>
+        <li>同时开启 RDB（如 <code>save 900 1</code>）——用于<strong>快速全量恢复</strong>（RDB 是二进制快照、体积小恢复快）。</li>
+        <li>定期执行 <code>BGREWRITEAOF</code> 重写 AOF，避免文件过大。</li>
+        <li>重要业务配主从复制：从节点开 AOF、主节点用 RDB 减少性能开销。</li>
+      </ul>
+      <p>理由：<strong>RDB 恢复快但可能丢数据</strong>（快照间隔之外），<strong>AOF 几乎不丢但恢复慢</strong>；混合（4.0+）＝AOF 前半段 RDB 全量 + 后半段增量日志，兼得快速恢复与低丢失。</p>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 6</span><div class="case-title">Redis 响应变慢排查</div></div>
+    <div class="scene">某接口调用 Redis 平时 <code>&lt;10ms</code>，最近经常超过 100ms 甚至秒级，用户反馈卡顿。架构师准备排查。</div>
+    <div class="case-q"><span class="qn">问题</span>请按顺序给出排查思路。</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <ul>
+        <li><strong>先定基线</strong>：用 <code>redis-cli</code> 测当前环境基线性能（服务器无压力、无干扰时的性能）。</li>
+        <li><strong>排除外部因素</strong>：测响应速度，排除网络问题（跨机房、带宽不足）和客户端连接数过多。</li>
+        <li><strong>慢查询</strong>：排查复杂度过高的命令，用<strong>慢查询日志</strong>定位。</li>
+        <li><strong>大量 key 同时过期</strong>：主线程长时间阻塞 → 给过期时间加<strong>随机数</strong>避免同时删除。</li>
+        <li><strong>bigkey</strong>：用 <code>scan</code> 扫描大 key，避免写入 bigkey。</li>
+        <li><strong>AOF 重写/fsync 阻塞</strong>：每写命令同步等 fsync 会阻塞主线程 → 允许时改 <code>appendfsync no</code> 或 <code>no-appendfsync-on-rewrite yes</code>，最好用 SSD 存放 AOF。</li>
+        <li>另注意：<strong><code>keys *</code> 生产禁用</strong>（阻塞主线程）。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 7</span><div class="case-title">单节点内存不足 / 数据量大</div></div>
+    <div class="scene">某库有 1000 万条数据，Redis 只能缓存 20 万条；同时单节点 Redis 内存持续告警，说内存快满了，写请求开始报 OOM。</div>
+    <div class="case-q"><span class="qn">问题 1</span>如何保证缓存里留下的都是热点数据？</div>
+    <div class="case-q"><span class="qn">问题 2</span>内存满了会发生什么？怎么选淘汰策略？</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p><strong>问题 1</strong>：用 <strong>allkeys-lru</strong> 淘汰策略——把最近最少使用的淘汰掉，留下的都是经常访问的热点数据。LFU（按访问频率）也可用于有明确冷热/数据可重建的场景。</p>
+      <p><strong>问题 2</strong>：看淘汰策略。<strong>默认 noeviction</strong> 时内存不足写请求直接报错（OOM）、读不受影响。常用选择：<strong>volatile-lru</strong>（淘汰过期键中最久未用，90% 生产场景、保留核心永久数据）、<strong>allkeys-lru</strong>（纯缓存、数据可重建）。若单节点 <strong>超 10G 内存</strong>，通常给不同服务分配独立主从节点，尽量不做分片（维护麻烦、耗网络带宽、不能用 Lua 和事务）。</p>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 8</span><div class="case-title">集群选型与哨兵脑裂</div></div>
+    <div class="scene">业务 A：1 主 1 从、读多写少，要自动故障转移；业务 B：海量数据 + 高并发写。某晚哨兵集群网络分区，出现两个 master，恢复后旧 master 大量数据丢失。</div>
+    <div class="case-q"><span class="qn">问题 1</span>业务 A、B 各适合哪种集群方案？</div>
+    <div class="case-q"><span class="qn">问题 2</span>「脑裂」怎么发生、如何防范？</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p><strong>问题 1</strong>：业务 A（读多写少、要自动故障转移）→ <strong>主从 + 哨兵</strong>；业务 B（海量数据、高并发写）→ <strong>分片集群（Cluster）</strong>（多主多从 + 16384 个哈希槽，CRC16 取模分片，解决存储和写瓶颈）。</p>
+      <p><strong>问题 2</strong>：<strong>脑裂</strong>＝主节点、从节点、sentinel 处于不同网络分区，sentinel 心跳感知不到 master 就通过选举把某个 slave 提升为新 master，导致<strong>两个 master</strong>；客户端仍往旧 master 写、新 master 无法同步；网络恢复后哨兵把旧 master 降为 slave 再同步，造成大量数据丢失。<strong>防范</strong>：配置<strong>最少从节点数量</strong>（达不到就拒绝写）+<strong>缩短主从同步延迟时间</strong>（达不到要求拒绝请求）。</p>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 9</span><div class="case-title">热点 Key 与大 Key（bigkey）治理</div></div>
+    <div class="scene">①某秒杀商品 key 被超高并发访问，单节点压力巨大，服务报警；②某用户的积分列表 hash 非常大，读写都带来阻塞、内存分配不均。</div>
+    <div class="case-q"><span class="qn">问题</span>分别怎么治理两类问题？</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p><strong>热点 Key</strong>（某 key 被超高并发访问、单节点压力大）→ <strong>二级缓存</strong>（本地缓存承接）、<strong>key 分片加后缀分散</strong>（拆成 key_0、key_1…）、<strong>热点识别 + 预热</strong>。</p>
+      <p><strong>大 Key（bigkey）</strong>（大 value、阻塞/内存不均/迁移慢）→ <strong>拆分</strong>大结构、<strong>压缩序列化</strong>、<strong>避免大字符串</strong>、<strong>慎用 HGETALL</strong> 等一次性取大对象的命令；用 <code>scan</code> 扫描发现 bigkey。</p>
+    </div>
+  </div>
+
+  <div class="case">
+    <div class="case-head"><span class="case-num">案例 10</span><div class="case-title">防缓存穿透：空值缓存 vs 布隆过滤器</div></div>
+    <div class="scene">某接口上线后遭到一批「不存在 ID」的恶意请求，直接打爆 DB。团队讨论用「缓存空值」还是「布隆过滤器」来挡。</div>
+    <div class="case-q"><span class="qn">问题</span>两种方案各有什么优缺点？怎么选？</div>
+    <button class="ans-btn" onclick="tog(this)">查看参考答案</button>
+    <div class="ans"><div class="ans-label">参考答案</div>
+      <p><strong>缓存空对象</strong>：查询返回空也缓存（<code>{key:1, value:null}</code>）、设短过期。优点<strong>简单易实现</strong>；缺点<strong>消耗内存、可能不一致</strong>（大量不存在的 key 都被缓存）。</p>
+      <p><strong>布隆过滤器</strong>：初始化大型位数组（0/1），元素经 3 次 hash 模数组长度置 1，查询看对应位；<strong>应用层前置拦截</strong>，元素肯定不存在直接返回、不查 Redis/DB。优点<strong>内存占用少、无多余 key</strong>；缺点<strong>实现复杂、存在误判（一般 ≤5%）、不支持删除</strong>。</p>
+      <p><strong>选型</strong>：明显是<strong>恶意攻击/大量不存在的 key</strong> → 用<strong>布隆过滤器</strong>（省内存、前置拦截）；简单/低频场景 → 用<strong>缓存空值</strong>（快）。</p>
+    </div>
+  </div>
+
+  <div class="back"><a href="index.html">&#x2190; 返回 Redis 索引</a></div>
+</div>
+
+<script>
+function tog(btn){
+  var ans = btn.nextElementSibling;
+  if(ans && ans.classList.contains('ans')){
+    var show = ans.classList.toggle('show');
+    btn.textContent = show ? '收起参考答案' : '查看参考答案';
+  }
+}
+</script>
+</body>
+</html>

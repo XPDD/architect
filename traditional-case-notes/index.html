@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>传统架构案例分析 · 知识索引</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:36px 0}
+.container{max-width:960px;margin:0 auto;padding:0 20px}
+.hero{text-align:center;padding:48px 20px 36px;position:relative;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);margin-bottom:32px;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+.hero-badge{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:8px}
+.hero-title{font-size:32px;font-weight:800;letter-spacing:-.02em}
+.hero-title .accent{color:var(--cyan);text-shadow:0 0 20px rgba(0,212,255,.3)}
+.hero-sub{font-size:14px;color:var(--text-muted);margin-top:10px}
+.hero-stats{display:flex;justify-content:center;gap:24px;margin-top:20px;flex-wrap:wrap}
+.hero-stat{padding:6px 16px;border-radius:4px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:13px;color:var(--text-secondary)}
+.hero-stat strong{color:var(--cyan)}
+.part-section{margin-bottom:28px}
+.part-header{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius);border-left:3px solid var(--cyan);margin-bottom:12px}
+.part-num{font-family:var(--font-mono);font-size:28px;font-weight:800;color:var(--cyan);text-shadow:0 0 16px rgba(0,212,255,.25);min-width:40px}
+.part-info h2{font-size:18px;font-weight:700}
+.part-info span{font-size:12px;color:var(--text-muted)}
+.note-card{display:flex;align-items:center;gap:16px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius);margin-bottom:8px;text-decoration:none;color:inherit;cursor:pointer;transition:border-color .2s,background .2s}
+.note-card:hover{border-color:rgba(0,212,255,.15);background:rgba(0,212,255,.02)}
+.note-icon{width:40px;height:40px;border-radius:var(--radius);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:16px;font-weight:700}
+.note-icon.cyan{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+.note-icon.blue{background:rgba(77,124,255,.1);border:1px solid rgba(77,124,255,.2);color:var(--blue)}
+.note-icon.green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.note-icon.purple{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--purple)}
+.note-icon.amber{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
+.note-icon.case{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--rose)}
+.note-info{flex:1}.note-info h3{font-size:15px;font-weight:700;margin-bottom:2px}
+.note-info p{font-size:12px;color:var(--text-muted);line-height:1.5}
+.note-arrow{color:var(--text-muted);font-size:18px;transition:color .2s}
+.note-card:hover .note-arrow{color:var(--cyan)}
+.footer{text-align:center;padding:20px;font-size:12px;color:var(--text-muted);margin-top:16px}
+.footer a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2)}
+.footer a:hover{border-color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="hero">
+<div class="hero-badge">第二十二章 · 传统架构案例分析 · 康奈尔笔记库</div>
+<div class="hero-title"><span class="accent">传统架构</span>案例分析专题</div>
+<div class="hero-sub">软件架构风格 · 质量属性 · 软件工程 · 数据库系统 · 嵌入式</div>
+    <div class="hero-stats">
+<div class="hero-stat">笔记 <strong>5</strong> 份</div>
+<div class="hero-stat">题库 <strong>5</strong> 组</div>
+<div class="hero-stat">案例题 <strong>5</strong> 道</div>
+</div>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--cyan);text-shadow:0 0 16px rgba(0,212,255,.25);">01</div>
+<div class="part-info"><h2>软件架构风格</h2><span>7 种风格对比 · C/S · B/S · MVC 家族 · 非功能需求</span></div>
+</div>
+<a class="note-card" href="arch-style.html">
+<div class="note-icon cyan">AS</div>
+<div class="note-info"><h3>软件架构风格 · C/S · B/S · MVC 家族</h3><p>7 种架构风格对比 · 两层/三层 C/S · B/S · RIA · MVC/MVP/MVVM · 非功能需求四类</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-arch-style.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>架构风格 · 练习题库（10 题）</h3><p>点选判分 · 带解析 · 覆盖风格对比/C-S/B-S/MVC 家族/非功能需求</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-arch-style.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>架构风格 · 案例题（字处理软件 IDE）</h3><p>真题 · 管道-过滤器 vs 数据存储为中心 / 解释器 / 隐式调用 · 可展开参考答案</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--purple);text-shadow:0 0 16px rgba(167,139,250,.25);">02</div>
+<div class="part-info"><h2>质量属性与架构评估</h2><span>效用树 · 敏感点 · 权衡点 · 架构风险</span></div>
+</div>
+<a class="note-card" href="quality.html">
+<div class="note-icon purple">QA</div>
+<div class="note-info"><h3>质量属性 · 效用树 · 敏感点与权衡点</h3><p>8 个质量属性+设计策略 · 架构风险/敏感点/权衡点 · 可靠性 vs 可用性 · 效用树真题</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-quality.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>质量属性 · 练习题库（10 题）</h3><p>点选判分 · 带解析 · 覆盖核心概念/8 属性/可靠性指标/效用树</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-quality.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>质量属性 · 案例题（在线交易系统评估）</h3><p>真题 · 效用树填空 / 架构风险·敏感点·权衡点 · 可展开参考答案</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--blue);text-shadow:0 0 16px rgba(77,124,255,.25);">03</div>
+<div class="part-info"><h2>软件工程（结构化 + OO）</h2><span>结构化分析 · 面向对象分析 · 项目管理</span></div>
+</div>
+<a class="note-card" href="se-structured.html">
+<div class="note-icon blue">SA</div>
+<div class="note-info"><h3>软件工程 · 结构化分析 · OO 分析 · 项目管理</h3><p>三大模型 · DFD 加工三错误 · OO 分析五活动 · 关键路径 · 甘特图/PERT · 房屋租赁真题</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-se.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>软件工程 · 练习题库（10 题）</h3><p>点选判分 · 带解析 · 覆盖结构化分析/OO 分析/项目管理</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-se.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>软件工程 · 案例题（房屋租赁服务系统）</h3><p>真题 · 顶层 DFD / ERD / 实体 vs 类 / 用例 · 可展开参考答案</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--amber);text-shadow:0 0 16px rgba(251,191,36,.25);">04</div>
+<div class="part-info"><h2>数据库系统</h2><span>范式 · 封锁协议 · NoSQL · 反规范化</span></div>
+</div>
+<a class="note-card" href="db-case.html">
+<div class="note-icon amber">DB</div>
+<div class="note-info"><h3>数据库系统 · 范式 · 封锁 · NoSQL · 反规范化</h3><p>1NF~4NF · 并发三大问题 · 三级封锁协议 · NoSQL 四类 · 反规范化 5 法 · Redis/读写分离</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-db.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>数据库系统 · 练习题库（11 题）</h3><p>点选判分 · 带解析 · 覆盖范式/封锁/NoSQL/反规范化/Redis</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-db.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>数据库系统 · 案例题（药品销售系统）</h3><p>2021 真题 · 反规范化 5 法 / 数据一致性 / Redis 排名 · 可展开参考答案</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--green);text-shadow:0 0 16px rgba(52,211,153,.25);">05</div>
+<div class="part-info"><h2>嵌入式系统</h2><span>实时系统 · 可靠性 · 鸿蒙架构</span></div>
+</div>
+<a class="note-card" href="embedded-case.html">
+<div class="note-icon green">EM</div>
+<div class="note-info"><h3>嵌入式系统 · 实时系统 · 可靠性 · 鸿蒙架构</h3><p>五阶段 · RTOS 硬/软实时 · 可靠性计算（串联/并联）· 容错三技术 · 鸿蒙四层 · 可靠性真题</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-embedded.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>嵌入式系统 · 练习题库（11 题）</h3><p>点选判分 · 带解析 · 覆盖介绍/RTOS/可靠性计算/鸿蒙架构</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-embedded.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>嵌入式系统 · 案例题（软件可靠性设计）</h3><p>真题 · 可靠度计算 / 动态冗余 · N 版本 · 检错技术 · 可展开参考答案</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="footer">
+<a href="../index.html">&#x2190; 返回总索引</a> &nbsp;·&nbsp;
+<a href="arch-style.html">架构风格</a> &nbsp;·&nbsp;
+<a href="quality.html">质量属性</a> &nbsp;·&nbsp;
+<a href="se-structured.html">软件工程</a> &nbsp;·&nbsp;
+<a href="db-case.html">数据库</a> &nbsp;·&nbsp;
+<a href="embedded-case.html">嵌入式</a>
+</div>
+</div>
+
+</body>
+</html>

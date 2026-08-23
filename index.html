@@ -3,129 +3,396 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>系统架构设计师 · 康奈尔笔记知识库</title>
+<title>系统架构设计师 · 23 章知识索引</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
-body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:48px 0}
-.container{max-width:1000px;margin:0 auto;padding:0 20px}
-.hero{text-align:center;padding:60px 20px 40px;position:relative;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);margin-bottom:40px;overflow:hidden}
-.hero::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.2),transparent 30%,transparent 70%,rgba(77,124,255,.15));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
-.hero-badge{font-family:var(--font-mono);font-size:11px;font-weight:600;color:var(--cyan);letter-spacing:.25em;margin-bottom:12px}
-.hero-title{font-size:38px;font-weight:800;letter-spacing:-.03em;margin-bottom:8px}
-.hero-title .accent{color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.35)}
-.hero-sub{font-size:15px;color:var(--text-muted);margin-top:12px;line-height:1.5}
-.hero-stats{display:flex;justify-content:center;gap:32px;margin-top:28px;flex-wrap:wrap}
-.hero-stat{padding:10px 20px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);font-size:14px;color:var(--text-secondary)}
-.hero-stat strong{color:var(--cyan);font-family:var(--font-mono);font-size:20px}
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--elevated:#1a2030;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--radius-lg:12px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:40px 16px}
+  .wrap{max-width:960px;margin:0 auto}
+  .hero{text-align:center;padding:52px 20px 40px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:28px;position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .hero-badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--cyan);letter-spacing:.25em;margin-bottom:12px}
+  .hero h1{font-size:34px;font-weight:800;letter-spacing:-.02em}
+  .hero h1 .accent{color:var(--cyan);text-shadow:0 0 24px rgba(0,212,255,.35)}
+  .hero-sub{font-size:14px;color:var(--muted);margin-top:10px;line-height:1.6}
+  .hero-stats{display:flex;justify-content:center;gap:14px;margin-top:22px;flex-wrap:wrap}
+  .hero-stat{padding:8px 18px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);font-size:13px;color:var(--text2)}
+  .hero-stat strong{color:var(--cyan);font-family:var(--mono);font-size:18px}
 
-.part-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;margin-bottom:40px}
-.part-card{background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);padding:28px 24px;text-decoration:none;color:inherit;transition:border-color .25s,transform .25s,box-shadow .25s;position:relative;overflow:hidden;display:block}
-.part-card:hover{border-color:rgba(0,212,255,.18);transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3),0 0 0 1px rgba(0,212,255,.06)}
-.part-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px}
-.part-card.arch::after{background:linear-gradient(90deg,var(--cyan),var(--blue))}
-.part-card.se::after{background:linear-gradient(90deg,var(--purple),var(--green))}
-.part-card.db::after{background:linear-gradient(90deg,var(--amber),var(--rose))}
-.part-card.os::after{background:linear-gradient(90deg,#22d3ee,var(--cyan))}
-.part-card.qb::after{background:linear-gradient(90deg,#f97316,var(--amber))}
-.part-card .pc-icon{font-family:var(--font-mono);font-size:32px;font-weight:800;margin-bottom:14px;display:block}
-.part-card.arch .pc-icon{color:var(--cyan);text-shadow:0 0 16px rgba(0,212,255,.25)}
-.part-card.se .pc-icon{color:var(--purple);text-shadow:0 0 16px rgba(167,139,250,.25)}
-.part-card.db .pc-icon{color:var(--amber);text-shadow:0 0 16px rgba(251,191,36,.25)}
-.part-card.os .pc-icon{color:#22d3ee;text-shadow:0 0 16px rgba(34,211,238,.25)}
-.part-card.qb .pc-icon{color:#f97316;text-shadow:0 0 16px rgba(249,115,22,.25)}
-.part-card .pc-title{font-size:18px;font-weight:700;margin-bottom:6px}
-.part-card .pc-sub{font-size:12px;color:var(--text-muted);line-height:1.6;margin-bottom:12px}
-.part-card .pc-meta{display:flex;gap:12px;font-size:11px;color:var(--text-muted);font-family:var(--font-mono)}
-.part-card .pc-meta span{padding:2px 8px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.05)}
+  .group{margin-bottom:30px}
+  .group-head{display:flex;align-items:center;gap:14px;margin:0 0 12px}
+  .group-head .g-tag{font-family:var(--mono);font-size:11px;font-weight:700;letter-spacing:.15em;padding:4px 12px;border-radius:4px;white-space:nowrap}
+  .group-head h2{font-size:18px;font-weight:700}
+  .group-head .rule{flex:1;height:1px;background:var(--border)}
+  .g-found .g-tag{color:var(--cyan);background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.2)}
+  .g-core .g-tag{color:var(--purple);background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2)}
+  .g-adv .g-tag{color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)}
+  .g-case .g-tag{color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2)}
 
-.relation-section{margin-bottom:40px;padding:24px;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg)}
-.relation-title{font-family:var(--font-mono);font-size:10px;font-weight:700;color:var(--cyan);letter-spacing:.15em;margin-bottom:16px}
-.relation-flow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
-.rel-box{padding:10px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;text-decoration:none;border:1px solid}
-.rel-box.arch{border-color:rgba(0,212,255,.2);color:var(--cyan);background:rgba(0,212,255,.05)}
-.rel-box.se{border-color:rgba(167,139,250,.2);color:var(--purple);background:rgba(167,139,250,.05)}
-.rel-box.db{border-color:rgba(251,191,36,.2);color:var(--amber);background:rgba(251,191,36,.05)}
-.rel-box:hover{filter:brightness(1.3)}
-.rel-arrow{color:rgba(255,255,255,.1);font-size:18px}
-.rel-bracket{color:rgba(255,255,255,.15);font-size:11px;font-family:var(--font-mono)}
+  .ch-list{display:flex;flex-direction:column;gap:8px}
+  .ch-card{display:flex;align-items:flex-start;gap:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;transition:border-color .2s}
+  .ch-card:hover{border-color:rgba(0,212,255,.15)}
+  .ch-num{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);min-width:64px;padding-top:1px;flex-shrink:0}
+  .ch-body{flex:1}
+  .ch-title{font-size:15px;font-weight:700;margin-bottom:2px}
+  .ch-links{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+  .ch-link{font-family:var(--mono);font-size:11px;text-decoration:none;padding:3px 10px;border-radius:4px;border:1px solid var(--border);color:var(--text2);transition:.15s;white-space:nowrap}
+  .ch-link:hover{color:var(--cyan);border-color:rgba(0,212,255,.3)}
+  .ch-link.note{color:var(--green);border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.05)}
+  .ch-link.note:hover{border-color:rgba(52,211,153,.5)}
+  .ch-link.quiz{color:var(--amber);border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.05)}
+  .ch-link.quiz:hover{border-color:rgba(251,191,36,.5)}
+  .ch-link.case{color:var(--rose);border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.05)}
+  .ch-link.case:hover{border-color:rgba(248,113,113,.5)}
+  .ch-link.off{color:var(--muted);opacity:.5;cursor:default}
+  .ch-note{font-size:12px;color:var(--muted);margin-top:2px}
 
-.footer{text-align:center;padding:24px;font-size:12px;color:var(--text-muted)}
-.footer a{color:var(--cyan);text-decoration:none}
-@media(max-width:768px){.part-grid{grid-template-columns:1fr}.hero-title{font-size:28px}.relation-flow{flex-direction:column;gap:6px}.rel-arrow{transform:rotate(90deg)}}
+  .footer{text-align:center;padding:20px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .footer a{color:var(--cyan);text-decoration:none}
+  @media(max-width:640px){.hero h1{font-size:26px}.ch-card{flex-direction:column;gap:6px}.ch-num{min-width:0}}
 </style>
 </head>
 <body>
+<div class="wrap">
 
-<div class="container">
+  <div class="hero">
+    <div class="hero-badge">SYS ARCHITECT · 23 CHAPTERS</div>
+    <h1><span class="accent">系统架构设计师</span> · 知识索引</h1>
+    <div class="hero-sub">覆盖 23 章核心内容 · 笔记 + 题库 · 按章节顺序编排</div>
+    <div class="hero-stats">
+      <div class="hero-stat">章节 <strong>23</strong></div>
+      <div class="hero-stat">笔记库 <strong>18</strong> 组</div>
+      <div class="hero-stat">题库 <strong>21</strong> 组</div>
+    </div>
+  </div>
 
-<div class="hero">
-<div class="hero-badge">SYS ARCHITECT · KNOWLEDGE BASE</div>
-<div class="hero-title"><span class="accent">系统架构设计师</span> 康奈尔笔记知识库</div>
-<div class="hero-sub">基于架构直播1/2/3三本教材 + 安全/软件工程讲义 · 40份科技风康奈尔笔记 · 全部图片内嵌可离线浏览</div>
-<div class="hero-stats">
-<div class="hero-stat">笔记总量 <strong>40</strong></div>
-<div class="hero-stat">知识点 <strong>4</strong> 大门类</div>
-<div class="hero-stat">原书截图 <strong>38+</strong></div>
-</div>
-</div>
+  <!-- ═══ 第一阶段：基础 ═══ -->
+  <div class="group">
+    <div class="group-head g-found"><span class="g-tag">基础</span><h2>计算机系统与信息基础（第 1 ~ 8 章）</h2><span class="rule"></span></div>
+    <div class="ch-list">
 
-<div class="part-grid">
-<a class="part-card arch" href="architecture-notes/index.html">
-<span class="pc-icon">&#x25A3;</span>
-<div class="pc-title">架构 · 质量 · 安全 · 软件工程</div>
-<div class="pc-sub">架构设计 + 质量属性 + 信息安全 + 软件工程<br>架构风格·质量属性·加密签名·抗攻击·过程模型·测试·需求</div>
-<div class="pc-meta"><span>23 份笔记</span><span>架构11·安全5·软工7</span></div>
-</a>
-<a class="part-card se" href="software-engineering-notes/index.html">
-<span class="pc-icon">&#x2699;</span>
-<div class="pc-title">软件工程 & 面向对象</div>
-<div class="pc-sub">架构直播2：软件工程+面向对象精华提炼<br>过程模型·需求·设计·测试·维护·UML·设计模式</div>
-<div class="pc-meta"><span>8 份笔记</span><span>P4-P96</span></div>
-</a>
-<a class="part-card db" href="database-notes/index.html">
-<span class="pc-icon">&#x2B1B;</span>
-<div class="pc-title">数据库精讲</div>
-<div class="pc-sub">架构直播1：数据库精讲<br>三级模式·范式·关系代数·并发·封锁·分布式·NoSQL</div>
-<div class="pc-meta"><span>6 份笔记</span><span>P27-P71</span></div>
-</a>
-<a class="part-card os" href="os-notes/index.html">
-<span class="pc-icon">&#x2B21;</span>
-<div class="pc-title">操作系统</div>
-<div class="pc-sub">操作系统常考知识点<br>进程管理·内存管理·文件系统·设备管理</div>
-<div class="pc-meta"><span>1 份笔记</span></div>
-</a>
-<a class="part-card qb" href="question-bank/index.html">
-<span class="pc-icon">&#x2611;</span>
-<div class="pc-title">题库练习</div>
-<div class="pc-sub">历年真题训练<br>架构风格·数据库系统·软件工程</div>
-<div class="pc-meta"><span>3 份题库</span></div>
-</a>
-</div>
+      <div class="ch-card">
+        <div class="ch-num">第一章</div>
+        <div class="ch-body">
+          <div class="ch-title">计算机组成与体系结构</div>
+          <div class="ch-note">CPU · Flynn · CISC/RISC · 流水线 · 总线</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="computer-basics-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="computer-basics-notes/computer-basics-quiz.html">✍️ 题库</a>
+            <a class="ch-link src" href="计算基础知识/">📁 讲义</a>
+          </div>
+        </div>
+      </div>
 
-<div class="relation-section">
-<div class="relation-title">&#x25B6; 知识关系图 — 三大门类如何串联</div>
-<div class="relation-flow">
-<div class="rel-box arch">架构设计<br><small>宏观决策层</small></div>
-<div class="rel-arrow">&#x2192;</div>
-<div class="rel-bracket">决定</div>
-<div class="rel-box se">软件工程<br><small>过程执行层</small></div>
-<div class="rel-arrow">&#x2192;</div>
-<div class="rel-bracket">依赖</div>
-<div class="rel-box db">数据库<br><small>数据存储层</small></div>
-</div>
-<div style="text-align:center;margin-top:14px;font-size:12px;color:var(--text-muted);line-height:1.8">
-<strong>架构设计</strong>决定系统整体结构（风格/质量/评估）→ <strong>软件工程</strong>执行具体开发过程（模型/设计/测试/UML/模式）→ <strong>数据库</strong>支撑数据存储层（范式/并发/SQL/分布式NoSQL）<br>
-三门互补，从顶层战略到底层实现，覆盖软考系统架构设计师全部核心考点
-</div>
-</div>
+      <div class="ch-card">
+        <div class="ch-num">第二章</div>
+        <div class="ch-body">
+          <div class="ch-title">计算机系统知识</div>
+          <div class="ch-note">数据表示 · 校验码 · 存储层次/Cache · 磁盘 · I/O · 可靠性 · 加密</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="computer-system-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="computer-system-notes/computer-system-quiz.html">✍️ 题库</a>
+            <a class="ch-link src" href="计算基础知识/">📁 讲义</a>
+          </div>
+        </div>
+      </div>
 
-<div class="footer">
-教材来源：架构直播1 · 架构直播2 · 架构直播3 &nbsp;|&nbsp; 工具：康奈尔笔记 skill + 科技风模板 &nbsp;|&nbsp; 2026.08
-</div>
+      <div class="ch-card">
+        <div class="ch-num">第三章</div>
+        <div class="ch-body">
+          <div class="ch-title">操作系统基础</div>
+          <div class="ch-note">进程管理 · PV 操作 · 死锁 · 存储/文件/设备管理</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="os-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="os-notes/os-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
 
-</div>
+      <div class="ch-card">
+        <div class="ch-num">第四章</div>
+        <div class="ch-body">
+          <div class="ch-title">计算机网络基础</div>
+          <div class="ch-note">OSI/TCP-IP 模型 · IP 地址与子网 · 网络规划 · 5G/虚拟化</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="network-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="network-notes/net-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
 
+      <div class="ch-card">
+        <div class="ch-num">第五章</div>
+        <div class="ch-body">
+          <div class="ch-title">其他计算机知识</div>
+          <div class="ch-note">计算机语言 · 多媒体 · 系统工程</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="misc-computer-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="misc-computer-notes/misc-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第六章</div>
+        <div class="ch-body">
+          <div class="ch-title">嵌入式技术应用</div>
+          <div class="ch-note">系统组成 · 处理器分类 · 嵌入式 OS · 多核处理器</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="embedded-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="embedded-notes/emb-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第七章</div>
+        <div class="ch-body">
+          <div class="ch-title">系统配置与性能评价</div>
+          <div class="ch-note">性能指标 · 评价方法 · 阿姆达尔定律</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="system-performance-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="system-performance-notes/sp-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第八章</div>
+        <div class="ch-body">
+          <div class="ch-title">信息系统基础知识</div>
+          <div class="ch-note">五功能/诺兰 · 专家系统 · OAS · ERP · 电子政务 · 开发方法</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="information-system-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="information-system-notes/is-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ 第二阶段：核心 ═══ -->
+  <div class="group">
+    <div class="group-head g-core"><span class="g-tag">核心</span><h2>软件与架构核心（第 9 ~ 16 章）</h2><span class="rule"></span></div>
+    <div class="ch-list">
+
+      <div class="ch-card">
+        <div class="ch-num">第九章</div>
+        <div class="ch-body">
+          <div class="ch-title">数据库设计</div>
+          <div class="ch-note">三级模式 · E-R 模型 · 范式 · 关系代数 · SQL · 并发控制 · NoSQL</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="database-design-notes/index.html">📖 笔记（设计）</a>
+            <a class="ch-link note" href="database-notes/index.html">📖 笔记（精讲）</a>
+            <a class="ch-link quiz" href="database-design-notes/quiz.html">✍️ 题库</a>
+            <a class="ch-link quiz" href="question-bank/exam-database.html">✍️ 历年真题</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">数据库 · Redis</div>
+        <div class="ch-body">
+          <div class="ch-title">Redis 缓存数据库（补充强化）</div>
+          <div class="ch-note">基础数据类型 · 缓存穿透/击穿/雪崩 · 双写一致 · 持久化 · 集群高可用 · 分布式锁 · 秒杀架构</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="redis-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="redis-notes/redis-case.html">📋 案例</a>
+            <a class="ch-link quiz" href="redis-notes/quiz-redis-basics.html">✍️ 题库</a>
+            <a class="ch-link src" href="redis/">📁 讲义</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十章</div>
+        <div class="ch-body">
+          <div class="ch-title">信息安全技术</div>
+          <div class="ch-note">五要素 · 加密 · 抗攻击 · 网络安全 · 保证评估</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="security-notes/security-basics.html">📖 基础</a>
+            <a class="ch-link note" href="security-notes/security-crypto.html">📖 加密·签名</a>
+            <a class="ch-link note" href="security-notes/security-attacks.html">📖 抗攻击</a>
+            <a class="ch-link note" href="security-notes/security-network.html">📖 网络安全</a>
+            <a class="ch-link note" href="security-notes/security-assurance.html">📖 保证评估</a>
+            <a class="ch-link quiz" href="security-notes/security-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十一章</div>
+        <div class="ch-body">
+          <div class="ch-title">软件工程</div>
+          <div class="ch-note">过程模型 · 系统设计 · 测试 · 需求工程 · 逆向 · 维护</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="software-engineering-notes/se-process-models.html">📖 过程模型</a>
+            <a class="ch-link note" href="software-engineering-notes/se-system-design.html">📖 系统设计</a>
+            <a class="ch-link note" href="software-engineering-notes/se-testing.html">📖 测试</a>
+            <a class="ch-link note" href="software-engineering-notes/se-requirements.html">📖 需求工程</a>
+            <a class="ch-link note" href="software-engineering-notes/se-requirements-management.html">📖 需求管理</a>
+            <a class="ch-link note" href="software-engineering-notes/se-reverse-engineering.html">📖 逆向工程</a>
+            <a class="ch-link note" href="software-engineering-notes/se-maintenance.html">📖 维护</a>
+            <a class="ch-link note" href="software-engineering-notes/index.html">📖 全部笔记</a>
+            <a class="ch-link quiz" href="software-engineering-notes/se-quiz.html">✍️ 题库</a>
+            <a class="ch-link quiz" href="question-bank/exam-software-engineering.html">✍️ 历年真题</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十二章</div>
+        <div class="ch-body">
+          <div class="ch-title">软件工程扩展</div>
+          <div class="ch-note">逆向工程 · 系统维护 · 遗留系统</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="software-engineering-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="software-engineering-notes/se-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十三章</div>
+        <div class="ch-body">
+          <div class="ch-title">面向对象设计</div>
+          <div class="ch-note">OO 基础 · 设计原则 · UML · GoF 23 设计模式</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="software-engineering-notes/oo-uml-patterns.html">📖 笔记（OO·UML）</a>
+            <a class="ch-link note" href="software-engineering-notes/oo-basics.html">📖 笔记（基础）</a>
+            <a class="ch-link note" href="software-engineering-notes/gof-23-patterns.html">📖 笔记（设计模式）</a>
+            <a class="ch-link quiz" href="software-engineering-notes/oo-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十四章</div>
+        <div class="ch-body">
+          <div class="ch-title">项目管理</div>
+          <div class="ch-note">进度管理 · 关键路径 · 配置管理 · 质量与风险</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="project-management-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="project-management-notes/pm-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十五章</div>
+        <div class="ch-body">
+          <div class="ch-title">系统架构设计</div>
+          <div class="ch-note">架构风格 · DSSA · ABSD · 构件 · CBSD</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="architecture-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="question-bank/exam-arch-styles.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十六章</div>
+        <div class="ch-body">
+          <div class="ch-title">系统质量属性与架构评估</div>
+          <div class="ch-note">质量属性 · ATAM/SAAM · 架构评估</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="quality-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="quality-notes/quality-quiz.html">✍️ 题库</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ 第三阶段：拓展 ═══ -->
+  <div class="group">
+    <div class="group-head g-adv"><span class="g-tag">拓展</span><h2>可靠性 · 演化 · 新技术（第 17 ~ 21 章）</h2><span class="rule"></span></div>
+    <div class="ch-list">
+
+      <div class="ch-card">
+        <div class="ch-num">第十七章</div>
+        <div class="ch-body">
+          <div class="ch-title">软件可靠性</div>
+          <div class="ch-links"><span class="ch-link off">待整理</span></div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十八章</div>
+        <div class="ch-body">
+          <div class="ch-title">软件架构演化和维护</div>
+          <div class="ch-links"><span class="ch-link off">待整理</span></div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第十九章</div>
+        <div class="ch-body">
+          <div class="ch-title">未来信息综合技术</div>
+          <div class="ch-note">云计算 · 大数据 · 物联网 · 人工智能 · 区块链 · 边缘计算</div>
+          <div class="ch-links"><span class="ch-link off">待整理</span></div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第二十章</div>
+        <div class="ch-body">
+          <div class="ch-title">数学与经济管理知识补充</div>
+          <div class="ch-links"><span class="ch-link off">待整理</span></div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第二十一章</div>
+        <div class="ch-body">
+          <div class="ch-title">知识产权与标准化</div>
+          <div class="ch-links"><span class="ch-link off">待整理</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ═══ 第四阶段：案例 ═══ -->
+  <div class="group">
+    <div class="group-head g-case"><span class="g-tag">案例</span><h2>案例分析专题（第 22 ~ 23 章）</h2><span class="rule"></span></div>
+    <div class="ch-list">
+
+      <div class="ch-card">
+        <div class="ch-num">第二十二章</div>
+        <div class="ch-body">
+          <div class="ch-title">传统架构案例分析专题</div>
+          <div class="ch-note">架构风格 · 质量属性 · 软件工程 · 数据库 · 嵌入式</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="traditional-case-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="traditional-case-notes/quiz-arch-style.html">✍️ 题库</a>
+            <a class="ch-link case" href="traditional-case-notes/case-arch-style.html">📝 案例题</a>
+            <a class="ch-link src" href="案例分析题汇总/">📁 讲义</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="ch-card">
+        <div class="ch-num">第二十三章</div>
+        <div class="ch-body">
+          <div class="ch-title">架构案例分析专题</div>
+          <div class="ch-note">层次架构 · 云原生 · SOA · 安全架构（架构直播4 上）</div>
+          <div class="ch-links">
+            <a class="ch-link note" href="architecture-case-notes/index.html">📖 笔记</a>
+            <a class="ch-link quiz" href="architecture-case-notes/quiz-layered.html">✍️ 题库</a>
+            <a class="ch-link case" href="architecture-case-notes/case-layered.html">📝 案例题</a>
+            <a class="ch-link src" href="架构直播4：架构案例分析上.pdf">📁 讲义</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer">系统架构设计师 · 23 章知识索引 · 2026.08</div>
+</div>
 </body>
 </html>

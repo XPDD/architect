@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统配置与性能评价 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>系统配置与性能评价 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { topic:"sp-indicators", q:"对计算机评价的主要性能指标有时钟频率、（　）、运算精度和内存容量等。对数据库管理系统评价的主要性能指标有（　）、数据库所允许的索引数量和最大并发事务处理能力等。\n（第一空）",
+    options:["丢包率","端口吞吐量","可移植性","数据处理速率"],
+    answer:3, explain:"<b>解析：</b>计算机评价指标=时钟频率、运算速度、运算精度、内存容量、<b>数据处理速率 PDR</b> 等。「丢包率」「端口吞吐量」是网络设备（路由器）指标；「可移植性」是操作系统指标，都不属于计算机评价指标。" },
+  { topic:"sp-indicators", q:"接上题，第二空应填（　）。对数据库管理系统评价的主要性能指标有（　）、数据库所允许的索引数量和最大并发事务处理能力等。",
+    options:["MIPS","支持协议和标准","最大连接数","时延抖动"],
+    answer:2, explain:"<b>解析：</b>数据库管理系统指标=最大并发事务处理、负载均衡、<b>最大连接数</b>等。「MIPS」是性能评测单位；「支持协议和标准」是交换机指标；「时延抖动」是路由器指标，均不属于数据库指标。" },
+  { topic:"sp-indicators", q:"为了优化系统的性能，有时需要对系统进行调整。对于数据库系统，调整参数主要包括 CPU/内存使用状况、（　）、进程/线程使用状态、日志文件大小等。",
+    options:["数据丢包率","端口吞吐量","数据处理速率","查询语句性能"],
+    answer:3, explain:"<b>解析：</b>数据库系统调优参数=CPU/内存、<b>查询语句性能</b>、进程/线程、日志文件大小。「丢包率」「端口吞吐量」是网络设备指标；「数据处理速率」是评价指标而非调优参数，均不适用。" },
+  { topic:"sp-indicators", q:"对于应用系统，其调整参数主要包括应用系统的可用性、响应时间、（　）、特定应用资源占用等。",
+    options:["并发用户数","支持协议和标准","最大连接数","时延抖动"],
+    answer:0, explain:"<b>解析：</b>应用系统调优参数=可用性、响应时间、<b>并发用户数</b>、特定应用资源占用。「最大连接数」是数据库指标；「支持协议和标准」是交换机指标；「时延抖动」是路由器指标，都不是应用系统调优参数。" },
+  { topic:"sp-indicators", q:"RASIS 特性中，「R」和「A」分别表示（　）。",
+    options:["可靠性和可用性","可维护性和安全性","完整性和可靠性","可用性和可维护性"],
+    answer:0, explain:"<b>解析：</b>RASIS=Reliability(可靠性)、Availability(可用性)、Serviceability(可维护性)、Integrity and Security(完整性和安全性)。R=可靠性、A=可用性，勿把 S 当成 Security。" },
+  { topic:"sp-indicators", q:"下列属于操作系统评价的主要性能指标的是（　）。",
+    options:["丢包率","可移植性","最大连接数","背板吞吐量"],
+    answer:1, explain:"<b>解析：</b>操作系统指标=可靠性、吞吐率、响应时间、资源利用率、<b>可移植性</b>。「丢包率」是路由器指标；「最大连接数」是数据库指标；「背板吞吐量」是交换机指标。" },
+  { topic:"sp-indicators", q:"对网络进行评价的主要性能指标，从底层到顶层依次是（　）。",
+    options:["设备级、网络级、应用级、用户级","用户级、应用级、网络级、设备级","网络级、设备级、应用级、用户级","设备级、应用级、网络级、用户级"],
+    answer:0, explain:"<b>解析：</b>网络 4 级指标=设备级 → 网络级 → 应用级 → 用户级（口诀：设网应用），自底向上递进，其余顺序均错乱。" },
+  { topic:"sp-methods", q:"把应用程序中使用最频繁的那部分核心程序作为评价计算机性能的标准程序，称为（　）程序。",
+    options:["仿真测试","核心测试","基准测试","标准测试"],
+    answer:2, explain:"<b>解析：</b>用核心程序作标准程序即为<b>基准测试程序（Benchmark）</b>，是目前公认较好的方法。「仿真/核心/标准测试」都是臆造说法。" },
+  { topic:"sp-methods", q:"（　）不是对 Web 服务器进行性能评估的主要指标。",
+    options:["丢包率","最大并发连接数","响应延迟","吞吐量"],
+    answer:0, explain:"<b>解析：</b>Web 服务器指标=最大并发连接数、响应延迟、吞吐量，<b>不含丢包率</b>。丢包率是路由器等网络设备的指标，别张冠李戴。" },
+  { topic:"sp-methods", q:"关于数据处理速率 PDR 法，下列说法正确的是（　）。",
+    options:["PDR 值越大，机器性能越好","PDR 值越小，机器性能越好","PDR 与指令平均运算速度无关","PDR 就是时钟频率"],
+    answer:0, explain:"<b>解析：</b>PDR 值<b>越大</b>性能越好；它与每条指令和操作数的平均位数、每条指令平均运算速度都有关，与「时钟频率」不是一回事。" },
+  { topic:"sp-methods", q:"等效指令速度法通过统计各类指令在程序中所占比例并折算，是一种（　）。",
+    options:["动态加权法","固定比例法","统计预测法","随机抽样法"],
+    answer:1, explain:"<b>解析：</b>等效指令速度法就是<b>固定比例法</b>，按各类指令的固定占比折算速度，其余为干扰项。" },
+  { topic:"sp-methods", q:"TPC-C、TPC-D、TPC-E 分别对应的应用场景是（　）。",
+    options:["OLTP、决策支持、大型企业信息服务","决策支持、OLTP、大型企业信息服务","大型企业信息服务、OLTP、决策支持","OLTP、大型企业信息服务、决策支持"],
+    answer:0, explain:"<b>解析：</b>TPC-C=在线事务处理(OLTP)、TPC-D=决策支持、TPC-E=大型企业信息服务。口诀：C 联 · D 决 · E 企。" },
+  { topic:"sp-methods", q:"以下 4 种评价程序，评测准确程度由高到低依次是（　）。",
+    options:["合成基准、小型基准、核心程序、真实程序","真实程序、核心程序、小型基准程序、合成基准程序","核心程序、真实程序、合成基准、小型基准","小型基准、核心程序、真实程序、合成基准"],
+    answer:1, explain:"<b>解析：</b>准确度依次递减=<b>真实程序 &gt; 核心程序 &gt; 小型基准程序 &gt; 合成基准程序</b>。越接近真实负载越准，合成基准最不准。" },
+  { topic:"sp-methods", q:"浮点测试程序通常采用的性能指标是（　）。",
+    options:["MIPS","MFLOPS","KIPS","PDR"],
+    answer:1, explain:"<b>解析：</b>浮点测试用 <b>MFLOPS</b>（理论峰值浮点速度）；整数测试用 MIPS；KIPS 是低频指令计数单位；PDR 是数据处理速率法。" },
+  { topic:"sp-amdahl", q:"某系统原执行时间为 100ms，其中 40% 的部件经改进后速度提升为原来的 4 倍，则总加速比约为（　）。",
+    options:["1.33","1.43","1.60","4.00"],
+    answer:1, explain:"<b>解析：</b>总加速比=1÷[(1−0.4)+0.4÷4]=1÷(0.6+0.1)=1÷0.7≈<b>1.43</b>。注意不是 4 倍——受未增强的 60% 制约，加速比远小于 4。" },
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

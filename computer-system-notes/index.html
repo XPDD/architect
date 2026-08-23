@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>操作系统基础 · 康奈尔笔记索引</title>
+<title>计算机系统知识 · 康奈尔笔记索引</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -28,14 +28,14 @@
   .hero-stat { padding: 6px 16px; border-radius: 4px; background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.05); font-size: 13px; color: var(--text-secondary); }
   .hero-stat strong { color: var(--cyan); }
 
-  .part-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius); border-left: 3px solid var(--cyan); margin-bottom: 12px; }
-  .part-num { font-family: var(--font-mono); font-size: 28px; font-weight: 800; color: var(--cyan); text-shadow: 0 0 16px rgba(0,212,255,.25); min-width: 40px; }
+  .part-header { display: flex; align-items: center; gap: 14px; padding: 16px 20px; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius); border-left: 3px solid var(--purple); margin-bottom: 12px; }
+  .part-num { font-family: var(--font-mono); font-size: 28px; font-weight: 800; color: var(--purple); text-shadow: 0 0 16px rgba(167,139,250,.25); min-width: 40px; }
   .part-info h2 { font-size: 18px; font-weight: 700; }
   .part-info span { font-size: 12px; color: var(--text-muted); }
 
   .note-card { display: flex; align-items: center; gap: 16px; padding: 16px 20px; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius); margin-bottom: 8px; cursor: pointer; transition: border-color .2s, background .2s; text-decoration: none; color: inherit; }
-  .note-card:hover { border-color: rgba(0,212,255,.15); background: rgba(0,212,255,.02); }
-  .note-icon { width: 40px; height: 40px; border-radius: var(--radius); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 14px; font-weight: 700; }
+  .note-card:hover { border-color: rgba(167,139,250,.15); background: rgba(167,139,250,.02); }
+  .note-icon { width: 40px; height: 40px; border-radius: var(--radius); flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 13px; font-weight: 700; }
   .note-icon.cyan { background: rgba(0,212,255,.1); border: 1px solid rgba(0,212,255,.2); color: var(--cyan); }
   .note-icon.blue { background: rgba(77,124,255,.1); border: 1px solid rgba(77,124,255,.2); color: var(--blue); }
   .note-icon.green { background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.2); color: var(--green); }
@@ -46,13 +46,13 @@
   .note-body h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
   .note-body p { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
   .note-arrow { color: var(--text-muted); font-size: 14px; flex-shrink: 0; }
-  a.note-card:hover .note-arrow { color: var(--cyan); }
+  a.note-card:hover .note-arrow { color: var(--purple); }
 
   .relation-diagram { background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 24px; margin-top: 28px; text-align: center; }
-  .relation-diagram h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--cyan); }
+  .relation-diagram h2 { font-size: 16px; font-weight: 700; margin-bottom: 16px; color: var(--purple); }
   .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 6px 0; }
   .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 8px 14px; font-size: 12px; font-weight: 500; color: rgba(255,255,255,.75); text-align: center; white-space: nowrap; }
-  .flow-box.accent { border-color: rgba(0,212,255,.2); background: rgba(0,212,255,.06); color: var(--cyan); font-weight: 700; }
+  .flow-box.accent { border-color: rgba(167,139,250,.2); background: rgba(167,139,250,.06); color: var(--purple); font-weight: 700; }
   .flow-box.primary { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.08); color: var(--blue); font-weight: 700; }
   .flow-arrow { display: flex; align-items: center; justify-content: center; width: 24px; color: rgba(255,255,255,.15); font-size: 14px; flex-shrink: 0; }
   .flow-v-arrow { display: flex; justify-content: center; color: rgba(255,255,255,.15); font-size: 14px; line-height: 1; margin: 4px 0; }
@@ -65,101 +65,103 @@
 <div class="container">
 
   <div class="hero">
-    <div class="hero-badge">OPERATING SYSTEM · KNOWLEDGE BASE</div>
-    <div class="hero-title">操作系统<span class="accent">基础</span></div>
-    <div class="hero-sub">概述 · 进程 · PV 操作 · 死锁 · 存储 · 文件 · 设备 · 8 篇笔记 + 22 道自测题</div>
+    <div class="hero-badge">COMPUTER SYSTEM · KNOWLEDGE BASE</div>
+    <div class="hero-title">计算机<span class="accent">系统知识</span></div>
+    <div class="hero-sub">第二章 · 数据表示 · 存储系统 · 输入输出 · 可靠性 · 加密 · 9 篇笔记 + 25 道自测题</div>
     <div class="hero-stats">
-      <span class="hero-stat">共 <strong>8</strong> 篇笔记</span>
-      <span class="hero-stat">自测 <strong>22</strong> 题</span>
-      <span class="hero-stat">常考 <strong>3-5 分</strong></span>
+      <span class="hero-stat">共 <strong>9</strong> 篇笔记</span>
+      <span class="hero-stat">自测 <strong>25</strong> 题</span>
+      <span class="hero-stat">常考 <strong>选择 1~2 分</strong></span>
     </div>
   </div>
 
   <div class="part-header">
-    <div class="part-num">03</div>
-    <div class="part-info"><h2>操作系统基础</h2><span>第三章 · 高频考点 · 进程/存储/文件/设备四模块</span></div>
+    <div class="part-num">02</div>
+    <div class="part-info"><h2>计算机系统知识</h2><span>第二章 · 数据表示与存储系统 · Cache 命中率/校验码/进制是必考计算</span></div>
   </div>
 
-  <a class="note-card" href="os-quiz.html" style="border-color:rgba(52,211,153,.3);">
+  <a class="note-card" href="computer-system-quiz.html" style="border-color:rgba(52,211,153,.3);">
     <div class="note-icon green">&#x2713;</div>
-    <div class="note-body"><h3>真题 · 自测练习（22 题 · 交互做题）</h3><p>点选判分 · 带解析 · 覆盖概述/进程/PV/死锁/存储/文件/设备</p></div>
+    <div class="note-body"><h3>真题 · 自测练习（25 题 · 交互做题）</h3><p>点选判分 · 带解析 · 覆盖进制/补码/Cache 命中率/校验码/磁盘/I/O 等计算题</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-overview.html">
-    <div class="note-icon cyan">OS</div>
-    <div class="note-body"><h3>操作系统概述 — 作用 · 特征 · 功能 · 分类 · 微内核</h3><p>并共虚不 · 进存文设作 · BIOS 启动 · 微内核 vs 单体内核 · 嵌入式</p></div>
+  <a class="note-card" href="radix.html">
+    <div class="note-icon rose">RA</div>
+    <div class="note-body"><h3>进制转换 — 二进制/十进制互转</h3><p>按位权求和 · 除2取余/乘2取整 · 1100.101=12.625</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
-
-  <a class="note-card" href="os-process.html">
-    <div class="note-icon blue">PR</div>
-    <div class="note-body"><h3>进程管理基础 — 组成 · 三态五态 · 线程 · 前趋图 · 资源图</h3><p>PCB · 就绪/运行/等待 · 线程共享代码不共享栈 · 全阻塞即死锁</p></div>
+  <a class="note-card" href="datacode.html">
+    <div class="note-icon cyan">DC</div>
+    <div class="note-body"><h3>数据的表示 — 原码 · 反码 · 补码 · 移码 · 浮点数</h3><p>补码=减法转加法 · 阶码管范围/尾数管精度 · 对阶小向大</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
-
-  <a class="note-card" href="os-pv.html">
-    <div class="note-icon purple">PV</div>
-    <div class="note-body"><h3>PV 操作与信号量 — P/V 语义 · 生产者消费者</h3><p>P 申请减一 S&lt;0 阻塞 · V 释放加一 S≤0 唤醒 · 尾 V 头 P</p></div>
+  <a class="note-card" href="checkcode.html">
+    <div class="note-icon blue">CC</div>
+    <div class="note-body"><h3>校验码 — 奇偶校验 · CRC · 海明码</h3><p>奇偶检错不纠错 · 模2(异或)除法 · 2ᵏ−1≥n+k</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
-
-  <a class="note-card" href="os-deadlock.html">
-    <div class="note-icon rose">DL</div>
-    <div class="note-body"><h3>死锁与银行家算法 — 四条件 · 四措施 · 资源计算</h3><p>互斥+占有等待+不可剥夺+环路 · n×(R−1)+1 · 银行家安全序列</p></div>
+  <a class="note-card" href="memory.html">
+    <div class="note-icon purple">ME</div>
+    <div class="note-body"><h3>存储器层次结构与 Cache — 寄存器 · Cache · 主存 · 外存</h3><p>SRAM/DRAM · 硬件自动映射 · 平均访问时间=h·t_c+(1−h)·t_m</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
-
-  <a class="note-card" href="os-memory.html">
-    <div class="note-icon amber">MM</div>
-    <div class="note-body"><h3>存储管理 — 页式 · 段式 · 段页式 · 快表 · 页面置换</h3><p>块号×块大小+偏移 · 段基址+偏移 · OPT/FIFO/LRU</p></div>
+  <a class="note-card" href="cache.html">
+    <div class="note-icon green">CA</div>
+    <div class="note-body"><h3>Cache 地址映像与替换算法</h3><p>直接/全相联/组相联 · LRU/LFU/RAND/FIFO · 写直达/写回</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
-
-  <a class="note-card" href="os-file.html">
-    <div class="note-icon green">FL</div>
-    <div class="note-body"><h3>文件管理 — 索引文件 · 目录结构 · 位示图</h3><p>直接 40KB / 一级 4MB / 二级 4GB · 相对/绝对路径 · 位示图计算</p></div>
+  <a class="note-card" href="disk.html">
+    <div class="note-icon amber">DK</div>
+    <div class="note-body"><h3>磁盘详解 — 移臂调度 · 旋转调度</h3><p>先移臂后旋转 · FCFS/SSTF/SCAN/CSCAN · 访问时间组成</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
-
-  <a class="note-card" href="os-device.html">
-    <div class="note-icon purple">DV</div>
-    <div class="note-body"><h3>设备管理 — I/O 技术 · SPOOLING</h3><p>程序控制→中断→DMA 效率递增 · 输入井输出井 · 设备虚拟化</p></div>
+  <a class="note-card" href="io.html">
+    <div class="note-icon rose">IO</div>
+    <div class="note-body"><h3>输入/输出技术 — 程序控制 · 中断 · DMA · IOP</h3><p>DMA 主存↔外设 · 中断+DMA 可并行 · IOP 增硬件代价</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
-
-  <a class="note-card" href="os-key-points.html">
-    <div class="note-icon cyan">KP</div>
-    <div class="note-body"><h3>操作系统常考知识点（旧版汇总）</h3><p>进程/存储/文件/设备四大模块一页速览 · 直播精华提炼</p></div>
+  <a class="note-card" href="reliability.html">
+    <div class="note-icon cyan">RL</div>
+    <div class="note-body"><h3>计算机可靠性 — 串联 · 并联系统</h3><p>串联相乘 / 并联 1−(1−R)ⁿ · MTBF=1/λ</p></div>
+    <span class="note-arrow">&#x2197;</span>
+  </a>
+  <a class="note-card" href="crypto.html">
+    <div class="note-icon blue">CY</div>
+    <div class="note-body"><h3>加密认证技术（要点）— 对称 · 非对称 · 数字签名</h3><p>DES/3DES/AES · RSA 数字签名 · MD5 是哈希</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
   <div class="relation-diagram">
     <h2>&#x25C6; 知识体系关系图</h2>
     <div class="flow-row">
-      <div class="flow-box accent" style="font-size:14px;padding:10px 20px;">操作系统概述<br><small>并共虚不 · 进存文设作 · 微内核</small></div>
+      <div class="flow-box accent" style="font-size:14px;padding:10px 20px;">数据表示<br><small>进制 · 原反补码 · 浮点数 · 校验码</small></div>
     </div>
     <div class="flow-v-arrow">&#x2193;</div>
     <div class="flow-row">
-      <div class="flow-box primary">进程管理<br><small>三态五态 · PV · 死锁</small></div>
+      <div class="flow-box primary">存储系统</div>
       <div class="flow-arrow">+</div>
-      <div class="flow-box primary">存储管理<br><small>页式 · 段式 · 段页式</small></div>
+      <div class="flow-box">Cache</div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box">磁盘</div>
+      <div class="flow-arrow">+</div>
+      <div class="flow-box">I/O 技术</div>
     </div>
     <div class="flow-v-arrow">&#x2193;</div>
     <div class="flow-row">
-      <div class="flow-box">文件管理<br><small>索引 · 位示图</small></div>
+      <div class="flow-box" style="border-color:rgba(248,113,113,.2);color:var(--rose);">可靠性</div>
       <div class="flow-arrow">+</div>
-      <div class="flow-box">设备管理<br><small>DMA · SPOOLING</small></div>
-      <div class="flow-arrow">+</div>
-      <div class="flow-box" style="border-color:rgba(248,113,113,.2);color:var(--rose);">真题自测<br><small>22 题</small></div>
+      <div class="flow-box">加密认证</div>
     </div>
     <div class="flow-row" style="margin-top:8px;">
-      <div class="flow-box" style="font-size:10px;border:none;color:var(--text-muted);">概述 → 进程 + 存储 → 文件 + 设备 → 真题自测</div>
+      <div class="flow-box" style="font-size:10px;border:none;color:var(--text-muted);">数据表示 → 存储/磁盘/I/O → 可靠性/安全 → 真题自测</div>
     </div>
   </div>
 
   <div style="text-align:center;padding:20px;font-size:12px;color:var(--text-muted);margin-top:8px;">
-    <a href="../index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);">&#x2190; 返回总索引</a>
+    <a href="../index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);">&#x2190; 返回总索引</a> &nbsp;&middot;&nbsp;
+    <a href="../computer-basics-notes/index.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.2);">计算机组成与体系结构（第一章）</a> &nbsp;&middot;&nbsp;
+    <a href="../os-notes/index.html" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(251,191,36,.2);">操作系统笔记</a>
   </div>
 
 </div>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>面向服务架构 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>面向服务架构 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"SOA与微服务", q:"关于 SOA 与微服务的区别，下列说法正确的是（　）。",
+   options:["SOA 的服务粒度比微服务更细","SOA 采用 ESB 作为服务间通信的关键组件，微服务推荐统一 RESTful/RPC 协议","微服务更关注兼容已有系统","SOA 要求必须采用自动化测试和持续集成"],
+   answer:1, explain:"<b>SOA 粒度粗、用 ESB（重量级）、考虑兼容已有系统</b>；<b>微服务粒度细、统一 REST/RPC 协议（无需 ESB）、要求快速交付</b>。B 正确。"},
+
+  {topic:"SOA与微服务", q:"下列应用场景中，更适合采用 SOA 架构的是（　）。",
+   options:["快速、轻量级、基于 Web 的互联网系统","庞大、复杂、异构的企业级系统，很多老系统已发展多年","业务变化极快、需要快速试错的新项目","只有少量微服务的简单系统"],
+   answer:1, explain:"SOA 诞生背景就是<b>庞大、复杂、异构的企业级系统</b>，成本影响太大无法推倒重来，只能靠 ESB 兼容；微服务更适合快速轻量的互联网系统。"},
+
+  {topic:"SOA参考架构", q:"SOA 参考架构中，通过企业服务总线（ESB）提供分布在各种架构元素中服务间连接性的是（　）。",
+   options:["业务逻辑服务","控制服务","连接服务","开发服务"],
+   answer:2, explain:"<b>连接服务（Connectivity Service）</b>通过 ESB 提供服务间连接性；控制服务实现人/流程/信息集成；开发服务贯穿开发生命周期。"},
+
+  {topic:"SOA参考架构", q:"SOA 参考架构的六大类服务中，「监控业务系统运行时服务的业务性能，采取措施适应变化的市场」属于（　）。",
+   options:["业务创新和优化服务","IT 服务管理","控制服务","业务逻辑服务"],
+   answer:0, explain:"<b>业务创新和优化服务</b>监控业务性能、应对市场变化（以 BPM 为核心）；IT 服务管理提供安全/目录/系统管理/虚拟化等基础设施能力。"},
+
+  {topic:"SOA协议", q:"在 Web 服务协议中，用于「服务的注册和发现」的是（　）。",
+   options:["WSDL","SOAP","UDDI","REST"],
+   answer:2, explain:"<b>UDDI</b> 负责服务的注册和发现；<b>WSDL</b> 描述服务的接口和操作；<b>SOAP</b> 是消息交换协议（XML 文件）；REST 是架构风格。"},
+
+  {topic:"SOA协议", q:"关于 REST 架构风格，下列叙述不正确的是（　）。",
+   options:["REST 中一切都是资源，每个资源有唯一 URL 标识","REST 是有状态的，服务器需要保存客户端的状态","使用 HTTP 方法（GET/POST/PUT/DELETE）对资源操作","REST 强调客户端-服务器分离和统一接口"],
+   answer:1, explain:"REST 是<b>无状态</b>的，每个请求都包含足够信息，服务器不需要保存客户端状态。B 项说反了。"},
+
+  {topic:"ESB", q:"下列不属于 ESB（企业服务总线）核心功能的是（　）。",
+   options:["提供位置透明性的消息路由和寻址服务","提供服务注册和命名的管理功能","支持多种消息传递范型（如请求/响应、发布/订阅）","负责数据库的物理存储与索引"],
+   answer:3, explain:"ESB 核心功能＝位置透明消息路由寻址、服务注册命名管理、多种消息传递范型、多传输协议、多数据格式转换、日志监控。<b>不负责数据库物理存储</b>。"},
+
+  {topic:"ESB", q:"在 ESB 环境中组件间的交互过程是（　）。",
+   options:["点对点的直接交互模式","由事件驱动的消息交互模式，消息经标准化后由总线转发","所有服务通过共享内存直接通信","由中心数据库中转所有请求"],
+   answer:1, explain:"ESB 交互是<b>事件驱动的消息交互</b>（非点对点）：请求者触发 → 消息标准化 → 发送总线 → 按服务名/接口名查找 → 转发 → 逆向返回。"},
+
+  {topic:"SOA设计原则", q:"SOA 设计原则中，「调用服务时不用考虑它还需要其他状态及数据，以避免服务请求者依赖服务提供者的状态」体现的是（　）。",
+   options:["无状态","单一实例","粗粒度","松耦合"],
+   answer:0, explain:"<b>无状态</b>：调用服务时不依赖其他状态/数据；单一实例＝每服务只提供单一功能；松耦合＝使用者只见接口，位置/实现/状态不可见。"},
+
+  {topic:"SOA设计原则", q:"SOA 设计原则中，强调「服务数量不应该太多，依靠消息交互而不是远程过程调用（RPC）」的是（　）。",
+   options:["单一实例","自包含和模块化","粗粒度","重用能力"],
+   answer:2, explain:"<b>粗粒度</b>：服务数量不宜太多，靠消息交互而非 RPC，消息量较大但交互频度较低。"},
+
+  {topic:"SOA设计模式", q:"服务注册表模式支持下列哪项 SOA 治理功能？",
+   options:["服务注册、服务位置、服务绑定","服务编码、服务测试、服务部署","数据存储、索引、备份","消息加密、签名、认证"],
+   answer:0, explain:"服务注册表模式支持：<b>服务注册</b>（提供者公布功能）、<b>服务位置</b>（查询符合要求的服务）、<b>服务绑定</b>（利用服务合同开发代码并绑定调用）。"},
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好，继续保持！' : pct >= 60 ? '基本掌握，错题建议回顾层次架构笔记。' : '还需加强，建议重看层次架构笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息系统基础知识 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>信息系统基础知识 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { topic:"is-overview", q:"信息系统的 5 个基本功能是：输入、存储、处理、输出和（　）。",
+    options:["控制","反馈","通信","决策"],
+    answer:0, explain:"<b>解析：</b>五功能=输存处出控（输入→存储→处理→输出→控制）。「反馈」「通信」「决策」都是混淆项，不属于信息系统的 5 个基本功能。" },
+  { topic:"is-overview", q:"在诺兰模型中，标志着「计算机管理逐渐变为数据管理」的关键阶段是（　）。",
+    options:["传播阶段","控制阶段","集成阶段","数据管理阶段"],
+    answer:1, explain:"<b>解析：</b>控制阶段强调从整体上控制发展、解决数据共享问题，是「计算机管理→数据管理」的关键。集成阶段是后续建基础数据库，别混淆。" },
+  { topic:"is-overview", q:"下列信息系统中，处于最低级、最初级形式的是（　）。",
+    options:["DSS","MIS","TPS/DPS","OAS"],
+    answer:2, explain:"<b>解析：</b>分类从低到高：TPS/DPS → MIS → DSS → ES → OAS。业务处理系统 TPS（EDP）是最初级形式。" },
+  { topic:"is-overview", q:"信息系统生命周期中「最重要、最关键」的阶段是（　）。",
+    options:["产生阶段","开发阶段","运行阶段","消亡阶段"],
+    answer:1, explain:"<b>解析：</b>开发阶段包含总体规划/系统分析/系统设计/系统实施/系统验收 5 个子阶段，是最重要关键的阶段。" },
+  { topic:"is-overview", q:"下列不属于信息系统建设原则的是（　）。",
+    options:["高层管理人员介入原则","用户参与开发原则","自底向上规划原则","工程化原则"],
+    answer:2, explain:"<b>解析：</b>建设原则是「自顶向下」规划，而非自底向上。其余（高层介入、用户参与、工程化）都是正确原则。" },
+  { topic:"is-es", q:"专家系统的核心三要素是（　）。",
+    options:["知识库、综合数据库、推理机","知识库、模型库、推理机","数据库、知识库、解释程序","知识库、人机接口、推理机"],
+    answer:0, explain:"<b>解析：</b>三要素=综合数据库(数据级)+知识库(知识库级)+推理机(控制级)。「模型库」是 DSS 的部件，「解释程序」「人机接口」是 ES 的组成但不是核心三要素。" },
+  { topic:"is-es", q:"专家系统的知识分为三级，而传统应用程序只有（　）级结构。",
+    options:["一级","两级","三级","四级"],
+    answer:1, explain:"<b>解析：</b>专家系统有数据级、知识库级、控制级三级；传统程序只有「数据+程序」两级结构。" },
+  { topic:"is-es", q:"与推理机一起构成专家系统核心的是（　）。",
+    options:["综合数据库","知识库","完整知识库","解释程序"],
+    answer:2, explain:"<b>解析：</b>推理机与「完整知识库」（知识库+综合数据库）一起构成核心。单选填「完整知识库」最准确。" },
+  { topic:"is-oas", q:"办公自动化系统（OAS）四大支柱中，起主导作用的是（　）。",
+    options:["计算机技术","通信技术","行为科学","系统科学"],
+    answer:2, explain:"<b>解析：</b>四大支柱=计算机技术、通信技术、系统科学、行为科学；其中行为科学为主导，系统科学为理论基础。" },
+  { topic:"is-oas", q:"OAS 三大功能中，「辅助决策」功能类似于下列哪个系统（　）。",
+    options:["TPS","MIS","DSS","ES"],
+    answer:2, explain:"<b>解析：</b>事务处理≈TPS、信息管理≈MIS、辅助决策≈DSS，一一对应。" },
+  { topic:"is-erp", q:"ERP 的演变过程正确的是（　）。",
+    options:["MRP → ERP → MRPⅡ","MRP → MRPⅡ → ERP","ERP → MRP → MRPⅡ","MRPⅡ → MRP → ERP"],
+    answer:1, explain:"<b>解析：</b>物料需求计划 MRP → 制造资源计划 MRPⅡ（增加库存分销）→ 企业资源计划 ERP（打通供应链，加财务/人力/销售）。" },
+  { topic:"is-erp", q:"一般认为企业除物流、资金流、信息流三大资源外，第四大资源是（　）。",
+    options:["技术资源","人力资源","客户资源","数据资源"],
+    answer:1, explain:"<b>解析：</b>物流(物流管理)、资金流(财务管理)、信息流(生产控制管理)，第四大是人力资源(人力资源管理)。" },
+  { topic:"is-erp", q:"对 ERP 的「三层理解」不包括（　）。",
+    options:["管理思想","软件产品","管理系统","硬件平台"],
+    answer:3, explain:"<b>解析：</b>ERP 首先是管理思想、其次是软件产品、最后是管理系统。「硬件平台」是干扰项。" },
+  { topic:"is-egovernment", q:"电子政务发展的正确阶段顺序是（　）。",
+    options:["起步→双向互动→单向互动→网上事务处理","起步→单向互动→双向互动→网上事务处理","起步→网上事务处理→单向互动→双向互动","单向互动→起步→双向互动→网上事务处理"],
+    answer:1, explain:"<b>解析：</b>4 阶段=起步→政府与用户单向互动→双向互动→网上事务处理，循序渐进。" },
+  { topic:"is-egovernment", q:"电子政务模式中，G2B 表示（　）。",
+    options:["政府到政府","政府到企业","政府到公众","企业到政府"],
+    answer:1, explain:"<b>解析：</b>G2B=Government to Business 政府对企业的服务（如招标采购）。G2G 政府间、G2C 政府对公众、B2G 企业对政府。" },
+  { topic:"is-egovernment", q:"企业信息化的根本目的在于（　）。",
+    options:["优化业务流程","提高企业竞争能力","实现技术升级","降低人力成本"],
+    answer:1, explain:"<b>解析：</b>「优化业务流程」是具体目标，根本目的是提高企业竞争能力。注意区分目标与根本目的。" },
+  { topic:"is-dev-methods", q:"结构化开发方法的精髓是（　）。",
+    options:["自底向上、逐步求精","自顶向下、逐步求精、模块化设计","面向对象、接口解耦","快速建模、快速迭代"],
+    answer:1, explain:"<b>解析：</b>结构化方法=SA+SD+SP，精髓是自顶向下、逐步求精、模块化设计。「自底向上」是其实现方式，不是精髓。" },
+  { topic:"is-dev-methods", q:"原型化方法最适用于（　）的系统。",
+    options:["需求明确、技术难度大","需求不明确","大型复杂","对安全要求极高"],
+    answer:1, explain:"<b>解析：</b>原型法的核心优点就是「能更有效确认用户需求」，适用于需求不明确、分析难度大而技术难度不大的系统。" },
+  { topic:"is-dev-methods", q:"面向服务开发方法（SOA）的核心思想是（　）。",
+    options:["模块化封装","接口定义与实现解耦","自顶向下分解","对象继承复用"],
+    answer:1, explain:"<b>解析：</b>SOA 将接口定义与实现解耦，实现服务提供者与调用者松耦合。模块化是结构化、对象继承是 OO，都不是 SOA 核心。" },
+  { topic:"is-tps-mis-dss", q:"下列不属于 TPS 数据处理周期构成的是（　）。",
+    options:["数据输入","数据处理","模型建立","查询处理"],
+    answer:2, explain:"<b>解析：</b>TPS 周期=数据输入/数据处理/数据维护/文件报表产生/查询处理。「模型建立」是 DSS 的组成，不是 TPS。" },
+  { topic:"is-tps-mis-dss", q:"管理信息系统（MIS）由四大部件组成，不包括（　）。",
+    options:["信息源","信息处理器","信息用户","模型库"],
+    answer:3, explain:"<b>解析：</b>MIS 四大部件=信息源、信息处理器、信息用户、信息管理者。「模型库」是 DSS 的部件。" },
+  { topic:"is-tps-mis-dss", q:"决策支持系统（DSS）的「两库结构」指的是（　）。",
+    options:["数据库 + 方法库","数据库 + 模型库","知识库 + 模型库","数据库 + 知识库"],
+    answer:1, explain:"<b>解析：</b>两库结构=数据库子系统 + 模型库子系统 + 对话子系统（三角形分布）。「知识库」是专家系统 ES 的部件。" },
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

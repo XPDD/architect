@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架构直播4 · 架构案例分析上 · 知识索引</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:36px 0}
+.container{max-width:960px;margin:0 auto;padding:0 20px}
+.hero{text-align:center;padding:48px 20px 36px;position:relative;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);margin-bottom:32px;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+.hero-badge{font-family:var(--font-mono);font-size:10px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:8px}
+.hero-title{font-size:32px;font-weight:800;letter-spacing:-.02em}
+.hero-title .accent{color:var(--cyan);text-shadow:0 0 20px rgba(0,212,255,.3)}
+.hero-sub{font-size:14px;color:var(--text-muted);margin-top:10px}
+.hero-stats{display:flex;justify-content:center;gap:24px;margin-top:20px;flex-wrap:wrap}
+.hero-stat{padding:6px 16px;border-radius:4px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:13px;color:var(--text-secondary)}
+.hero-stat strong{color:var(--cyan)}
+.part-section{margin-bottom:28px}
+.part-header{display:flex;align-items:center;gap:14px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius);border-left:3px solid var(--cyan);margin-bottom:12px}
+.part-num{font-family:var(--font-mono);font-size:28px;font-weight:800;color:var(--cyan);text-shadow:0 0 16px rgba(0,212,255,.25);min-width:40px}
+.part-info h2{font-size:18px;font-weight:700}
+.part-info span{font-size:12px;color:var(--text-muted)}
+.note-card{display:flex;align-items:center;gap:16px;padding:16px 20px;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius);margin-bottom:8px;text-decoration:none;color:inherit;cursor:pointer;transition:border-color .2s,background .2s}
+.note-card:hover{border-color:rgba(0,212,255,.15);background:rgba(0,212,255,.02)}
+.note-icon{width:40px;height:40px;border-radius:var(--radius);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:16px;font-weight:700}
+.note-icon.cyan{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+.note-icon.blue{background:rgba(77,124,255,.1);border:1px solid rgba(77,124,255,.2);color:var(--blue)}
+.note-icon.green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+.note-icon.purple{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--purple)}
+.note-icon.amber{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
+.note-icon.case{background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--rose)}
+.note-info{flex:1}.note-info h3{font-size:15px;font-weight:700;margin-bottom:2px}
+.note-info p{font-size:12px;color:var(--text-muted);line-height:1.5}
+.note-arrow{color:var(--text-muted);font-size:18px;transition:color .2s}
+.note-card:hover .note-arrow{color:var(--cyan)}
+.footer{text-align:center;padding:20px;font-size:12px;color:var(--text-muted);margin-top:16px}
+.footer a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2)}
+.footer a:hover{border-color:var(--cyan)}
+</style>
+</head>
+<body>
+
+<div class="container">
+<div class="hero">
+<div class="hero-badge">架构直播4 · 案例分析上 · 康奈尔笔记库</div>
+<div class="hero-title"><span class="accent">八大架构</span> 案例分析（上）</div>
+<div class="hero-sub">层次架构 · 云原生架构 · 面向服务架构 · 安全架构</div>
+    <div class="hero-stats">
+<div class="hero-stat">笔记 <strong>4</strong> 份</div>
+<div class="hero-stat">题库 <strong>4</strong> 组</div>
+<div class="hero-stat">案例题 <strong>4</strong> 道</div>
+<div class="hero-stat">架构案例图 <strong>5</strong> 张</div>
+</div>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--cyan);text-shadow:0 0 16px rgba(0,212,255,.25);">01</div>
+<div class="part-info"><h2>层次架构</h2><span>N 层架构 · 业务容器 · 数据访问模式 · 物联网三层</span></div>
+</div>
+<a class="note-card" href="layered-architecture.html">
+<div class="note-icon cyan">LA</div>
+<div class="note-info"><h3>层次架构 · 表现层 · 业务层 · 数据访问层</h3><p>N 层分层 · Domain Model—Service—Control · 5 种数据访问模式 · 工厂模式 · 连接池 · 物联网三层 · 电子小票案例</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-layered.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>层次架构 · 练习题库（11 题）</h3><p>点选判分 · 带解析 · 覆盖 N 层架构/业务容器/数据访问模式/物联网</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-layered.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>层次架构 · 案例实战（电子小票服务系统）</h3><p>试题一 · 阅读说明 / 3 个小问 / 可展开参考答案 · 物联网三层架构</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--blue);text-shadow:0 0 16px rgba(77,124,255,.25);">02</div>
+<div class="part-info"><h2>云原生架构</h2><span>内涵 · 原则 · 模式 · 微服务 · Serverless · ServiceMesh</span></div>
+</div>
+<a class="note-card" href="cloud-native.html">
+<div class="note-icon blue">CN</div>
+<div class="note-info"><h3>云原生架构 · 内涵 · 原则 · 模式 · 技术</h3><p>代码三部分 · 7 原则 · 7 架构模式 · 微服务 4 约束 · 可观测三支柱 · 旅行公司改造案例（8 层架构）</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-cloud-native.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>云原生架构 · 练习题库（12 题）</h3><p>点选判分 · 带解析 · 覆盖内涵/原则/模式/微服务/Serverless/ServiceMesh</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-cloud-native.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>云原生架构 · 案例实战（旅行公司云原生改造）</h3><p>试题二 · 三阶段改造 / 8 层架构 / 3 个小问 · 可展开参考答案</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--purple);text-shadow:0 0 16px rgba(167,139,250,.25);">03</div>
+<div class="part-info"><h2>面向服务架构（SOA）</h2><span>SOA vs 微服务 · 参考架构 · 协议 · 设计原则与模式</span></div>
+</div>
+<a class="note-card" href="soa.html">
+<div class="note-icon purple">SO</div>
+<div class="note-info"><h3>面向服务架构 · SOA 参考架构 · 协议 · 设计模式</h3><p>SOA 与微服务四区别 · 六大类服务 · UDDI/WSDL/SOAP/REST · ESB · 8 条设计原则 · 服务注册表</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-soa.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>面向服务架构 · 练习题库（11 题）</h3><p>点选判分 · 带解析 · 覆盖区别/参考架构/协议/ESB/设计原则</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-soa.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>面向服务架构 · 案例实战（企业异构系统 SOA 整合）</h3><p>试题三 · ESB/服务注册表/SOA vs 微服务 · 可展开参考答案</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="part-section">
+<div class="part-header">
+<div class="part-num" style="color:var(--amber);text-shadow:0 0 16px rgba(251,191,36,.25);">04</div>
+<div class="part-info"><h2>安全架构</h2><span>威胁 · 三道防线 · WPDRRC · 脆弱性分析</span></div>
+</div>
+<a class="note-card" href="security.html">
+<div class="note-icon amber">SE</div>
+<div class="note-info"><h3>安全架构 · 威胁 · 模型 · 脆弱性分析</h3><p>六类威胁 · 19 种安全威胁 · 三道防线 · WPDRRC · 5 方面安全设计 · 7 种架构脆弱性 · 混合云案例</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="quiz-security.html">
+<div class="note-icon green">&#x2713;</div>
+<div class="note-info"><h3>安全架构 · 练习题库（12 题）</h3><p>点选判分 · 带解析 · 覆盖威胁/防线/WPDRRC/脆弱性/完整性</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+<a class="note-card" href="case-security.html">
+<div class="note-icon case">&#x25C6;</div>
+<div class="note-info"><h3>安全架构 · 案例实战（混合云安全生产管理系统）</h3><p>试题四 · 混合云 / 4 层架构 / 安全体系 · 可展开参考答案</p></div>
+<div class="note-arrow">&#x2192;</div>
+</a>
+</div>
+
+<div class="footer">
+<a href="../index.html">&#x2190; 返回总索引</a> &nbsp;·&nbsp;
+<a href="layered-architecture.html">层次架构</a> &nbsp;·&nbsp;
+<a href="cloud-native.html">云原生</a> &nbsp;·&nbsp;
+<a href="soa.html">SOA</a> &nbsp;·&nbsp;
+<a href="security.html">安全</a>
+</div>
+</div>
+
+</body>
+</html>

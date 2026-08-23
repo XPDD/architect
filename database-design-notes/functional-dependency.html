@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 函数依赖与 Armstrong 公理</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:860px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+  .header-badge-icon{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--cyan)}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}.note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .hl-red{color:var(--rose);background:linear-gradient(180deg,transparent 58%,rgba(248,113,113,.12)58%);padding:0 2px;font-weight:600}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green)}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px}
+  .tip{font-size:11.5px;color:var(--amber);background:rgba(251,191,36,.06);border-left:2px solid var(--amber);padding:8px 12px;border-radius:4px;margin:8px 0;line-height:1.6}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-family:var(--font-mono)}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  .tag.warn{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2);color:var(--amber)}
+  .footer-nav{grid-column:1/-1;display:flex;justify-content:space-between;padding:14px 44px;border-top:1px solid var(--border-default);font-size:12px;font-family:var(--font-mono);position:relative;z-index:1}
+  .footer-nav a{color:var(--cyan);text-decoration:none}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.footer-nav{padding:14px 16px;flex-direction:column;gap:8px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">∀</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">数据库设计 · 第 5 篇</div>
+        <div class="header-title">函数依赖 · Armstrong 公理系统</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item">2026.08</div>
+      <div class="meta-item">软考高级架构师 · 规范化基础</div>
+      <div class="meta-item">重点 ★★★</div>
+    </div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>函数依赖、部分依赖、传递依赖的区别？</div>
+      <div class="cue-item"><span class="q-mark">?</span>Armstrong 三大公理 + 三条派生规则？</div>
+      <div class="cue-item"><span class="q-mark">?</span>如何求候选键（闭包法）？</div>
+    </div>
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>函数依赖的三种形态</div>
+      <div class="note-section">
+        <table class="compare-table">
+          <thead><tr><th>依赖</th><th>定义</th><th>示例</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hl-green">函数依赖</span></td><td>X 能唯一确定 Y，记 X→Y</td><td>Y=X²，X 确定 Y（反之不行）</td></tr>
+            <tr><td><span class="hl-orange">部分函数依赖</span></td><td>A 可决定 C，(A,B) 也可决定 C，B 多余</td><td>候选键 (学号,课程号)，但 学号→姓名</td></tr>
+            <tr><td><span class="hl-purple">传递函数依赖</span></td><td>A→B 且 B→C（A≠B），则 A→C</td><td>学号→系号→系主任</td></tr>
+          </tbody>
+        </table>
+        <p>判定要点：<b>部分依赖</b>是"候选键的子集能决定非主属性"；<b>传递依赖</b>是"非主属性决定非主属性"（A→B→C，且 B 不是候选键）。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>Armstrong 公理系统（3 公理 + 3 派生）</div>
+      <div class="note-section">
+        <table class="compare-table">
+          <thead><tr><th>定律</th><th>规则</th><th>记忆</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hl-purple">自反律</span></td><td>Y ⊆ X ⊆ U → X→Y</td><td>大集合决定自己的子集</td></tr>
+            <tr><td><span class="hl-purple">增广律</span></td><td>X→Y → XZ→YZ</td><td>两边同时加 Z</td></tr>
+            <tr><td><span class="hl-purple">传递律</span></td><td>X→Y 且 Y→Z → X→Z</td><td>链式传递</td></tr>
+            <tr><td><span class="hl-green">合并律</span></td><td>X→Y 且 X→Z → X→YZ</td><td>右端合并</td></tr>
+            <tr><td><span class="hl-green">分解律</span></td><td>X→YZ → X→Y 且 X→Z</td><td>右端拆分</td></tr>
+            <tr><td><span class="hl-green">合成律(伪传递律)</span></td><td>X→Y 且 Y→Z → XZ→YZ</td><td>增广+传递</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="numbered-header"><span class="num">3</span>候选键求法（闭包法 · 高频）</div>
+      <div class="note-section">
+        <ul>
+          <li><b>第 1 步</b>：找<b>从未出现在依赖右边</b>的属性 —— 它们必在候选键中。</li>
+          <li><b>第 2 步</b>：以该属性为基础，用依赖集依次扩展（求闭包），看能否遍历全部属性。</li>
+          <li><b>第 3 步</b>：遍历不到的属性加入候选键，再求闭包，直至覆盖全部属性。</li>
+        </ul>
+        <div class="tip">&#x26A0; 例：U={A,B,C,D}，F={AB→C，CD→B}。右边出现过的属性=A,C,B；从未在右边出现=<span class="hl-red">D</span>。D 必在候选键。D 单独闭包={D}，需加 A/C；CD→B、AB→C ⇒ 候选键 <b>ACD、ABD</b>。</div>
+      </div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>函数依赖就是"由谁推出谁"的箭头图。</strong>部分依赖=箭头图里有个属性"搭便车"（去掉它也能推出）；传递依赖=箭头串成一条链（A 推 B，B 又推 C）。求候选键的核心口诀：<b>"从没被谁决定的属性出发，一路顺着箭头走，走不到的拉进来一起走"</b>。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">函数依赖 X→Y；<strong>部分依赖=候选键子集决定非主属性，传递依赖=非主属性间传递</strong>。Armstrong 公理：<strong>自反律、增广律、传递律</strong>（派生：合并律、分解律、合成律）。候选键求法：从"从未在右边出现的属性"出发求闭包。</div>
+      <div class="summary-tags"><span class="tag primary">函数依赖</span><span class="tag warn">候选键求法</span><span class="tag">Armstrong 公理</span></div>
+    </div>
+  </div>
+  <div class="footer-nav">
+    <a href="index.html">← 返回索引</a>
+    <a href="normalization.html">下一篇：范式 →</a>
+  </div>
+</div>
+</body>
+</html>

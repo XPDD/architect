@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redis 进阶 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>Redis 进阶 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"事务", q:"Redis 事务命令中，「监听 key，实现乐观锁（若被改动则 EXEC 失败）」的是（　）。",
+   options:["MULTI","EXEC","DISCARD","WATCH"],
+   answer:3, explain:"<b>WATCH</b>＝监听 key 的乐观锁，被改则 EXEC 失败返回 nil；MULTI 开启事务、EXEC 执行队列、DISCARD 取消事务。"},
+
+  {topic:"事务", q:"关于 Redis 事务，下列说法正确的是（　）。",
+   options:["等价于关系型数据库事务，支持回滚","不保证传统意义的回滚和隔离性","必须保证 ACID","不支持打包执行多条命令"],
+   answer:1, explain:"Redis 事务<b>不保证回滚和隔离性</b>，核心价值是「打包执行 + WATCH 实现乐观并发控制」，不完全等于关系型事务。"},
+
+  {topic:"锁", q:"「先加锁、再操作，认为并发冲突大概率发生」是（　）。",
+   options:["乐观锁","悲观锁","无锁","CAS"],
+   answer:1, explain:"<b>悲观锁</b>＝先锁后干、动辄阻塞（setnx/Redisson 排他锁）；<b>乐观锁</b>＝放手去干、提交把关（WATCH+MULTI）。"},
+
+  {topic:"锁", q:"乐观锁在 Redis 中的实现方式是（　）。",
+   options:["setnx + 过期时间","WATCH + MULTI/EXEC","SELECT ... FOR UPDATE","INCR"],
+   answer:1, explain:"乐观锁＝<b>WATCH + MULTI</b>（提交时校验）适合读多写少；悲观锁＝<b>setnx</b>（先锁后干）适合写多强一致（秒杀扣减）。"},
+
+  {topic:"CAP", q:"CAP 定理中，Redis 通常被归为（　）。",
+   options:["CP","AP","CA","三者都要"],
+   answer:1, explain:"Redis 基于主从异步复制，归为 <b>AP</b>（可用性优先、最终一致）；<b>CP</b> 如 ZooKeeper/etcd/银行转账。"},
+
+  {topic:"BASE", q:"BASE 理论（基本可用 + 软状态 + 最终一致）是（　）的延伸。",
+   options:["CA","CP","AP","AC"],
+   answer:2, explain:"<b>BASE</b> 是 <b>AP</b> 的延伸，也是「缓存允许短暂不一致」的理论依据；一致性阶梯：强一致→顺序一致→因果一致→最终一致→弱一致。"},
+
+  {topic:"一致性哈希", q:"一致性哈希相比哈希槽（Cluster）的优势是（　）。",
+   options:["节点增减仅影响邻近一小段数据","不需要虚拟节点","寻址更快","支持跨槽事务"],
+   answer:0, explain:"<b>一致性哈希</b>（哈希环+顺时针寻址+虚拟节点）节点增减仅影响邻近数据；Cluster 哈希槽按 CRC16%16384、节点增减需槽重新分配。"},
+
+  {topic:"缓存策略", q:"业务代码负责读/写缓存、DB 更新后删缓存，这是（　）。",
+   options:["Cache-Aside（旁路）","Read-Through","Write-Through","Write-Behind"],
+   answer:0, explain:"<b>Cache-Aside</b>＝业务自己管缓存，最常用（双写一致方案即此类）；Read-Through 缓存组件回填；Write-Through 同步写库；Write-Behind 异步落库。"},
+
+  {topic:"限流", q:"「匀速放令牌、突发可短暂超过」的限流算法是（　）。",
+   options:["固定窗口","滑动窗口","令牌桶","漏桶"],
+   answer:2, explain:"<b>令牌桶</b>＝匀速放令牌，突发可短暂超过（平滑+可突发）；<b>漏桶</b>匀速流出、超出丢弃（严格削峰）；固定窗口临界突刺；滑动窗口最平滑。"},
+
+  {topic:"治理", q:"针对「大 key（bigkey）」的治理，下列做法不合适的是（　）。",
+   options:["拆分大 value","压缩序列化","慎用 HGETALL","用 HGETALL 一次性取出大对象"],
+   answer:3, explain:"大 key 治理＝<b>拆分、压缩序列化、避免大字符串、慎用 HGETALL</b>；<b>用 HGETALL 一次性取出大对象</b>会阻塞，是错误做法。"},
+
+  {topic:"秒杀+MQ", q:"「轻量业务用 Redis 做队列，重业务（可靠投递、削峰）用专业 MQ」原因是（　）。",
+   options:["Redis 延迟比 Kafka 高","Kafka 可靠性/吞吐更高，Redis 只是轻量队列","Redis 不支持 List","Kafka 不能持久化"],
+   answer:1, explain:"<b>Redis（List/Stream）</b>轻量队列、延迟低、简单异步，但<b>可靠性一般</b>；<b>Kafka/RabbitMQ</b>多副本持久化、可靠性/吞吐高，适合削峰解耦。秒杀串讲：预热→限流→锁→MQ 削峰→落库→Canal 同步。"},
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好，继续保持！' : pct >= 60 ? '基本掌握，错题建议回顾层次架构笔记。' : '还需加强，建议重看层次架构笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

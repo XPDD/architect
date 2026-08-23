@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>操作系统基础 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>操作系统基础 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { topic:"os-overview", q:"操作系统的作用不包括（　）。",
+    options:["通过资源管理提高计算机系统效率","改善人机界面，提供友好的工作环境","提高硬件主频、加快运算速度","对系统软硬件资源进行统一管理"],
+    answer:2, explain:"<b>解析：</b>操作系统两大作用=资源管理提高效率 + 改善人机界面。「提高硬件主频」是硬件层面的事，与操作系统无关，是干扰项。" },
+  { topic:"os-overview", q:"操作系统的 4 个基本特征是（　）。",
+    options:["并发性、共享性、虚拟性、不确定性","并发性、共享性、确定性、实时性","并行性、独占性、虚拟性、不确定性","并发性、实时性、虚拟性、可靠性"],
+    answer:0, explain:"<b>解析：</b>口诀「并共虚不」=并发、共享、虚拟、不确定。其余选项把「不确定性」换成「确定性/实时性/可靠性」都是坑。" },
+  { topic:"os-overview", q:"下列不属于操作系统 5 大功能的是（　）。",
+    options:["进程管理","存储管理","数据库管理","设备管理"],
+    answer:2, explain:"<b>解析：</b>口诀「进存文设作」=进程、存储、文件、设备、作业管理。「数据库管理」属于应用层 DBMS 的职责，不是操作系统功能。" },
+  { topic:"os-overview", q:"微内核操作系统的主要优点是（　）。",
+    options:["运行效率最高","内核精炼、易裁剪移植，可靠性稳定性安全性高","进程间通信开销最小","无需在内核态与用户态之间切换"],
+    answer:1, explain:"<b>解析：</b>微内核只实现基本功能、其余放内核外，故精炼、易裁剪、安全。其缺点是用户态/内核态频繁切换、效率不如单体内核——「效率最高/开销最小/无需切换」都是单体内核的优点，张冠李戴。" },
+  { topic:"os-overview", q:"计算机启动的基本流程是（　）。",
+    options:["操作系统 → 主引导记录 → BIOS","BIOS → 主引导记录 → 操作系统","主引导记录 → BIOS → 操作系统","BIOS → 操作系统 → 主引导记录"],
+    answer:1, explain:"<b>解析：</b>顺序为 BIOS → 主引导记录（MBR）→ 操作系统。其他选项打乱顺序。" },
+  { topic:"os-overview", q:"嵌入式系统初始化的正确顺序是（　）。",
+    options:["系统级 → 板卡级 → 芯片级","芯片级 → 板卡级 → 系统级","板卡级 → 芯片级 → 系统级","芯片级 → 系统级 → 板卡级"],
+    answer:1, explain:"<b>解析：</b>自底向上、从硬件到软件：芯片级（微处理器）→ 板卡级（其他硬件）→ 系统级（软件及 OS）。" },
+  { topic:"os-process", q:"进程控制块（PCB）的作用是（　）。",
+    options:["描述进程要执行的操作","存放进程执行所需的数据","唯一标识进程","存储进程的代码"],
+    answer:2, explain:"<b>解析：</b>进程三组成：PCB=唯一标志、程序=描述做什么、数据=存放执行数据。「描述操作」是程序、「存放数据」是数据、代码属程序，均非 PCB 职责。" },
+  { topic:"os-process", q:"引入线程后，关于线程与进程说法正确的是（　）。",
+    options:["进程是独立调度的最小单位","线程是拥有资源的最小单位","线程是独立调度的最小单位，进程是拥有资源的最小单位","线程可共享其他线程的栈指针"],
+    answer:2, explain:"<b>解析：</b>线程=独立调度最小单位，进程=拥有资源最小单位。线程共享代码/数据/全局变量/文件，但<strong>不共享</strong>栈指针等标识数据——D 项说反了。" },
+  { topic:"os-process", q:"前趋图用来表示（　）。",
+    options:["进程与资源的分配关系","任务间的并行关系和先后顺序","内存页面的映射关系","文件的目录结构"],
+    answer:1, explain:"<b>解析：</b>前趋图表示哪些任务可并行、哪些有先后顺序。「进程与资源分配」是进程资源图，张冠李戴。" },
+  { topic:"os-process", q:"在进程资源图中，若所有进程都是阻塞节点，则系统（　）。",
+    options:["可以继续运行","陷入死锁","进入等待状态","发生中断"],
+    answer:1, explain:"<b>解析：</b>阻塞节点=请求资源已全部分完无法获取；当<strong>所有进程都是阻塞节点</strong>即陷入死锁。「等待状态」是三态概念，「中断」是设备范畴，均不准确。" },
+  { topic:"os-pv", q:"对信号量执行 P 操作时，若 S=S−1 后 S<0，则进程（　）。",
+    options:["继续执行","被置为阻塞状态并插入阻塞队列","被置为就绪状态","立即释放资源"],
+    answer:1, explain:"<b>解析：</b>P 操作 S≥0 继续，S<0 表示无可用资源→阻塞入阻塞队列。「就绪」是 V 操作唤醒后的去向，「释放资源」是 V 操作干的事，均张冠李戴。" },
+  { topic:"os-pv", q:"对信号量执行 V 操作时，若 S=S+1 后 S≤0，则（　）。",
+    options:["进程继续执行，无阻塞进程","从阻塞队列唤醒一个进程并插入就绪队列","从就绪队列唤醒一个进程","直接释放全部资源"],
+    answer:1, explain:"<b>解析：</b>V 操作 S>0 无阻塞继续执行；S≤0 说明有进程被阻塞，需<strong>唤醒一个阻塞进程插入就绪队列</strong>。「唤醒就绪队列的进程」方向错了。" },
+  { topic:"os-pv", q:"生产者—消费者问题中，表示「仓库商品个数」的信号量是（　）。",
+    options:["S0（互斥信号量）","S1（仓库空闲位置）","S2（仓库商品个数）","不需要专门信号量"],
+    answer:2, explain:"<b>解析：</b>三信号量：S0=仓库独占使用权（互斥）、S1=空闲位置数、S2=商品个数。商品个数对应 S2。" },
+  { topic:"os-deadlock", q:"下列不属于死锁 4 个必要条件的是（　）。",
+    options:["资源互斥","占有并等待","不可剥夺","资源可抢占"],
+    answer:3, explain:"<b>解析：</b>四条件=互斥、占有并等待、不可剥夺、环路等待。「资源可抢占」恰恰与「不可剥夺」相反，是破解死锁的手段而非条件。" },
+  { topic:"os-deadlock", q:"银行家算法属于（　）。",
+    options:["死锁预防","死锁避免","死锁检测","死锁解除"],
+    answer:1, explain:"<b>解析：</b>银行家算法=提前算出安全序列再分配，属于<strong>死锁避免</strong>。预防靠破坏四条件之一，检测靠定时检测程序，解除靠剥夺/撤销进程，注意区分。" },
+  { topic:"os-deadlock", q:"系统中有 3 个并发进程竞争资源 R，每个进程需要 5 个 R，则系统至少需要（　）个 R 才保证不发生死锁。",
+    options:["12","13","14","15"],
+    answer:1, explain:"<b>解析：</b>不发生死锁最小资源数 = n×(R−1)+1 = 3×(5−1)+1 = 13。最大死锁资源数=12，故 12 是「差一个就僵住」，选 12 就掉坑。" },
+  { topic:"os-memory", q:"某系统页面大小 4K，页面变换表为 0→1、1→3、2→4、3→6，逻辑地址 1D16H 变换后的物理地址是（　）。",
+    options:["1024H","3D16H","4D16H","6D16H"],
+    answer:1, explain:"<b>解析：</b>4K=2^12，偏移取末 3 位十六进制=D16H，页号=1；页号 1 对应块号 3，故物理地址=3D16H。若误把页号当 1D 或直接抄块号 1/4/6 都会错。" },
+  { topic:"os-memory", q:"关于页面置换算法，下列说法错误的是（　）。",
+    options:["OPT 是理论上的最优算法，无法实现","FIFO 可能产生抖动（Belady 异常）","LRU 基于局部性原理，效率高且不抖动","FIFO 是效率最高、最常用的算法"],
+    answer:3, explain:"<b>解析：</b>LRU 才是基于局部性、效率高不抖动的实用算法；FIFO 会抖动、效率不高。「FIFO 效率最高」把 LRU 的优点安到了 FIFO 头上。" },
+  { topic:"os-file", q:"索引文件有 13 个索引节点（0-9 直接、10 一级间接、11 二级间接），每块 4KB、地址 4B，则直接索引可存（　）。",
+    options:["4KB","40KB","4MB","4GB"],
+    answer:1, explain:"<b>解析：</b>直接索引 10 个 × 4KB = 40KB。一级=1024×4KB=4MB，二级=4GB——别把不同层级容量混淆。" },
+  { topic:"os-file", q:"某位示图字长 32 位，块号 4195 分配给文件，则该块在位示图中（　）。",
+    options:["第 131 个字、第 3 位","第 132 个字、第 4 位","第 130 个字、第 3 位","第 132 个字、第 3 位"],
+    answer:1, explain:"<b>解析：</b>字号=4195/32=131（第 0 个字起，故为第 132 个字），位号=4195%32=3（第 0 位起，故第 4 位）。分配后该位置 1。忽略「从 0 计数」会差一。" },
+  { topic:"os-device", q:"DMA（直接主存存取）方式的特点是（　）。",
+    options:["CPU 全程参与数据传送","数据在主存与外设间成块直接传送，CPU 只在开始/结束时介入","CPU 主动查询外设状态并死等","通过输入井输出井缓冲数据"],
+    answer:1, explain:"<b>解析：</b>DMA=成块直接传送、CPU 仅首尾介入，适合高速设备。「全程参与/主动查询死等」是程序控制方式，「输入井输出井」是 SPOOLING 技术。" },
+  { topic:"os-device", q:"SPOOLING 技术的主要作用是（　）。",
+    options:["加快 CPU 主频","把独占设备虚拟化为多台可共享的虚拟设备","提高磁盘容量","实现内存地址转换"],
+    answer:1, explain:"<b>解析：</b>SPOOLING 通过输入井/输出井把独占设备（打印机）虚拟化为共享虚拟设备。「内存地址转换」是页表的事，「提高磁盘容量」无关。" },
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

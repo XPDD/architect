@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>安全架构 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>安全架构 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"安全威胁", q:"在系统平台中的软件或硬件芯片中植入威胁，如「木马」、「陷阱门」、BIOS 的万能密码，这类威胁属于（　）。",
+   options:["物理安全威胁","操作系统安全威胁","通信链路安全威胁","管理系统安全威胁"],
+   answer:1, explain:"<b>操作系统安全威胁</b>指对系统平台软/硬件芯片植入威胁（木马、陷阱门、BIOS 万能密码）；物理安全威胁针对设备（自然灾害、电源故障）。"},
+
+  {topic:"安全威胁", q:"攻击者利用系统的安全缺陷或安全性上的脆弱之处获得非授权的权利或特权，这种威胁是（　）。",
+   options:["假冒","旁路控制","授权侵犯","重放"],
+   answer:1, explain:"<b>旁路控制</b>：利用安全缺陷/脆弱处获得非授权特权；<b>假冒</b>：冒充合法/特权用户；<b>授权侵犯</b>＝内部攻击（把权限用于非授权目的）。"},
+
+  {topic:"安全威胁", q:"所截获的某次合法通信数据备份，出于非法目的而被重新发送，这种威胁是（　）。",
+   options:["窃听","抵赖","重放","业务流分析"],
+   answer:2, explain:"<b>重放</b>：截获合法通信数据重新发送；<b>业务流分析</b>：长期监听用统计方法发现有价值信息规律；<b>抵赖</b>：否认曾发布消息。"},
+
+  {topic:"三道防线", q:"安全架构中，可组成三道安全防线，下列不属于这三道防线的是（　）。",
+   options:["产品安全架构","安全技术体系架构","审计架构","网络拓扑架构"],
+   answer:3, explain:"三道安全防线＝<b>产品安全架构</b>（源头打造安全产品）、<b>安全技术体系架构</b>（通用安全技术基础设施）、<b>审计架构</b>（独立审计发现风险）。"},
+
+  {topic:"安全模型", q:"信息系统的安全目标是控制和管理（　）对（　）的访问。",
+   options:["客体、主体","主体、客体","进程、用户","程序、数据"],
+   answer:1, explain:"安全目标是控制和管理<b>主体（含用户和进程）</b>对<b>客体（含数据和程序）</b>的访问。"},
+
+  {topic:"WPDRRC", q:"WPDRRC 信息安全模型包含 6 个环节，其正确顺序是（　）。",
+   options:["预警、保护、检测、响应、恢复、反击","保护、预警、响应、检测、恢复、反击","检测、预警、保护、恢复、反击、响应","预警、检测、保护、反击、响应、恢复"],
+   answer:0, explain:"WPDRRC 6 环节＝<b>预警 → 保护 → 检测 → 响应 → 恢复 → 反击</b>，具有较强时序性和动态性。3 要素＝人员、策略、技术。"},
+
+  {topic:"WPDRRC", q:"WPDRRC 信息安全模型的 3 大要素中，起「核心」作用的是（　）。",
+   options:["策略","技术","人员","工具"],
+   answer:2, explain:"3 要素＝<b>人员（核心）、策略（桥梁）、技术（保证）</b>。"},
+
+  {topic:"信息安全体系", q:"信息安全体系架构从 5 个方面设计，其中「访问控制、通信保密、入侵检测、网络安全扫描系统和防病毒」属于（　）。",
+   options:["物理安全","系统安全","网络安全","应用安全"],
+   answer:2, explain:"<b>网络安全</b>（访问控制、通信保密、入侵检测、安全扫描、防病毒）是整个安全解决方案的<b>关键</b>；应用安全关注资源共享和信息存储。"},
+
+  {topic:"脆弱性", q:"B/S 架构相对 C/S 架构更容易被病毒入侵，其主要原因是（　）。",
+   options:["B/S 架构没有客户端","B/S 架构使用 HTTP 协议","B/S 架构不使用数据库","B/S 架构没有网络层"],
+   answer:1, explain:"B/S 架构使用 <b>HTTP 协议</b>，相对 C/S 更易被病毒入侵，虽然最新 HTTP 安全性有所提升但仍弱于 C/S。"},
+
+  {topic:"脆弱性", q:"分层架构的脆弱性主要表现在（　）。",
+   options:["客户端程序被分析","层间的脆弱性和层间通信的脆弱性","组件易进入死循环","视图对模型数据低效访问"],
+   answer:1, explain:"<b>分层架构</b>脆弱性：层间脆弱性（底层出错整程序无法运行）、层间通信脆弱性（层层传递性能下降）；死循环是事件驱动架构的问题。"},
+
+  {topic:"数据库完整性", q:"实施数据库完整性设计时，关于静态约束和动态约束的实现方式，正确的是（　）。",
+   options:["静态约束和动态约束都应由应用程序实现","静态约束尽量包含在数据库模式中，动态约束由应用程序实现","静态约束由应用程序实现，动态约束放数据库模式","两者都放数据库模式"],
+   answer:1, explain:"<b>静态约束尽量包含在数据库模式中</b>（如库存量防负库存），<b>动态约束由应用程序实现</b>（如购物车数量随操作动态变化）。"},
+
+  {topic:"案例分析", q:"某大型集团采用混合云实现跨区域安全生产管理，出于安全考虑，企业更愿意将数据存放在（　）。",
+   options:["公有云","私有云","离线专属云","第三方托管云"],
+   answer:1, explain:"<b>私有云</b>面向企业用户，出于安全考虑企业更愿意把数据放私有云，同时希望获得公有云的计算资源，因此混合云被越来越多采用。"},
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好，继续保持！' : pct >= 60 ? '基本掌握，错题建议回顾层次架构笔记。' : '还需加强，建议重看层次架构笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

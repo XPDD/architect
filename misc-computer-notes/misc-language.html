@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 计算机语言</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25);flex-shrink:0}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);text-align:center;white-space:nowrap}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-arrow{display:flex;align-items:center;justify-content:center;width:22px;color:rgba(255,255,255,.15);font-size:14px;flex-shrink:0}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:4px 0}
+  .vs-block{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:10px 0}
+  .vs-col{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:12px 14px}
+  .vs-col.vs-old{border-color:rgba(251,191,36,.2)}.vs-col.vs-new{border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.04)}
+  .vs-title{font-size:12px;font-weight:700;margin-bottom:8px}.vs-old .vs-title{color:var(--amber)}.vs-new .vs-title{color:var(--cyan)}
+  .vs-col ul{list-style:none}.vs-col ul li{font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.6;padding-left:14px;position:relative}
+  .vs-col ul li::before{content:'\00B7';position:absolute;left:2px;color:var(--text-muted)}
+  .vs-arrow{display:flex;align-items:center;color:var(--cyan);font-size:18px}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table thead th:first-child{border-radius:var(--radius) 0 0 0}.compare-table thead th:last-child{border-radius:0 var(--radius) 0 0}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:last-child td:first-child{border-radius:0 0 0 var(--radius)}.compare-table tbody tr:last-child td:last-child{border-radius:0 0 var(--radius) 0}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:rgba(77,124,255,.15);border:1px solid rgba(77,124,255,.25);color:var(--blue);font-family:var(--font-mono);font-size:10px;font-weight:700;margin-bottom:4px}
+  .card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.card-grid{grid-template-columns:1fr}.vs-block{grid-template-columns:1fr;gap:8px}.vs-arrow{justify-content:center;transform:rotate(90deg)}.compare-table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">CL</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">其他计算机知识 · 第 1 讲</div>
+        <div class="header-title">计算机语言 — 定义 · 三类语言 · 指令格式 · 汇编/高级/建模/形式化</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-dot"></span>2026.08</div>
+      <div class="meta-item"><span class="meta-dot"></span>来源：其他计算机知识讲义</div>
+      <div class="meta-item"><span class="meta-dot"></span>常考：选择 1 分</div>
+    </div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>计算机语言分哪 3 大类？第一代是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>机器语言指令必须包含哪 4 个要素？</div>
+      <div class="cue-item"><span class="q-mark">?</span>三/二/单/四地址指令如何区分？</div>
+      <div class="cue-item"><span class="q-mark">?</span>汇编语言有哪 3 种语句？</div>
+      <div class="cue-item"><span class="q-mark">?</span>高级语言按抽象程度分哪 3 类？</div>
+      <div class="cue-item"><span class="q-mark">?</span>形式化语言分哪 4 类？</div>
+    </div>
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>计算机语言概述</div>
+      <div class="note-section">
+        <p>计算机语言（编程语言）是<span class="note-highlight">人与计算机通讯</span>的语言，用来描述计算机所需执行的操作和计算步骤，主要由<span class="note-highlight">一套指令</span>组成，指令一般包括<strong>表达式、流程控制、集合</strong>三大部分。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>机器语言与指令格式</div>
+      <div class="note-section">
+        <p><strong>机器语言</strong>：<span class="hl-orange">第一代</span>计算机语言，计算机自身语言，二进制代码串。指令必须包括：<span class="note-highlight">操作码、操作数的地址、操作结果的存储地址、下条指令的地址</span>（口诀：<span class="hl-green">码·数·存·下</span>）。</p>
+        <table class="compare-table">
+          <thead><tr><th>指令格式</th><th>地址构成</th><th>特点</th></tr></thead>
+          <tbody>
+            <tr><td><strong>三地址</strong></td><td>A1 第一操作数 + A2 第二操作数 + A3 存结果</td><td>下条指令由程序计数器 PC 顺序给出</td></tr>
+            <tr><td><strong>二地址</strong></td><td>A1 第一操作数 + A2 第二操作数&结果</td><td>隐含第二操作数和结果，<strong>操作码较短</strong></td></tr>
+            <tr><td><strong>单地址</strong></td><td>A 操作数（结果隐含在寄存器）</td><td>需指定寄存器存第二操作数和结果</td></tr>
+            <tr><td><strong>四地址</strong></td><td>A1、A2 两操作数 + A3、A4 存结果</td><td>操作码长，可表示更多操作类型</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="numbered-header"><span class="num">3</span>汇编语言（符号语言）</div>
+      <div class="note-section">
+        <p>面向机器的程序设计语言，用<span class="note-highlight">助记符</span>代替操作码、地址符号/标号代替指令或操作数地址。3 种语句：</p>
+        <div class="card-grid">
+          <div class="card"><div class="card-badge">I</div><div class="card-title">指令</div><ul class="card-list"><li>最基本语句，描述计算机要执行的操作</li></ul></div>
+          <div class="card"><div class="card-badge">P</div><div class="card-title">伪指令</div><ul class="card-list"><li>控制汇编过程，<strong>不是真正的机器指令</strong></li></ul></div>
+          <div class="card"><div class="card-badge">M</div><div class="card-title">宏指令</div><ul class="card-list"><li>定义<strong>可重用</strong>的代码块</li></ul></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">4</span>高级语言（按抽象程度 3 类）</div>
+      <div class="note-section">
+        <p>与特定计算机体系结构无关，接近自然语言，<span class="note-highlight">可读性/可维护性/可移植性</span>好。</p>
+        <ul>
+          <li><strong>面向过程</strong>：自上而下、功能模块化 → C 语言。</li>
+          <li><strong>面向对象</strong>：对象集合（属性+方法）→ Java、C++、C#。</li>
+          <li><strong>泛型</strong>：类型集合 → <span class="hl-purple">Python</span>。</li>
+        </ul>
+      </div>
+
+      <div class="numbered-header"><span class="num">5</span>建模语言 &amp; 形式化语言</div>
+      <div class="note-section">
+        <p><strong>建模语言</strong>：描述/设计/构建系统的技术，可为图形或文本。图形语言典型是 <span class="note-highlight">UML</span>（用概念、连接符号、图形符号表示组件、关系、约束）。</p>
+        <p><strong>形式化语言</strong>：把概念/判断/推理转化为形式符号，4 类——<span class="hl-green">形式逻辑语言</span>（符号规则表示概念推理）、<span class="hl-green">自动机理论语言</span>（描述自动机行为的数学模型）、<span class="hl-green">程序设计语言</span>（定义程序：数据类型/变量/操作符/控制结构）、<span class="hl-green">描述性语言</span>（自然语言描述系统结构行为）。</p>
+      </div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>计算机语言是一条「越走越像人话」的路：</strong>最底层机器语言是给硬件看的 0/1 二进制，每条指令要写全「码、数、存、下」四要素；往上汇编语言用助记符做「符号替身」；再往上高级语言直接接近自然语言，分过程式(C)、对象式(Java/C++)、泛型式(Python)三派。旁边还有两条支线：画图的建模语言(UML)和讲逻辑的形式化语言。</p></div>
+
+      <div class="diagram"><div class="diagram-label">&#x25C6; 逻辑关系 — 语言层次与分支</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">机器语言<br><small>第一代 · 二进制</small></div><div class="flow-arrow">→</div><div class="flow-box primary">汇编语言<br><small>符号 · 助记符</small></div><div class="flow-arrow">→</div><div class="flow-box">高级语言<br><small>面向过程/对象/泛型</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">建模语言（UML）</div><div class="flow-arrow">+</div><div class="flow-box">形式化语言（4 类）</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text"><strong>三类语言</strong>=机器(第一代二进制)→汇编(符号)→高级；<strong>机器指令四要素</strong>=操作码/操作数地址/结果存储地址/下条指令地址；<strong>地址指令</strong>=三(两操作数+结果)、二(隐含)、单(寄存器)、四(A3A4 存结果)；<strong>汇编 3 语句</strong>=指令/伪指令/宏指令；<strong>高级 3 类</strong>=过程/对象/泛型；<strong>形式化 4 类</strong>=逻辑/自动机/程序/描述。</div>
+      <div class="summary-tags"><span class="tag primary">机器语言</span><span class="tag">地址指令</span><span class="tag">汇编/高级语言</span><span class="tag">UML</span></div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

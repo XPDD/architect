@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件架构风格 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>软件架构风格 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"架构风格", q:"软件架构风格是指描述特定软件系统组织方式的（　）。",
+   options:["惯用模式","编程语言","数据结构","设计工具"],
+   answer:0, explain:"软件架构风格＝描述特定软件系统组织方式的<b>惯用模式</b>。组织方式描述系统组成构件及其组织方式，惯用模式反映众多系统共有的结构和语义。"},
+
+  {topic:"架构风格", q:"下列架构风格中，过滤器相对独立、具有并发性、模块独立性高，但「不适于交互性强的应用」的是（　）。",
+   options:["事件驱动","管道-过滤器","分层风格","数据共享风格"],
+   answer:1, explain:"<b>管道-过滤器</b>：过滤器独立、可复用、可并发，但不适于交互性强的应用，存在关系的数据流必须协调。"},
+
+  {topic:"架构风格", q:"采用「中央数据单元 + 相对独立的组件集合」、以数据为中心，适合专家系统等 AI 领域的是（　）。",
+   options:["解释器风格","闭环控制风格","数据共享风格","面向对象风格"],
+   answer:2, explain:"<b>数据共享风格</b>：中央数据单元+相对独立组件，数据集中、以数据为中心，适合专家系统等人工智能领域；解释器风格核心是虚拟机。"},
+
+  {topic:"架构风格", q:"下列不属于两层 C/S 架构「不常用原因」的是（　）。",
+   options:["开发成本较高、客户端程序设计复杂","软件维护和升级困难","服务器端压力大难以复用","完全不需要网络连接"],
+   answer:3, explain:"两层 C/S 缺点：开发成本高、客户端复杂、信息单一、界面风格不一、移植/维护/升级难、新技术难应用、安全问题、服务器压力大难复用。<b>「不需要网络连接」不属于</b>。"},
+
+  {topic:"三层C/S", q:"关于三层 C/S 架构，下列说法不正确的是（　）。",
+   options:["表示层在客户机、功能层在应用服务器、数据层在数据库服务器","功能层有效隔离表示层与数据层，为安全管理奠定基础","三层间通信效率不影响系统性能","各层可并行开发、各选最适合的语言"],
+   answer:2, explain:"三层 C/S 设计<b>关键在于各层之间的通信效率</b>（通信方法、频度、数据量），否则硬件再强性能也不高。C 项说反了。"},
+
+  {topic:"B/S", q:"下列属于三层 B/S 架构（0 客户端架构）缺点的是（　）。",
+   options:["安全性难以控制、响应速度低于 C/S","需要为每个用户安装客户端","只能在局域网内使用","不支持 Web 服务器"],
+   answer:0, explain:"三层 B/S 缺点：<b>安全性难控制、查询响应速度远低于 C/S、数据以页面为单位交互性不强</b>；优点是不用开发客户端。"},
+
+  {topic:"MVC家族", q:"MVP 架构相比 MVC，最关键的区别是（　）。",
+   options:["把 Controller 换成 Presenter，完全切断 View 与 Model 的联系","增加了一个数据层","去掉了 View 层","把 Model 和 View 合并"],
+   answer:0, explain:"<b>MVP</b> 把 Controller 换成 Presenter，<b>完全切断 View 与 Model 联系</b>，View 非常薄（被动视图）、Presenter 非常厚，逻辑都在 Presenter 里。"},
+
+  {topic:"MVC家族", q:"MVVM 架构的核心特点是（　）。",
+   options:["实现视图（View）和模型（Model）的双向绑定","完全去除视图层","必须使用原生 HTML 表单","不支持组件化开发"],
+   answer:0, explain:"<b>MVVM</b> 主要目的是分离 View 和 Model，实现<b>双向绑定</b>，优点：低耦合、可重用、独立开发、可测试。"},
+
+  {topic:"非功能需求", q:"决定系统架构设计的非功能性需求主要有四类，其中「带有文化背景因素的系统需求」是（　）。",
+   options:["操作性需求","性能需求","安全性需求","文化需求"],
+   answer:3, explain:"四类：<b>操作性需求</b>（与用户操作相关）、<b>性能需求</b>（响应时间/吞吐量等）、<b>安全性需求</b>（阻止非授权）、<b>文化需求</b>（文化背景因素，如多语言）。"},
+
+  {topic:"真题-风格选择", q:"为脚本语言 IDE（编辑/解释/调试）选择架构时，最终采用「以数据存储为中心」而非「管道-过滤器」，主要原因是（　）。",
+   options:["管道-过滤器性能更高","数据存储为中心能更好地支持交互式数据处理、数据格式转换和功能灵活组织","数据存储为中心成本更低","管道-过滤器不支持并发"],
+   answer:1, explain:"从<b>交互方式、扩展性、数据管理</b>三方面看：数据存储为中心支持交互式处理、以数据格式解耦功能依赖、能表示多种数据格式并支持转换；管道-过滤器对交互式支持和数据格式转换灵活性较差。"},
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好，继续保持！' : pct >= 60 ? '基本掌握，错题建议回顾层次架构笔记。' : '还需加强，建议重看层次架构笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

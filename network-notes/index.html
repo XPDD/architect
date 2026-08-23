@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>操作系统基础 · 康奈尔笔记索引</title>
+<title>计算机网络基础 · 康奈尔笔记索引</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -65,101 +65,83 @@
 <div class="container">
 
   <div class="hero">
-    <div class="hero-badge">OPERATING SYSTEM · KNOWLEDGE BASE</div>
-    <div class="hero-title">操作系统<span class="accent">基础</span></div>
-    <div class="hero-sub">概述 · 进程 · PV 操作 · 死锁 · 存储 · 文件 · 设备 · 8 篇笔记 + 22 道自测题</div>
+    <div class="hero-badge">COMPUTER NETWORK · KNOWLEDGE BASE</div>
+    <div class="hero-title">计算机网络<span class="accent">基础</span></div>
+    <div class="hero-sub">互联模型&协议 · IP 地址及子网 · 网络规划与设计 · 其他网络知识 · 5G/虚拟化 · 5 篇笔记 + 18 道自测题</div>
     <div class="hero-stats">
-      <span class="hero-stat">共 <strong>8</strong> 篇笔记</span>
-      <span class="hero-stat">自测 <strong>22</strong> 题</span>
-      <span class="hero-stat">常考 <strong>3-5 分</strong></span>
+      <span class="hero-stat">共 <strong>5</strong> 篇笔记</span>
+      <span class="hero-stat">自测 <strong>18</strong> 题</span>
+      <span class="hero-stat">常考 <strong>选择 3~5 分</strong></span>
     </div>
   </div>
 
   <div class="part-header">
-    <div class="part-num">03</div>
-    <div class="part-info"><h2>操作系统基础</h2><span>第三章 · 高频考点 · 进程/存储/文件/设备四模块</span></div>
+    <div class="part-num">04</div>
+    <div class="part-info"><h2>计算机网络基础</h2><span>每年约 3~5 分 · 子网计算必考 · 超纲率较高 · 重点抓真题</span></div>
   </div>
 
-  <a class="note-card" href="os-quiz.html" style="border-color:rgba(52,211,153,.3);">
+  <a class="note-card" href="net-quiz.html" style="border-color:rgba(52,211,153,.3);">
     <div class="note-icon green">&#x2713;</div>
-    <div class="note-body"><h3>真题 · 自测练习（22 题 · 交互做题）</h3><p>点选判分 · 带解析 · 覆盖概述/进程/PV/死锁/存储/文件/设备</p></div>
+    <div class="note-body"><h3>真题 · 自测练习（18 题 · 交互做题）</h3><p>点选判分 · 带解析 · 含子网划分/掩码/路由匹配计算 · 覆盖 5 篇笔记</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-overview.html">
-    <div class="note-icon cyan">OS</div>
-    <div class="note-body"><h3>操作系统概述 — 作用 · 特征 · 功能 · 分类 · 微内核</h3><p>并共虚不 · 进存文设作 · BIOS 启动 · 微内核 vs 单体内核 · 嵌入式</p></div>
+  <a class="note-card" href="net-model.html">
+    <div class="note-icon cyan">NM</div>
+    <div class="note-body"><h3>网络互联模型 & 协议 — OSI 七层 · TCP/IP · 各层协议</h3><p>应表会传网数物 · 各层设备/协议 · TCP vs UDP · ARP/ICMP/IGMP · 拓扑结构</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-process.html">
-    <div class="note-icon blue">PR</div>
-    <div class="note-body"><h3>进程管理基础 — 组成 · 三态五态 · 线程 · 前趋图 · 资源图</h3><p>PCB · 就绪/运行/等待 · 线程共享代码不共享栈 · 全阻塞即死锁</p></div>
+  <a class="note-card" href="net-ip.html">
+    <div class="note-icon blue">IP</div>
+    <div class="note-body"><h3>IP 地址及子网 — 分类 · 子网划分 · 子网掩码 · 计算</h3><p>点分十进制 · A/B/C 分类 · 私有地址 · 子网数 2ⁿ / 主机数 2ᵐ−2 · IPv6 · DNS</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-pv.html">
-    <div class="note-icon purple">PV</div>
-    <div class="note-body"><h3>PV 操作与信号量 — P/V 语义 · 生产者消费者</h3><p>P 申请减一 S&lt;0 阻塞 · V 释放加一 S≤0 唤醒 · 尾 V 头 P</p></div>
+  <a class="note-card" href="net-planning.html">
+    <div class="note-icon purple">NP</div>
+    <div class="note-body"><h3>网络规划与设计 — 建设原则 · 三层模型 · 综合布线</h3><p>规划→设计→实施 · 8 原则 · 核心/汇聚/接入层 · PDS 六子系统</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-deadlock.html">
-    <div class="note-icon rose">DL</div>
-    <div class="note-body"><h3>死锁与银行家算法 — 四条件 · 四措施 · 资源计算</h3><p>互斥+占有等待+不可剥夺+环路 · n×(R−1)+1 · 银行家安全序列</p></div>
+  <a class="note-card" href="net-misc.html">
+    <div class="note-icon amber">MX</div>
+    <div class="note-body"><h3>其他网络知识 — 通信 · 交换路由 · 传输介质 · 存储</h3><p>单模/多模光纤 · 单工/半双工/全双工 · 分组交换 · DAS/NAS/SAN</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
-  <a class="note-card" href="os-memory.html">
-    <div class="note-icon amber">MM</div>
-    <div class="note-body"><h3>存储管理 — 页式 · 段式 · 段页式 · 快表 · 页面置换</h3><p>块号×块大小+偏移 · 段基址+偏移 · OPT/FIFO/LRU</p></div>
-    <span class="note-arrow">&#x2197;</span>
-  </a>
-
-  <a class="note-card" href="os-file.html">
-    <div class="note-icon green">FL</div>
-    <div class="note-body"><h3>文件管理 — 索引文件 · 目录结构 · 位示图</h3><p>直接 40KB / 一级 4MB / 二级 4GB · 相对/绝对路径 · 位示图计算</p></div>
-    <span class="note-arrow">&#x2197;</span>
-  </a>
-
-  <a class="note-card" href="os-device.html">
-    <div class="note-icon purple">DV</div>
-    <div class="note-body"><h3>设备管理 — I/O 技术 · SPOOLING</h3><p>程序控制→中断→DMA 效率递增 · 输入井输出井 · 设备虚拟化</p></div>
-    <span class="note-arrow">&#x2197;</span>
-  </a>
-
-  <a class="note-card" href="os-key-points.html">
-    <div class="note-icon cyan">KP</div>
-    <div class="note-body"><h3>操作系统常考知识点（旧版汇总）</h3><p>进程/存储/文件/设备四大模块一页速览 · 直播精华提炼</p></div>
+  <a class="note-card" href="net-5g.html">
+    <div class="note-icon rose">5G</div>
+    <div class="note-body"><h3>5G 技术 & 虚拟化技术 — 三大场景 · 网络切片 · NFV · SDN</h3><p>eMBB/mMTC/uRLLC · 网络切片 · NFV 软硬解耦 · SDN 控制转发分离</p></div>
     <span class="note-arrow">&#x2197;</span>
   </a>
 
   <div class="relation-diagram">
     <h2>&#x25C6; 知识体系关系图</h2>
     <div class="flow-row">
-      <div class="flow-box accent" style="font-size:14px;padding:10px 20px;">操作系统概述<br><small>并共虚不 · 进存文设作 · 微内核</small></div>
+      <div class="flow-box accent" style="font-size:14px;padding:10px 20px;">网络互联模型 & 协议<br><small>OSI 七层 · TCP/UDP · 各层协议</small></div>
     </div>
     <div class="flow-v-arrow">&#x2193;</div>
     <div class="flow-row">
-      <div class="flow-box primary">进程管理<br><small>三态五态 · PV · 死锁</small></div>
+      <div class="flow-box primary">IP 地址及子网<br><small>分类 · 子网掩码 · 计算</small></div>
       <div class="flow-arrow">+</div>
-      <div class="flow-box primary">存储管理<br><small>页式 · 段式 · 段页式</small></div>
+      <div class="flow-box">网络规划与设计<br><small>三层模型 · 综合布线</small></div>
     </div>
     <div class="flow-v-arrow">&#x2193;</div>
     <div class="flow-row">
-      <div class="flow-box">文件管理<br><small>索引 · 位示图</small></div>
+      <div class="flow-box">其他网络知识<br><small>通信 · 交换 · 介质 · 存储</small></div>
       <div class="flow-arrow">+</div>
-      <div class="flow-box">设备管理<br><small>DMA · SPOOLING</small></div>
-      <div class="flow-arrow">+</div>
-      <div class="flow-box" style="border-color:rgba(248,113,113,.2);color:var(--rose);">真题自测<br><small>22 题</small></div>
+      <div class="flow-box" style="border-color:rgba(248,113,113,.2);color:var(--rose);">5G / 虚拟化<br><small>网络切片 · NFV · SDN</small></div>
     </div>
     <div class="flow-row" style="margin-top:8px;">
-      <div class="flow-box" style="font-size:10px;border:none;color:var(--text-muted);">概述 → 进程 + 存储 → 文件 + 设备 → 真题自测</div>
+      <div class="flow-box" style="font-size:10px;border:none;color:var(--text-muted);">模型协议 → IP/子网 + 规划设计 → 其他技术 + 5G 虚拟化 → 真题自测</div>
     </div>
   </div>
 
   <div style="text-align:center;padding:20px;font-size:12px;color:var(--text-muted);margin-top:8px;">
-    <a href="../index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);">&#x2190; 返回总索引</a>
+    <a href="../index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);">&#x2190; 返回总索引</a> &nbsp;&middot;&nbsp;
+    <a href="../information-system-notes/index.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.2);">信息系统笔记</a> &nbsp;&middot;&nbsp;
+    <a href="../database-notes/index.html" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(251,191,36,.2);">数据库笔记</a>
   </div>
 
 </div>

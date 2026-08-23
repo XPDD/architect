@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 范式 1NF/2NF/3NF/BCNF</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:860px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center}
+  .header-badge-icon{font-family:var(--font-mono);font-size:16px;font-weight:700;color:var(--cyan)}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}.note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .hl-red{color:var(--rose);background:linear-gradient(180deg,transparent 58%,rgba(248,113,113,.12)58%);padding:0 2px;font-weight:600}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green)}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px}
+  .tip{font-size:11.5px;color:var(--amber);background:rgba(251,191,36,.06);border-left:2px solid var(--amber);padding:8px 12px;border-radius:4px;margin:8px 0;line-height:1.6}
+  .warn{font-size:11.5px;color:var(--rose);background:rgba(248,113,113,.06);border-left:2px solid var(--rose);padding:8px 12px;border-radius:4px;margin:8px 0;line-height:1.6}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-family:var(--font-mono)}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  .tag.warn{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2);color:var(--amber)}
+  .footer-nav{grid-column:1/-1;display:flex;justify-content:space-between;padding:14px 44px;border-top:1px solid var(--border-default);font-size:12px;font-family:var(--font-mono);position:relative;z-index:1}
+  .footer-nav a{color:var(--cyan);text-decoration:none}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.footer-nav{padding:14px 16px;flex-direction:column;gap:8px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">NF</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">数据库设计 · 第 6 篇</div>
+        <div class="header-title">范式 1NF / 2NF / 3NF / BCNF</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item">2026.08</div>
+      <div class="meta-item">软考高级架构师 · 规范化</div>
+      <div class="meta-item">难点 ★★★★★</div>
+    </div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>1NF/2NF/3NF/BCNF 各要求什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>如何判断一个关系属于第几范式？</div>
+      <div class="cue-item"><span class="q-mark">?</span>3NF 满足却仍有异常，怎么办？</div>
+    </div>
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>四级范式递进（层层加码）</div>
+      <div class="note-section">
+        <table class="compare-table">
+          <thead><tr><th>范式</th><th>要求（在前一级基础上）</th><th>通俗说法</th></tr></thead>
+          <tbody>
+            <tr><td><span class="hl-green">1NF</span></td><td>字段都是不可分割的<b>原子值</b></td><td>表中不能"套小表"</td></tr>
+            <tr><td><span class="hl-purple">2NF</span></td><td>每个非主属性<b>完全依赖</b>候选键（消除部分依赖）</td><td>不能有联合主键被"部分决定"</td></tr>
+            <tr><td><span class="hl-orange">3NF</span></td><td>非主属性<b>不传递依赖</b>其他非主属性（消除传递依赖）</td><td>每列只和主键直接相关</td></tr>
+            <tr><td><span class="hl-red">BCNF</span></td><td>每个决定因素都含候选键（消除主属性间的部分/传递依赖）</td><td>消除 3NF 下的剩余异常</td></tr>
+          </tbody>
+        </table>
+        <p>口诀：<span class="note-highlight">"一原子、二无部分、三无传递、BC 决定因素皆含码"</span>。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>贯穿案例：学生教务系统</div>
+      <div class="note-section">
+        <p>初始模式：<b>学生(学号，学生姓名，系号，系主任姓名，课程号，成绩)</b><br>依赖：学号→姓名，学号→系号，系号→系主任，(学号,课程号)→成绩</p>
+        <ul>
+          <li><b>不满足 2NF</b>：候选键 (学号,课程号)，但 学号→姓名 是部分依赖。</li>
+          <li><b>→ 2NF 分解</b>：学生(学号,姓名,系号,系名,系主任) + 选课(学号,课程号,成绩)。</li>
+          <li><b>不满足 3NF</b>：学号→系号→系主任，存在传递依赖。</li>
+          <li><b>→ 3NF 分解</b>：学生(学号,姓名,系号) + 系(系号,系名,系主任) + 选课(学号,课程号,成绩)。</li>
+        </ul>
+      </div>
+
+      <div class="numbered-header"><span class="num">3</span>BCNF：3NF 还不够时</div>
+      <div class="note-section">
+        <p>仓库管理(仓库ID，存储物品ID，管理员ID，数量)，已满足 3NF，但仍有三种异常：</p>
+        <ul>
+          <li><b>删除异常</b>：仓库清空后，管理员信息也被删。</li>
+          <li><b>插入异常</b>：仓库没物品时，无法分配管理员。</li>
+          <li><b>更新异常</b>：换管理员要改所有行。</li>
+        </ul>
+        <p><b>→ BCNF 分解</b>：仓库管理(仓库ID，管理员ID) + 仓库(仓库ID，存储物品ID，数量)。</p>
+        <div class="tip">&#x26A0; 判断某关系属于第几范式：先找候选键 → 看有无部分依赖（有则仅 1NF）→ 看有无传递依赖（有则 2NF）→ 看决定因素是否都含码（否则 3NF，含码则 BCNF）。</div>
+      </div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>范式就是"一张表只干一件事"的严格程度。</strong>1NF：每个格子里只能有一个值；2NF：别让"学号"这种半个主键就单独决定别的列；3NF：别让"系号"这种非主键去决定"系主任"；BCNF：更严格，连主属性之间的依赖也要拆干净。逐级拆分的目的只有一个——<b>消除插入、删除、更新异常</b>。</p></div>
+
+      <div class="diagram"><div class="diagram-label">&#x25C6; 逻辑关系 — 范式递进</div>
+        <div style="text-align:center;font-size:12.5px;color:rgba(255,255,255,.78);line-height:2.2">
+          1NF（原子）→ 2NF（无部分依赖）→ 3NF（无传递依赖）→ BCNF（决定因素含码）<br>
+          <span style="color:var(--muted)">每级都是上一级的子集：BCNF ⊂ 3NF ⊂ 2NF ⊂ 1NF</span>
+        </div>
+      </div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">范式递进：<strong>1NF 原子值 → 2NF 无部分依赖 → 3NF 无传递依赖 → BCNF 决定因素皆含码</strong>。判断顺序：找候选键 → 查部分依赖 → 查传递依赖 → 查决定因素。目标是消除插入/删除/更新异常。</div>
+      <div class="summary-tags"><span class="tag primary">范式</span><span class="tag warn">判断难点</span><span class="tag">三大异常</span></div>
+    </div>
+  </div>
+  <div class="footer-nav">
+    <a href="functional-dependency.html">← 上一篇：函数依赖</a>
+    <a href="quiz.html#范式">真题练习 →</a>
+  </div>
+</div>
+</body>
+</html>

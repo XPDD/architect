@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 嵌入式系统案例分析</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25);flex-shrink:0}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);text-align:center;white-space:nowrap}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-arrow{display:flex;align-items:center;justify-content:center;width:22px;color:rgba(255,255,255,.15);font-size:14px;flex-shrink:0}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:4px 0}
+  .vs-block{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:10px 0}
+  .vs-col{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:12px 14px}
+  .vs-col.vs-old{border-color:rgba(251,191,36,.2)}.vs-col.vs-new{border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.04)}
+  .vs-title{font-size:12px;font-weight:700;margin-bottom:8px}.vs-old .vs-title{color:var(--amber)}.vs-new .vs-title{color:var(--cyan)}
+  .vs-col ul{list-style:none}.vs-col ul li{font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.6;padding-left:14px;position:relative}
+  .vs-col ul li::before{content:'\00B7';position:absolute;left:2px;color:var(--text-muted)}
+  .vs-arrow{display:flex;align-items:center;color:var(--cyan);font-size:18px}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table thead th:first-child{border-radius:var(--radius) 0 0 0}.compare-table thead th:last-child{border-radius:0 var(--radius) 0 0}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:last-child td:first-child{border-radius:0 0 0 var(--radius)}.compare-table tbody tr:last-child td:last-child{border-radius:0 0 var(--radius) 0}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:rgba(77,124,255,.15);border:1px solid rgba(77,124,255,.25);color:var(--blue);font-family:var(--font-mono);font-size:10px;font-weight:700;margin-bottom:4px}
+  .card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.card-grid{grid-template-columns:1fr}.vs-block{grid-template-columns:1fr;gap:8px}.vs-arrow{justify-content:center;transform:rotate(90deg)}.compare-table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">EM</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">传统架构案例分析 · 第二十二章</div>
+        <div class="header-title">嵌入式系统 · 实时系统 · 可靠性 · 鸿蒙架构</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-08</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · 嵌入式案例</div><div class="meta-item"><span class="meta-dot"></span>可靠性计算 · 可选做</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>嵌入式系统发展五个阶段？</div>
+      <div class="cue-item"><span class="q-mark">?</span>RTOS 的硬实时和软实时？</div>
+      <div class="cue-item"><span class="q-mark">?</span>MTTF/MTBF/MTTR 的关系？</div>
+      <div class="cue-item"><span class="q-mark">?</span>容错三种技术？</div>
+      <div class="cue-item"><span class="q-mark">?</span>串联/并联系统可靠度公式？</div>
+      <div class="cue-item"><span class="q-mark">?</span>鸿蒙架构四层 + 分布式四优势？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>嵌入式系统介绍</div>
+      <div class="note-section"><p><span class="note-highlight">嵌入式系统</span>是为特定应用专门构建的计算机系统。发展五阶段：</p>
+      <ul>
+        <li><span class="note-highlight">SCM 单片微型计算机</span>（计算器）、<span class="hl-purple">MCU 微控制器</span>（汽车电子/医疗器械）、<span class="hl-green">SoC 片上系统</span>（麒麟芯片）、<span class="hl-orange">互联网嵌入式</span>（智能家居）、<span class="note-highlight">智能化云技术</span>（智能穿戴/汽车）。</li>
+        <li>组成：嵌入式微处理器(MCU)、存储器(RAM/ROM)、内(外)总线、定时/计数器、看门狗电路、I/O 接口、外部设备。</li>
+        <li>微处理器分类：<strong>MPU、MCU、DSP、GPU、SoC</strong>。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">2</span>嵌入式操作系统 + 实时系统</div>
+      <div class="note-section"><ul>
+        <li><span class="note-highlight">两种典型架构</span>：<strong>层次化模式</strong>（划分为多层）与<strong>递归模式</strong>（自相似子系统）。</li>
+        <li><span class="hl-purple">EOS 特点</span>：可裁剪、可移植、强实时、强紧凑、高质量代码、强定制、标准接口、强稳定、弱交互、强确定、操作简洁、硬件适应、可固化。</li>
+        <li><span class="hl-green">4 种结构</span>：整体结构、层次结构、客户/服务器结构、面向对象结构。</li>
+        <li><span class="hl-orange">实时系统</span>：要求<strong>确定性和可预测性</strong>。RTOS 分<strong>硬实时</strong>（规定时间内必须完成，设计时保证）和<strong>软实时</strong>（按优先级尽可能快完成）。特征：高精度计时、多级中断机制、实时调度机制。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">3</span>软件可靠性（定量描述）</div>
+      <div class="note-section"><ul>
+        <li><span class="note-highlight">软件可靠性</span>：软件产品在规定的条件下和规定的时间区间完成规定功能的能力。</li>
+        <li><span class="hl-purple">软件 vs 硬件可靠性</span>：软件复杂性高（失效多为软件失效）；硬件失效主要是物理退化、软件不存在物理退化；软件唯一（复制不改变本身）；软件更新快。</li>
+        <li><span class="hl-green">可靠度</span>＝规定条件/时间不发生失效的概率＝1-失效概率；<span class="hl-orange">MTTF</span>平均无故障时间、<span class="note-highlight">MTTR</span>平均修复时间、<span class="hl-purple">MTBF</span>平均故障间隔时间，<strong>MTBF=MTTF+MTTR</strong>。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">4</span>可靠性设计（容错 + 检错）</div>
+      <div class="note-section"><p><span class="note-highlight">可靠性设计</span>：在软件设计阶段采取措施进行可靠性控制（最有效、最经济、最重要）。设计原则：不与其他设计原则冲突、以可靠为目标、确定目标不无限扩大（排在功能度/用户需求/开发费用之后）。</p>
+      <ul>
+        <li><span class="note-highlight">容错设计</span>：系统发生硬件故障/软件错误时仍能保持正常工作。<strong>三种技术</strong>：冗余设计（硬件/软件冗余替代故障资源）、恢复块设计（回滚恢复/前向恢复）、N 版本程序设计（N 个独立设计的程序同时执行、投票表决）。</li>
+        <li><span class="hl-purple">检错设计</span>：故障后及时发现并报警，代价低于容错但需人工干预。四要素：检测对象、检测延时、实现方式（判断返回结果）、处理方式（停运行-报警）。</li>
+        <li><span class="hl-green">系统配置技术</span>：双机热备份（心跳检测、主备切换）、服务器集群（负载转嫁、功能整合、故障过渡）。</li>
+        <li><span class="hl-orange">负载均衡</span>：基于特定软件(Nginx/HAProxy)、DNS、NAT、反向代理、混合型。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">5</span>鸿蒙操作系统架构</div>
+      <div class="note-section"><p><span class="note-highlight">鸿蒙（HarmonyOS）</span>采用分层层次化设计，从下向上四层：<strong>内核层 → 系统服务层 → 框架层 → 应用层</strong>，按「系统→子系统→功能/模块」逐级展开，支持按需裁剪。</p>
+      <ul>
+        <li><span class="note-highlight">内核层</span>：内核子系统（多内核设计、内核抽象层屏蔽差异）+ 驱动子系统。</li>
+        <li><span class="hl-purple">系统服务层</span>：核心能力集合，含系统基本能力、基础软件服务、增强软件服务、硬件服务 4 部分。</li>
+        <li><span class="hl-green">框架层</span>：提供 Java/C/C++/JS 多语言用户程序框架和 Ability 框架、多语言框架 API。</li>
+        <li><span class="hl-orange">应用层</span>：系统应用+第三方应用，由 FA（有 UI 交互能力）或 PA（无 UI、后台运行）组成。</li>
+      </ul>
+      <p>4 个技术特性：<strong>分布式架构首次用于终端 OS、确定时延引擎+高性能 IPC、基于微内核的可信安全、统一 IDE 一次开发多端部署</strong>。分布式四优势：<strong>分布式软总线、分布式设备虚拟化、分布式数据管理、分布式任务调度</strong>。</p></div>
+
+      <div class="numbered-header"><span class="num">6</span>真题 — 数据流软件可靠性计算</div>
+      <div class="note-section"><p><span class="note-highlight">串并联可靠性</span>：<strong>串联</strong> R = R1×R2×…×Rn（一个坏全坏）；<strong>并联</strong> R = 1-(1-R1)(1-R2)…(1-Rn)（全坏才坏）。</p>
+      <ul>
+        <li>案例：4 个模块可靠度各 0.99，全串联可靠度 = 0.99⁴ ≈ 0.96，明显下降且任一模块失效全系统失效。</li>
+        <li><span class="hl-purple">动态冗余（主动冗余）</span>：故障检测/定位/恢复，多重模块待机储备，备用模块待机可工作（热备份/双重系统）或不工作（冷备份/双工系统）。</li>
+        <li><span class="hl-green">N 版本程序设计</span>：静态故障屏蔽，N 个独立设计的程序同时执行、多数表决。</li>
+        <li>M2 采用 3 份动态冗余后可靠度 = 1-(1-0.99)³ = 0.999999；整个系统 = 0.99×0.999999×0.999999×0.99 ≈ 0.98。</li>
+        <li><span class="hl-orange">检错技术</span>：代价低于容错但不能自动解决故障、需人工干预；实现方式＝判断返回结果/计算运行时间/置状态标志位；处理方式＝查处故障-停止运行-报警。</li>
+      </ul></div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>嵌入式可靠性说人话：</strong>可靠性就是「<strong>串起来会变脆，并起来才结实</strong>」——串联一个坏了全完蛋（可靠度相乘，越乘越小），并联只有全坏才坏（可靠度用 1-(1-R)ⁿ 算）。要扛故障就用<strong>容错三件套：多备几份（冗余）、坏了重跑（恢复块）、多版本投票（N 版本）</strong>。鸿蒙记住「<strong>内核→系统服务→框架→应用</strong>」四层 + 分布式四大件（软总线/设备虚拟化/数据管理/任务调度）。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">嵌入式发展五阶段<strong>SCM→MCU→SoC→互联网→智能云</strong>；RTOS 分<strong>硬实时/软实时</strong>，强调确定性和可预测性；可靠性指标<strong>MTBF=MTTF+MTTR</strong>；<strong>串联 R=∏Rᵢ、并联 R=1-∏(1-Rᵢ)</strong>；容错三技术<strong>冗余/恢复块/N 版本</strong>；鸿蒙<strong>内核层→系统服务层→框架层→应用层</strong>四层 + 分布式四优势。本题选做，掌握可靠性计算即可。</div>
+      <div class="summary-tags"><span class="tag primary">嵌入式</span><span class="tag">RTOS</span><span class="tag">可靠性计算</span><span class="tag">容错设计</span><span class="tag">鸿蒙架构</span><span class="tag">N版本</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="quiz-embedded.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 嵌入式案例练习（选择题）</a>
+</div>
+</body>
+</html>

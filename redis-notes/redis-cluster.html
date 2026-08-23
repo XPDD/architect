@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — Redis 集群与高可用</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25);flex-shrink:0}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);text-align:center;white-space:nowrap}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-arrow{display:flex;align-items:center;justify-content:center;width:22px;color:rgba(255,255,255,.15);font-size:14px;flex-shrink:0}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:4px 0}
+  .vs-block{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:10px 0}
+  .vs-col{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:12px 14px}
+  .vs-col.vs-old{border-color:rgba(251,191,36,.2)}.vs-col.vs-new{border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.04)}
+  .vs-title{font-size:12px;font-weight:700;margin-bottom:8px}.vs-old .vs-title{color:var(--amber)}.vs-new .vs-title{color:var(--cyan)}
+  .vs-col ul{list-style:none}.vs-col ul li{font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.6;padding-left:14px;position:relative}
+  .vs-col ul li::before{content:'\00B7';position:absolute;left:2px;color:var(--text-muted)}
+  .vs-arrow{display:flex;align-items:center;color:var(--cyan);font-size:18px}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table thead th:first-child{border-radius:var(--radius) 0 0 0}.compare-table thead th:last-child{border-radius:0 var(--radius) 0 0}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:last-child td:first-child{border-radius:0 0 0 var(--radius)}.compare-table tbody tr:last-child td:last-child{border-radius:0 0 var(--radius) 0}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:rgba(77,124,255,.15);border:1px solid rgba(77,124,255,.25);color:var(--blue);font-family:var(--font-mono);font-size:10px;font-weight:700;margin-bottom:4px}
+  .card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.card-grid{grid-template-columns:1fr}.vs-block{grid-template-columns:1fr;gap:8px}.vs-arrow{justify-content:center;transform:rotate(90deg)}.compare-table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">CL</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">Redis 补充强化版 · 集群高可用</div>
+        <div class="header-title">Redis 集群 · 主从 · 哨兵 · 分片 · 单线程快</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-08</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · Redis 高可用</div><div class="meta-item"><span class="meta-dot"></span>集群/脑裂/IO复用 · 高频</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>Redis 三种集群方案？</div>
+      <div class="cue-item"><span class="q-mark">?</span>主从同步全量/增量流程？</div>
+      <div class="cue-item"><span class="q-mark">?</span>哨兵的作用 + 选主规则？</div>
+      <div class="cue-item"><span class="q-mark">?</span>集群脑裂是什么、怎么解决？</div>
+      <div class="cue-item"><span class="q-mark">?</span>分片集群哈希槽如何寻址？</div>
+      <div class="cue-item"><span class="q-mark">?</span>Redis 单线程为什么快 + IO 多路复用？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>三种集群方案</div>
+      <div class="note-section"><p><span class="note-highlight">单节点并发能力有上限</span>，需搭建集群提高并发与可用性。三种方案：</p>
+      <ul>
+        <li><span class="note-highlight">主从复制</span>：一主多从，读写分离（主写从读），解决高并发读、数据冗余；但主节点单点，需人工/哨兵故障转移。</li>
+        <li><span class="hl-purple">哨兵模式</span>：主从 + 哨兵监控，<strong>自动故障恢复</strong>，无需人工介入；但主节点单点，写性能受限。</li>
+        <li><span class="hl-green">分片集群（Cluster）</span>：多主多从 + 数据分片，解决<strong>海量数据存储</strong>和<strong>高并发写</strong>两个问题；架构复杂、跨节点事务受限、不能用 Lua 和事务。</li>
+      </ul>
+      <p><strong>生产常见选择</strong>：主从（1 主 1 从）+ 哨兵即可；单节点不超 <strong>10G</strong> 内存，不够就给不同服务分配独立主从；尽量不做分片集群（维护麻烦、心跳和数据通信耗网络带宽）。</p></div>
+
+      <div class="numbered-header"><span class="num">2</span>主从同步（全量 / 增量）</div>
+      <div class="note-section"><p><span class="note-highlight">全量同步</span>（从节点第一次连接或积压缓冲区不足）：</p>
+      <ul>
+        <li>从节点携带 <strong>replicationid + offset</strong> 请求同步；主节点判断是否第一次（replicationid 是否一致）。</li>
+        <li>主节点执行 <strong>bgsave 生成 RDB</strong> 发送给从节点；从节点清空自身数据后加载 RDB。</li>
+        <li>RDB 生成期间主节点的写命令记录到<strong>缓冲区（日志文件）</strong>，最后一起发给从节点执行。</li>
+      </ul>
+      <p><span class="note-highlight">增量同步</span>（从节点重启后数据不一致）：从节点再次请求，主节点判断非第一次，从<strong>命令日志（repl-backlog 缓冲）</strong>中取 <strong>offset</strong> 之后的数据发给从节点同步。</p></div>
+
+      <div class="numbered-header"><span class="num">3</span>哨兵模式 + 脑裂</div>
+      <div class="note-section"><p><span class="note-highlight">哨兵（Sentinel）作用</span>：①<strong>监控</strong>（每隔 1 秒 ping 各实例，检测健康）；②<strong>自动故障恢复</strong>（master 故障时选一个 slave 提升为 master）；③<strong>通知</strong>（充当客户端服务发现来源，故障转移后推送最新信息）。</p>
+      <ul>
+        <li><span class="hl-purple">主观下线</span>：某 sentinel 发现实例未按时响应则主观下线；<span class="hl-green">客观下线</span>：超过指定数量（<strong>quorum</strong>）的 sentinel 都认为主观下线——quorum 最好超过 sentinel 数量一半。</li>
+        <li><span class="hl-orange">选主规则</span>：先排除与主断开过久的从节点 → 从节点 <strong>slave-priority 越小越优先</strong> → 相同则 <strong>offset 越大越优先</strong> → 相同则 <strong>运行 id 越小越好</strong>。</li>
+        <li><span class="note-highlight">脑裂</span>：主从和 sentinel 处于不同网络分区，sentinel 心跳感知不到 master 就选了个新 master，导致<strong>两个 master</strong>（旧 master 仍在写数据），网络恢复后旧 master 被降为 slave 再同步，大量数据丢失。</li>
+        <li><span class="hl-purple">解决脑裂</span>：配置<strong>最少从节点数量</strong>（没达到就拒绝写）+ 缩短<strong>主从同步延迟时间</strong>（达不到要求拒绝请求），避免大量数据丢失。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">4</span>分片集群（Cluster）</div>
+      <div class="note-section"><p><span class="note-highlight">分片集群解决</span>：海量数据存储 + 高并发写。特征：①集群有<strong>多个 master</strong>，每个保存不同数据；②每个 master 可有多个 slave；③master 之间 <strong>ping 监测</strong>健康；④客户端可访问任意节点、自动转发到正确节点。</p>
+      <ul>
+        <li><span class="hl-purple">哈希槽（Hash Slot）</span>：集群有 <strong>16384 个哈希槽</strong>，每个 key 经 <strong>CRC16</strong> 校验后对 16384 取模决定放置哪个槽，每个节点负责一部分槽。</li>
+        <li>读/写：key 的有效部分（大括号 <code>{user:1001}</code> 内容）计算哈希取模，找槽所在实例；若不在当前节点返回 <strong>MOVED 重定向</strong>。</li>
+        <li><span class="hl-orange">限制</span>：不支持跨槽多键操作（如事务、MGET）；批量操作需用 <strong>Hash Tag</strong>（<code>{user:1001}.name</code> 和 <code>{user:1001}.age</code> 同槽）。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">5</span>Redis 单线程为什么快 + IO 多路复用</div>
+      <div class="note-section"><ul>
+        <li><span class="note-highlight">单线程仍快原因</span>：①<strong>纯内存操作</strong>，C 语言编写，执行速度快；②<strong>单线程避免上下文切换和竞争条件</strong>（多线程还要考虑线程安全）；③使用 <strong>I/O 多路复用</strong>，非阻塞 IO。</li>
+        <li><span class="hl-purple">I/O 多路复用</span>：利用<strong>单个线程同时监听多个 Socket</strong>，某 Socket 可读可写时得到通知，避免无效等待、充分利用 CPU。</li>
+        <li>实现对比：<strong>select/poll</strong> 只通知有 Socket 就绪但不确定是哪个，需遍历确认；<strong>epoll</strong> 在通知同时把已就绪 Socket 写入用户空间，效率高。</li>
+        <li><span class="hl-green">Redis 网络模型</span>：I/O 多路复用 + 事件处理器（连接应答、命令请求、命令回复）；<strong>Redis 6.0 后命令请求/回复处理引入多线程，但命令执行仍单线程</strong>。</li>
+      </ul></div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>Redis 集群说人话：</strong>三个梯队——<strong>主从</strong>（一主多从，主写从读，手动切）、<strong>哨兵</strong>（派个"监工"盯主从，主挂了自动让从上位，但怕<strong>脑裂</strong>变两个 master 丢数据）、<strong>分片</strong>（多个 master 各管一段数据，靠 <strong>16384 个哈希槽</strong> + CRC16 算 key 该放哪）。单线程为啥快？<strong>内存操作 + 不切线程 + IO 多路复用（一个线程盯着很多 socket）</strong>，跟"一个人同时盯很多个电话，哪个响接哪个"一个道理。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">集群三方案<strong>主从/哨兵/分片</strong>：主从解决高并发读（<strong>全量同步 RDB + 增量同步 offset 偏移量</strong>）；哨兵自动故障转移（监控/通知/故障恢复）、选主看<strong>priority→offset→runid</strong>、防<strong>脑裂</strong>；分片用 <strong>16384 哈希槽 + CRC16</strong>（跨槽不能用事务/Lua）；单线程快因<strong>纯内存+不切线程+IO 多路复用(epoll)</strong>。重点应对集群选型与脑裂题。</div>
+      <div class="summary-tags"><span class="tag primary">主从复制</span><span class="tag">哨兵</span><span class="tag">分片集群</span><span class="tag">哈希槽</span><span class="tag">脑裂</span><span class="tag">IO多路复用</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="quiz-redis-cluster.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 集群高可用练习（选择题）</a>
+</div>
+</body>
+</html>

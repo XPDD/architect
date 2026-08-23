@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算机网络基础 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>计算机网络基础 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { topic:"net-model", q:"在 OSI 参考模型中，能实现路由选择、拥塞控制与互连功能的层是（　）。",
+    options:["传输层","应用层","网络层","物理层"],
+    answer:2, explain:"<b>解析：</b>网络层解决路由选择、网络拥塞、异构网络互联问题。传输层是端到端连接、应用层为端用户服务、物理层传二进制位，都不管路由。" },
+  { topic:"net-model", q:"在 TCP/IP 体系结构中，将 IP 地址转化为 MAC 地址的协议是（　）。",
+    options:["RARP","ARP","ICMP","TCP"],
+    answer:1, explain:"<b>解析：</b>ARP 地址解析协议把 IP 地址转成物理 MAC 地址。RARP 是反向（MAC→IP），ICMP 是控制报文，TCP 是传输层协议。" },
+  { topic:"net-model", q:"下列网络互连设备中，属于物理层的是（　）。",
+    options:["交换机","中继器","路由器","网桥"],
+    answer:1, explain:"<b>解析：</b>中继器/集线器工作在物理层；交换机/网桥在数据链路层，路由器在网络层。" },
+  { topic:"net-model", q:"关于 UDP 协议，下列描述正确的是（　）。",
+    options:["面向连接、可靠传输","无连接、尽最大努力交付","首部 20 字节","有拥塞控制机制"],
+    answer:1, explain:"<b>解析：</b>UDP 是无连接、尽最大努力交付、不可靠；首部仅 8 字节（TCP 是 20 字节）；无拥塞控制。A/D 是 TCP 的特征。" },
+  { topic:"net-ip", q:"把网络 117.15.32.0/23 划分为 117.15.32.0/27，得到的子网个数是（　）。",
+    options:["4","8","16","32"],
+    answer:2, explain:"<b>解析：</b>网络号从 23 位变 27 位，多拿出 4 位主机号作子网号，子网数=2⁴=16。注意区分「子网数」与「主机数」（主机数才是 2^5-2=30）。" },
+  { topic:"net-ip", q:"某公司网络地址是 192.168.192.0/20，要分成 32 个子网，对应的子网掩码是（　）。",
+    options:["255.255.252.0","255.255.254.0","255.255.255.0","255.255.255.128"],
+    answer:3, explain:"<b>解析：</b>32=2⁵ 需再借 5 位子网号，网络位变为 20+5=25 位，掩码=255.255.255.128（最后一字节最高位 1）。A 是 /22、B 是 /23、C 是 /24，位数都不对。" },
+  { topic:"net-ip", q:"与地址 220.112.179.92 匹配的路由表表项是（　）。",
+    options:["220.112.145.32/22","220.112.145.64/22","220.112.147.64/22","220.112.177.64/22"],
+    answer:3, explain:"<b>解析：</b>都 /22，前两组 220.112 相同，只需比较第三段前 6 位（22-16=6）。179=1011 0011，177=1011 0001 前 6 位相同；145=1001 0001、147=1001 0011 前 6 位是 100100，不匹配。" },
+  { topic:"net-ip", q:"某公司地址块是 220.17.192.0/20，该网络被划分为若干 C 类子网，不属于该公司网络的子网地址是（　）。",
+    options:["220.17.203.0","220.17.205.0","220.17.207.0","220.17.213.0"],
+    answer:3, explain:"<b>解析：</b>C 类 24 位掩码，现用 20 位，少 4 位 → 2⁴=16 个子网，第三字段范围 192~207。213 超出 207，不属于该公司网络。" },
+  { topic:"net-ip", q:"下列属于私有 IP 地址的是（　）。",
+    options:["172.32.1.1","192.168.10.1","11.0.0.1","202.112.14.1"],
+    answer:1, explain:"<b>解析：</b>私有地址范围：10.0.0.0/8、172.16.0.0~172.31.255.255(/12)、192.168.0.0/16。172.32 超出 172.31 范围，11.0.0.1 不在 10 网段，202 是公网地址。" },
+  { topic:"net-ip", q:"IPv6 地址的长度是（　）。",
+    options:["32 位","64 位","128 位","256 位"],
+    answer:2, explain:"<b>解析：</b>IPv6 为 128 位，以 16 位为一段共 8 段，地址空间比 IPv4 增 2^96 倍。32 位是 IPv4，64/256 是干扰项。" },
+  { topic:"net-ip", q:"主机 host1 对 host2 进行域名查询，根域名服务器采用迭代查询，中介域名服务器采用递归查询，下列说法正确的是（　）。",
+    options:["根服务器递归、中介迭代","根服务器迭代、中介递归","两者均迭代","两者均递归"],
+    answer:1, explain:"<b>解析：</b>本地服务器对用户做递归查询；服务器之间通常迭代。题目给定「根迭代、中介递归」即选 B，注意不要把方向记反。" },
+  { topic:"net-planning", q:"以下关于层次化局域网模型中核心层的叙述，正确的是（　）。",
+    options:["对分组进行有效性检查以保障安全","将分组从一个区域高速地转发到另一个区域","由多台二、三层交换机组成","提供多条路径来缓解通信瓶颈"],
+    answer:1, explain:"<b>解析：</b>核心层只负责高速数据交换/骨干传输，不做过多的有效性检查（那是汇聚层的过滤、安全策略）。A 的「有效性检查」正是核心层不做的事。" },
+  { topic:"net-planning", q:"结构化布线系统分为六个子系统，其中水平子系统（　）。",
+    options:["由各种交叉连接设备及集线器、交换机组成","连接了干线子系统和工作区子系统","由终端设备到信息插座的整个区域组成","实现各楼层设备间子系统之间的互连"],
+    answer:1, explain:"<b>解析：</b>水平子系统将干线子系统与用户工作区连接起来。A 是管理/设备间子系统，C 是工作区子系统，D 是垂直干线子系统。" },
+  { topic:"net-misc", q:"以下关于光纤的说法中，错误的是（　）。",
+    options:["单模光纤的纤芯直径更细","单模光纤采用 LED 作为光源","多模光纤比单模光纤传输距离近","多模光纤中光波以多种模式传播"],
+    answer:1, explain:"<b>解析：</b>单模光纤采用 LD（激光二极管）光源，多模光纤才用 LED（发光二极管）。B 把光源说反了，其余三项正确。" },
+  { topic:"net-misc", q:"按数据在传输链路上的传送方向，数据通信方式分为三类，下列不属于这三类的是（　）。",
+    options:["单工通信","半双工通信","全双工通信","全单工通信"],
+    answer:3, explain:"<b>解析：</b>三类为单工、半双工、全双工，不存在「全单工通信」这个说法。D 是拼凑的干扰项。" },
+  { topic:"net-misc", q:"关于存储区域网络（SAN），下列说法正确的是（　）。",
+    options:["通过 SCSI 电缆直连服务器","即插即用、以数据为中心的文件级存储","通过专用交换机连接磁盘阵列，采用块级存储","依赖服务器、不带有存储操作系统"],
+    answer:2, explain:"<b>解析：</b>SAN 通过专用交换机连磁盘阵列，采用块（block）级存储，把存储从以太网分离。A/D 是 DAS 的特点，B 是 NAS 的特点。" },
+  { topic:"net-5g", q:"SDN（软件定义网络）的网络架构中不包含（　）。",
+    options:["逻辑层","控制层","转发层","应用层"],
+    answer:0, explain:"<b>解析：</b>SDN 三层架构=应用层、控制层、转发层，核心是控制平面与转发平面分离。不存在「逻辑层」这一层。" },
+  { topic:"net-5g", q:"5G 网络采用（　）可将网络分割成多张虚拟网络，每个虚拟网络的接入、传输和核心网逻辑独立，任一虚拟网络故障不影响其他虚拟网络。",
+    options:["网络切片技术","边缘计算技术","网络隔离技术","软件定义网络技术"],
+    answer:0, explain:"<b>解析：</b>网络切片在单个物理网络上切分出多个逻辑网络，各逻辑网络相互独立。边缘计算/网络隔离/SDN 都不具备「切分多张虚拟网」的典型含义。" },
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

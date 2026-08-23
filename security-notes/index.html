@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息安全技术 · 知识索引</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:36px 0}
+  .container{max-width:860px;margin:0 auto;padding:0 20px}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+  .hero{text-align:center;padding:44px 20px 32px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:28px;overflow:hidden;position:relative}
+  .hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--rose),transparent)}
+  .hero-badge{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--rose);letter-spacing:.2em;margin-bottom:8px}
+  .hero h1{font-size:28px;font-weight:800}.hero h1 .accent{color:var(--rose);text-shadow:0 0 20px rgba(248,113,113,.3)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:8px}
+  .hero-stats{display:flex;justify-content:center;gap:18px;margin-top:18px;flex-wrap:wrap}
+  .hero-stat{padding:5px 14px;border-radius:4px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:13px;color:var(--text2)}
+  .hero-stat strong{color:var(--cyan)}
+  .part-section{margin-bottom:24px}
+  .part-header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid var(--rose);margin-bottom:10px}
+  .part-num{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--rose);min-width:36px}
+  .part-info h2{font-size:16px;font-weight:700}.part-info span{font-size:12px;color:var(--muted)}
+  .note-card{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;text-decoration:none;color:inherit;transition:border-color .2s,background .2s}
+  .note-card:hover{border-color:rgba(248,113,113,.2);background:rgba(248,113,113,.02)}
+  .note-icon{width:38px;height:38px;border-radius:var(--radius);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px;font-weight:700;background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.2);color:var(--rose)}
+  .note-icon.green{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.2);color:var(--green)}
+  .note-icon.cyan{background:rgba(0,212,255,.1);border-color:rgba(0,212,255,.2);color:var(--cyan)}
+  .note-info{flex:1}.note-info h3{font-size:14px;font-weight:700;margin-bottom:2px}
+  .note-info p{font-size:12px;color:var(--muted);line-height:1.5}
+  .note-arrow{color:var(--muted);font-size:16px}
+  .note-card:hover .note-arrow{color:var(--cyan)}
+  .footer{text-align:center;padding:20px;font-size:12px;color:var(--muted)}
+  .footer a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2)}
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="../index.html">← 返回总索引</a>
+  <div class="hero">
+    <div class="hero-badge">第 10 章 · 信息安全技术</div>
+    <h1>信息安全技术 <span class="accent">康奈尔笔记库</span></h1>
+    <div class="hero-sub">软考高级架构师 · 信息安全技术 · 7 份笔记</div>
+    <div class="hero-stats">
+      <div class="hero-stat">笔记 <strong>5</strong> 份</div>
+      <div class="hero-stat">真题 <strong>1</strong> 组</div>
+      <div class="hero-stat">知识体系 <strong>1</strong> 张</div>
+    </div>
+  </div>
+
+  <div class="part-section">
+    <div class="part-header"><div class="part-num">01</div><div class="part-info"><h2>信息安全基础与防护体系</h2><span>五要素 · 加密 · 抗攻击 · 网络安全 · 保证体系</span></div></div>
+
+    <a class="note-card" href="security-quiz.html"><div class="note-icon green">✓</div><div class="note-info"><h3>信息安全 · 真题练习</h3><p>交互做题 · 带解析 · 覆盖基础/加密/抗攻击/安全协议</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="security-knowledge-map.html"><div class="note-icon cyan">◆</div><div class="note-info"><h3>信息安全 · 知识体系与实体关系图</h3><p>五要素底座 + 加密→抗攻击→网络安全→保证评估主线</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="security-basics.html"><div class="note-icon">SE</div><div class="note-info"><h3>信息安全基础 — 五要素 + 防范体系</h3><p>机密性/完整性/可用性/可控性/可审查性 · 五层防范 · 组成框架</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="security-crypto.html"><div class="note-icon">CR</div><div class="note-info"><h3>加密 · 摘要 · 签名 · 访问控制</h3><p>对称/非对称 · 数字信封 · MD5/SHA-1 · 数字签名 · PKI/CA</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="security-attacks.html"><div class="note-icon">AT</div><div class="note-info"><h3>抗攻击技术 — DoS · 欺骗 · 扫描</h3><p>DoS/DDoS · ARP/DNS/IP 欺骗 · 端口扫描 · SYN Flooding</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="security-network.html"><div class="note-icon green">NW</div><div class="note-info"><h3>网络安全技术 + 安全协议</h3><p>防火墙 · IDS/IPS · 蜜罐 · SSL/SSH/SET/Kerberos/PGP/S-MIME</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="security-assurance.html"><div class="note-icon">AS</div><div class="note-info"><h3>保证体系与评估方法</h3><p>GB17859 五等级 · 风险评估五要素 · 风险计算五步</p></div><div class="note-arrow">→</div></a>
+  </div>
+
+  <div class="footer"><a href="../index.html">← 返回总索引</a> · 2026.08</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>嵌入式技术应用 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>嵌入式技术应用 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { topic:"emb-processor", q:"嵌入式处理器是嵌入式系统的核心部件，一般可分为嵌入式微处理器（MPU）、微控制器（MCU）、数字信号处理器（DSP）和片上系统（SoC）。以下叙述中，错误的是（　）。",
+    options:["MPU 在安全性和可靠性等方面进行增强，适用于运算量较大的智能系统","MCU 典型代表是单片机，体积小从而使功耗和成本下降","DSP 处理器对系统结构和指令进行了特殊设计，适合数字信号处理","SoC 是一个有专用目标的集成电路，其中包括完整系统并有嵌入式软件的全部内容"],
+    answer:0, explain:"<b>解析：</b>「大量运算」是 DSP 处理器的特点，而非 MPU。MPU 由通用 CPU 演变、32 位以上、高性能但需外挂存储器。DSP 采用哈佛结构+流水线，处理速度比最快 CPU 还快 10–50 倍。易错点：把 DSP 的「大量运算」张冠李戴到 MPU 上。" },
+  { topic:"emb-arch", q:"下列关于哈佛结构的叙述中，正确的是（　）。",
+    options:["程序和数据共用一个存储空间","程序和数据存储器相互独立，各自独立编址、独立访问","采用单一地址总线和数据总线","串行执行，传输上会出现瓶颈"],
+    answer:1, explain:"<b>解析：</b>哈佛结构=程序存储器与数据存储器相互独立、两套独立总线、并行执行。A/C/D 都是冯·诺依曼结构的特征。口诀：哈佛=分开存、双总线、并行快。" },
+  { topic:"emb-arch", q:"传统计算机采用的冯·诺依曼结构，又称（　）。",
+    options:["哈佛结构","普林斯顿结构","流水线结构","片上系统结构"],
+    answer:1, explain:"<b>解析：</b>冯·诺依曼结构也称普林斯顿结构。「哈佛结构」是与它并列的另一种架构；「流水线」「片上系统」是干扰项，不属于体系结构的别名。" },
+  { topic:"emb-overview", q:"嵌入式系统一般由嵌入式处理器、相关支撑硬件、嵌入式操作系统、支撑软件和应用软件组成。其中运行在系统中用于管理计算机资源和应用软件的基础软件是（　）。",
+    options:["嵌入式处理器","相关支撑硬件","嵌入式操作系统","支撑软件"],
+    answer:2, explain:"<b>解析：</b>嵌入式操作系统是运行在系统中的基础软件，负责管理资源与应用，具备实时性、可剪裁性、安全性。「支撑软件」以库的方式被应用引用，提供公共服务与开发调试能力，别混淆。" },
+  { topic:"emb-overview", q:"以下关于嵌入式系统硬件抽象层的叙述，错误的是（　）。",
+    options:["硬件抽象层与硬件密切相关，可对操作系统隐藏硬件的多样性","硬件抽象层将操作系统与硬件平台隔开","硬件抽象层使软硬件的设计与调试可以并行","硬件抽象层应包括设备驱动程序和任务调度"],
+    answer:3, explain:"<b>解析：</b>硬件抽象层是位于操作系统内核与硬件电路之间的接口层，目的是将硬件抽象化、提供虚拟硬件平台。「任务调度」是操作系统的职责，不属于硬件抽象层。陷阱：把「任务调度」这种 OS 职责塞进硬件抽象层。" },
+  { topic:"emb-overview", q:"BootLoader 是嵌入式系统加电后运行的第一段软件代码。下列不属于 BootLoader 功能的是（　）。",
+    options:["片级初始化（初始化微处理器）","板级初始化（初始化其他硬件设备）","加载内核（系统级初始化）","执行应用层业务逻辑"],
+    answer:3, explain:"<b>解析：</b>BootLoader 三级初始化=片级（纯硬件）→板级（软硬件混合）→加载内核（复制映像并跳转内核第一条指令）。「执行应用层业务逻辑」是应用软件的职责，与 BootLoader 无关。" },
+  { topic:"emb-processor", q:"下列关于嵌入式微控制器 MCU 的叙述，正确的是（　）。",
+    options:["典型代表是单片机，将 CPU、RAM、ROM、定时/计数器和 I/O 接口集成在一片芯片上","由通用计算机中的 CPU 演变而来，仅含 CPU","采用哈佛结构和流水线处理","在处理器芯片内嵌入操作系统代码模块"],
+    answer:0, explain:"<b>解析：</b>MCU（单片机）= CPU+片内内存+片内外设集成一片，是嵌入式系统工业主流。B 描述的是 MPU；C 是 DSP；D 是 SoC。易错点：四类处理器的「集成内容」张冠李戴。" },
+  { topic:"emb-processor", q:"按系统集成度划分，微处理器可分为（　）两类。",
+    options:["微控制器和数字信号处理器","一般用途型微处理器和单芯片微控制器","嵌入式微处理器和片上系统","16 位以下和 32 位以上"],
+    answer:1, explain:"<b>解析：</b>按集成度=一般用途型微处理器（仅含 CPU）vs 单芯片微控制器（CPU/ROM/RAM/I/O 集成一片）。D 是按「字长」划分，A/C 是按「用途」划分，别把三种分类维度混为一谈。" },
+  { topic:"emb-os", q:"以下关于 RTOS（实时操作系统）的叙述中，不正确的是（　）。",
+    options:["RTOS 不能针对硬件变化进行结构与功能上的配置及裁剪","RTOS 可以根据应用环境的要求对内核进行裁剪和重配","RTOS 的首要任务是调度一切可利用的资源来完成实时控制任务","RTOS 实质上是一个计算机资源管理程序，需要及时响应实时事件和中断"],
+    answer:0, explain:"<b>解析：</b>嵌入式操作系统具有「可裁减和可配置」特性，A 说法错误。RTOS 能根据应用环境裁剪重配内核，故 B/C/D 均正确。陷阱：反常识选项——「不能裁剪」与 EOS 的「可裁剪」特性冲突。" },
+  { topic:"emb-os", q:"大多数 RTOS 调度算法采用（　），对实时性的支持最好。",
+    options:["时间片轮转调度","轮流查询式调度","优先抢占式（可剥夺方式）调度","先来先服务调度"],
+    answer:2, explain:"<b>解析：</b>任务调度分时间分片式、轮流查询式、优先抢占式三种，其中优先抢占式（可剥夺）对实时性支持最好。易错点：时间片轮转是分时系统常用，不适合强调实时性。" },
+  { topic:"emb-os", q:"实时操作系统主要用于有实时要求的过程控制等领域。对于来自外部的事件，必须在（　）。",
+    options:["一个时间片内进行处理","一个周转时间内进行处理","一个机器周期内进行处理","被控对象允许的时间范围内进行处理"],
+    answer:3, explain:"<b>解析：</b>实时性要求外部事件必须在「被控对象允许的时间范围内」处理，强调的是相对被控对象而言的可接受时限，而非固定的时间片、周转时间或机器周期。硬实时必须完成、软实时按优先级完成。" },
+  { topic:"emb-multicore", q:"以下关于多核处理器的说法中，不正确的是（　）。",
+    options:["采用多核处理器可以降低计算机系统的功耗和体积","SMP、BMP 和 AMP 是多核处理器系统通常采用的三种结构，采用哪种结构与应用场景相关，而无须考虑硬件的组成差异","在多核处理器中，计算机可以同时执行多个进程，操作系统中的多个线程也可以并行执行","多核处理器是将两个或更多的独立处理器封装在一起，集成在一个电路中"],
+    answer:1, explain:"<b>解析：</b>AMP/SMP/BMP 三种模式「对操作系统的要求各不相同，采用哪种模式需要考虑硬件的差异情况」，故 B 说「无须考虑硬件差异」错误。A/C/D 均正确。" },
+  { topic:"emb-multicore", q:"多核 CPU 环境下进程的调度算法一般有全局队列调度和局部队列调度两种。（　）属于全局队列调度的特征。",
+    options:["操作系统为每个 CPU 维护一个任务等待队列","操作系统维护一个任务等待队列","任务基本上无需在多个 CPU 核心间切换，有利于提高 Cache 命中率","当系统中有一个 CPU 核心空闲时，操作系统便从该核心的任务等待队列中选取适当的任务执行"],
+    answer:1, explain:"<b>解析：</b>全局队列=OS 只维护「一个」全局任务队列，CPU 空闲时从全局队列取就绪任务，利用率高。A/C/D 均为局部队列调度的特征（每核一个队列、免切换、提高 Cache 命中率）。" },
+  { topic:"emb-software", q:"嵌入式系统设计一般要考虑低功耗，软件设计也要考虑低功耗设计，软件低功耗设计一般采用（　）。",
+    options:["结构优化、编译优化和代码优化","软硬件协同设计、开发过程优化和环境设计优化","轻量级操作系统、算法优化和仿真实验","编译优化技术、软硬件协同设计和算法优化"],
+    answer:3, explain:"<b>解析：</b>软件低功耗三大技术=编译优化技术、软硬件协同设计、算法优化（口诀「编协算」）。A 的「结构/代码优化」、B 的「开发过程/环境优化」、C 的「仿真实验」都是干扰项，不在三大技术之内。" },
+  { topic:"emb-software", q:"以下关于嵌入式系统开发的叙述，正确的是（　）。",
+    options:["宿主机与目标机之间只需要建立逻辑连接","宿主机与目标机之间只能采用串口通信方式","在宿主机上必须采用交叉编译器来生成目标机的可执行代码","调试器与被调试程序必须安装在同一台机器上"],
+    answer:2, explain:"<b>解析：</b>嵌入式开发需在宿主机上采用交叉编译器生成目标机可执行代码，C 正确。A「只需要逻辑连接」错误（需物理连接）；B「只能串口」错误（还有并口/网络/JTAG）；D 错误（调试器在宿主机、被调试程序在目标机，分离）。" },
+  { topic:"emb-software", q:"基于网络的数据库系统（NDB）是基于 4G/5G 移动通信之上的。以下有关 NDB 的叙述中，不正确的是（　）。",
+    options:["NDB 主要由客户端、通信协议和远程服务器等三部分组成","NDB 的客户端负责提供接口给嵌入式程序，远程服务器负责维护服务器上的数据库数据","NDB 具有客户端小、无需支持可剪裁性、代码可重用等特点","NDB 是以文件方式存储数据库数据，数据按一定格式储存在磁盘中"],
+    answer:3, explain:"<b>解析：</b>「以文件方式存储数据在磁盘」是 FDB（基于文件方式）的特征，不是 NDB。NDB 基于网络，嵌入式设备是远程服务器的客户端。陷阱：把 FDB 与 NDB 的存储方式互换。" },
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

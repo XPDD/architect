@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案例分析题 — 数据库系统（反规范化）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(251,191,36,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(251,191,36,.15),transparent 30%,transparent 70%,rgba(248,113,113,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(251,191,36,.05)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--amber),var(--rose),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(248,113,113,.1));border:1px solid rgba(251,191,36,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(251,191,36,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--amber);text-shadow:0 0 12px rgba(251,191,36,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--amber);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--amber);border-radius:50%;box-shadow:0 0 6px rgba(251,191,36,.25)}
+  .body{padding:26px 44px 30px;position:relative;z-index:1}
+  .case-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .case-head .exam-badge{font-family:var(--font-mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--amber),var(--rose));padding:4px 12px;border-radius:4px;box-shadow:0 0 14px rgba(251,191,36,.3)}
+  .case-head .exam-title{font-size:13.5px;font-weight:700}
+  .case-head .exam-sub{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-left:auto}
+  .scenario{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-left:2px solid var(--amber);border-radius:var(--radius);padding:16px 18px;margin-bottom:20px}
+  .scenario-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--amber);letter-spacing:.14em;margin-bottom:8px}
+  .scenario p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.75}
+  .scenario ul{list-style:none;padding-left:0;margin-top:6px}.scenario ul li{font-size:12.5px;padding:2px 0 2px 18px;position:relative;color:rgba(255,255,255,.75);line-height:1.6;font-family:var(--font-mono);font-size:11.5px}
+  .scenario ul li::before{content:'';position:absolute;left:6px;top:9px;width:4px;height:4px;border-radius:50%;background:rgba(251,191,36,.5)}
+  .scenario strong{color:var(--amber)}
+  .question{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);margin-bottom:16px;overflow:hidden}
+  .question-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.04)}
+  .question-head .q-tag{font-family:var(--font-mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--amber),var(--rose));padding:3px 10px;border-radius:4px}
+  .question-head .q-title{font-size:13px;font-weight:600}
+  .question-head .q-score{font-family:var(--font-mono);font-size:11px;color:var(--amber);margin-left:auto}
+  .question-body{padding:14px 16px}
+  .question-body p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.75}
+  .question-body ul{list-style:none;padding-left:0;margin-top:6px}.question-body ul li{font-size:12.5px;padding:2px 0 2px 18px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .question-body ul li::before{content:'';position:absolute;left:6px;top:9px;width:4px;height:4px;border-radius:50%;background:rgba(251,191,36,.5)}
+  .answer{display:none;margin:6px 16px 14px;padding:14px 16px;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15);border-left:2px solid var(--green);border-radius:var(--radius);font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.75}
+  .answer.show{display:block}
+  .answer b{color:var(--green)}.answer .ans-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:6px;display:block}
+  .answer ul{list-style:none;padding-left:0;margin-top:4px}.answer ul li{font-size:12.5px;padding:1px 0 1px 18px;position:relative;color:rgba(255,255,255,.8);line-height:1.6}
+  .answer ul li::before{content:'\00B7';position:absolute;left:4px;color:var(--green)}
+  .answer p{font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.7}
+  .reveal{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green);border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.07);padding:6px 16px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .reveal:hover{background:rgba(52,211,153,.14)}
+  .reveal.open{color:var(--text-secondary);border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.02)}
+  .qa-actions{margin-top:6px;padding:0 16px 16px;display:flex;gap:10px;align-items:center}
+  .foot{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;font-family:var(--font-mono);font-size:12px;margin-top:8px}
+  .foot a{color:var(--text-muted);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:1px}
+  .foot a:hover{color:var(--amber);border-color:var(--amber)}
+  .foot a.note-link{color:var(--amber);border-color:rgba(251,191,36,.3)}
+  .foot a.quiz-link{color:var(--green);border-color:rgba(52,211,153,.3);font-weight:700}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.header{padding:22px 20px}.header-meta{flex-wrap:wrap;gap:12px}.body{padding:18px 18px 24px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">DB</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">传统架构案例分析 · 第二十二章 / 数据库系统</div>
+        <div class="header-title">案例分析题 — 药品销售系统数据库设计</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2021 真题 · 25 分</div><div class="meta-item"><span class="meta-dot"></span>反规范化 / Redis</div><div class="meta-item"><span class="meta-dot"></span>3 个小问 · 可展开参考答案</div></div>
+  </div>
+  <div class="body">
+    <div class="case-head">
+      <div class="exam-badge">真题四</div>
+      <div class="exam-title">阅读以下关于数据库设计的叙述，回答问题 1 至问题 3。</div>
+      <div class="exam-sub">数据库</div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-label">【说明】</div>
+      <p>某医药销售企业因业务发展，需要建立<b>线上药品销售系统</b>，为用户提供便捷的互联网药品销售服务。系统除常规药品展示、订单、用户交流与反馈功能外，还需提供<b>热销产品排名、评价分类管理</b>等功能。通过对需求的分析，数据管理上初步决定采用<b>关系数据库（MySQL）与数据库缓存（Redis）的混合架构</b>。经过规范化设计之后，部分数据库表结构如下：</p>
+      <ul>
+        <li>供应商（供应商ID，供应商名称，联系方式，供应商地址）；</li>
+        <li>药品（药品ID，药品名称，药品型号，药品价格，供应商ID）；</li>
+        <li>药品库存（药品ID，当前库存数量）；</li>
+        <li>订单（订单号码，药品ID，供应商ID，药品数量，订单金额）。</li>
+      </ul>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 1</span><span class="q-title">反规范化设计方法有哪些？用户查询商品信息应采用哪种？</span><span class="q-score">9 分</span></div>
+      <div class="question-body">
+        <p>系统运行后数据访问性能较差。原因是规范化设计后关系表过于细分，造成大量<b>多表关联查询</b>影响性能。例如用户查询商品信息时需同时显示该药品信息、供应商信息、当前库存等。刘工建议采用<b>反规范化设计</b>改造药品关系的结构，修改后的药品关系为：<b>药品（药品ID，药品名称，药品型号，药品价格，供应商ID，供应商名称，当前库存数量）</b>。请用 200 字以内文字说明<b>常见的反规范化设计方法</b>，并说明用户查询商品信息应采用<b>哪种</b>方法。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a1">查看参考答案</button></div>
+      <div class="answer" id="a1">
+        <span class="ans-label">参考答案</span>
+        <p>常见反规范化技术（5 种）：</p>
+        <ul>
+          <li><b>增加冗余列</b>：在多个表中保留相同列，通过增加数据冗余减少或避免查询时的连接操作。</li>
+          <li><b>增加派生列</b>：增加由本表或其它表中数据计算生成的列，减少连接并避免计算或使用集合函数。</li>
+          <li><b>重新组表</b>：若许多用户需要查看两个表连接的结果数据，则把两表组成一个表来减少连接、提高性能。</li>
+          <li><b>水平分割表</b>：根据一列或多列数据值把数据放到多个独立表，用于表数据规模大、数据相对独立或需存放到多介质时。</li>
+          <li><b>垂直分割表</b>：将主键与部分列放到一个表、主键与其它列放到另一个表，查询时减少 I/O 次数。</li>
+        </ul>
+        <p>用户查询商品信息采用的是<b>增加冗余列</b>的方式（把供应商名称、当前库存数量冗余到药品表中）。</p>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 2</span><span class="q-title">解决反规范化数据不一致问题的三种常见方法，该系统应采用哪种？</span><span class="q-score">9 分</span></div>
+      <div class="question-body">
+        <p>王工认为，反规范化设计可提高查询性能，但必然会带来<b>数据不一致</b>问题。请用 200 字以内文字说明在反规范化设计中<b>解决数据不一致性问题的三种常见方法</b>，并说明该系统应<b>采用哪种方法</b>。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a2">查看参考答案</button></div>
+      <div class="answer" id="a2">
+        <span class="ans-label">参考答案</span>
+        <p>三种常见方法：</p>
+        <ul>
+          <li><b>批处理维护</b>：对复制列或派生列的修改积累一定时间后，运行一批处理作业或存储过程进行修改——仅适合<b>实时性要求不高</b>的场景。</li>
+          <li><b>应用逻辑</b>：必须<b>在同一事务</b>中对所有涉及的表进行增、删、改操作。用应用逻辑实现完整性风险较大，因为同一逻辑须在所有应用中维护，容易遗漏、不易维护。</li>
+          <li><b>触发器</b>：对数据的任何修改立即触发对复制列或派生列的修改。<b>实时</b>，且处理逻辑只出现在一个地方，<b>易于维护</b>，通常是较好的办法。</li>
+        </ul>
+        <p>该系统<b>应采用触发器</b>。</p>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 3</span><span class="q-title">实现热销药品排名应选哪种 Redis 数据类型？说明 Redis 与 MySQL 实时同步的常见方案。</span><span class="q-score">7 分</span></div>
+      <div class="question-body">
+        <p>系统采用 Redis 实现特定功能（如<b>当前热销药品排名</b>），并将药品关系数据放入内存以提高商品查询性能，但必然会造成 <b>Redis 与 MySQL 数据实时同步</b>问题。</p>
+        <p>(1) Redis 的数据类型包括 String、Hash、List、Set 和 ZSet 等，请说明实现<b>当前热销药品排名</b>功能应该选择使用哪种数据类型。</p>
+        <p>(2) 请用 200 字以内文字解释说明解决 <b>Redis 和 MySQL 数据实时同步</b>问题的常见方案。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a3">查看参考答案</button></div>
+      <div class="answer" id="a3">
+        <span class="ans-label">参考答案</span>
+        <p><b>(1) 选 ZSet（Sorted Set / 有序集合）</b>——按分数（销量）自动排序，天然适合排行榜/排名。</p>
+        <p><b>(2) Redis 与 MySQL 实时同步常见方案</b>：</p>
+        <ul>
+          <li><b>实时同步（强一致）</b>：查询缓存 hit 不到再从 DB 查询并写入缓存；更新缓存时<b>先更新数据库，再将缓存设置过期</b>（建议直接设置过期，而非更新缓存内容）。</li>
+          <li><b>异步队列</b>：对并发程度较高的场景，采用 Kafka 等<b>消息中间件</b>处理消息的生产与消费。</li>
+          <li><b>canal 工具</b>：模拟 MySQL slave/master 同步机制，<b>监控 DB binlog 日志</b>更新触发缓存更新，可解放程序员、减少工作量，但有一定局限性。</li>
+          <li><b>UDP 自定义函数 / 触发器</b>：对 MySQL API 编程，利用触发器进行缓存同步。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot">
+      <a href="db-case.html">← 数据库 · 笔记</a>
+      <a href="quiz-db.html">选择题题库</a>
+      <a href="index.html">返回索引</a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.reveal').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const el=document.getElementById(btn.dataset.target);
+    const open=el.classList.toggle('show');
+    btn.textContent=open?'收起参考答案':'查看参考答案';
+    btn.classList.toggle('open',open);
+  });
+});
+</script>
+</body>
+</html>

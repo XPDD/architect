@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>计算机组成与体系结构 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>计算机组成与体系结构 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+{ topic:"cpu", q:"在 CPU 中，（　）不仅要保证指令的正确执行，还要能够处理异常事件。",
+    options:["运算器","控制器","寄存器","内部总线"],
+    answer:1, explain:"<b>解析：</b>控制器（CU）负责取指、译码并产生控制信号，同时要处理中断、异常等事件。运算器只做算术/逻辑运算，寄存器存放数据，内部总线负责传输，都不承担异常处理职责。" },
+{ topic:"cpu", q:"目前处理器市场中的 CPU、GPU 和 DSP 具有不同体系结构，其中 DSP 采用（　）。",
+    options:["冯诺依曼结构","哈佛结构","FPGA 结构","与 GPU 相同的结构"],
+    answer:1, explain:"<b>解析：</b>DSP（数字信号处理器）采用哈佛结构：程序存储器与数据存储器分开、独立总线，可并行取指取数，速度快。冯诺依曼结构程序数据同储共享总线，不满足 DSP 高速处理需求。" },
+{ topic:"flynn", q:"Flynn 分类法根据计算机在执行程序过程中（　）的不同组合，将计算机分为 4 类。",
+    options:["指令流和数据流","数据流和控制流","指令流和控制流","数据流和总线带宽"],
+    answer:0, explain:"<b>解析：</b>Flynn 分类按「指令流 × 数据流」组合分 SISD/SIMD/MISD/MIMD。控制流、总线带宽都不是分类依据，是典型干扰项。" },
+{ topic:"cisc-risc", q:"以下关于 RISC 和 CISC 的叙述中，不正确的是（　）。",
+    options:["RISC 的大多指令在一个时钟周期内完成","RISC 普遍采用微程序控制器，CISC 则普遍采用硬布线控制器","RISC 的指令种类和寻址方式相对于 CISC 更少","RISC 和 CISC 都采用流水线技术"],
+    answer:1, explain:"<b>解析：</b>恰恰相反：RISC 普遍采用硬布线控制器，CISC 才普遍采用微程序控制器。其余三项均正确（RISC 定长单周期、指令种类少、两者都采用流水线）。" },
+{ topic:"pipeline", q:"执行指令时，每一条指令分解为取指、分析和执行三步。取指 5△t、分析 2△t、执行 3△t，按流水线方式从头到尾执行完 500 条指令需（　）△t。",
+    options:["2500","2505","2510","2515"],
+    answer:1, explain:"<b>解析：</b>流水线周期 = max(5,2,3) = 5△t；T = (5+2+3) + (500−1)×5 = 10 + 2495 = 2505△t。选 2500 是漏加首条填满管道的 10△t；2510/2515 是把周期错取成 2 或 3。" },
+{ topic:"pipeline", q:"流水线的加速比是指（　）。",
+    options:["完成同一批任务，不使用流水线所用时间与使用流水线所用时间之比","完成同一批任务，使用流水线所用时间与不使用流水线所用时间之比","单位时间完成的任务数量","流水线周期的倒数"],
+    answer:0, explain:"<b>解析：</b>加速比 S = 不使用流水线的时间 / 使用流水线的时间，恒 ≥1。选项 C 是吞吐率 TP、D 是最大吞吐率，都不是加速比。" },
+{ topic:"bus", q:"以下关于总线的叙述中，不正确的是（　）。",
+    options:["并行总线适合近距离高速数据传输","串行总线适合长距离数据传输","单总线结构在一个总线上适应不同种类的设备，设计简单且性能很高","专用总线在设计上可以与连接设备实现最佳匹配"],
+    answer:2, explain:"<b>解析：</b>单总线结构设计简单但「性能不高」，因为各类设备争用同一条总线。其余三项均正确：串行适合长距离、并行适合近距离、专用总线可最佳匹配。" },
+{ topic:"cpu", q:"CPU 中用于存放当前正在执行的指令的寄存器是（　）。",
+    options:["程序计数器 PC","指令寄存器 IR","累加寄存器 AC","状态条件寄存器 PSW"],
+    answer:1, explain:"<b>解析：</b>PC 存「下一条」指令的地址，IR 存「当前正在执行」的指令，AC 存运算结果，PSW 存状态标志。别把 PC 和 IR 搞混。" },
+{ topic:"cpu", q:"用于存放运算结果状态标志（如进位、溢出、零标志）的寄存器是（　）。",
+    options:["累加寄存器 AC","数据缓冲寄存器 DR","状态条件寄存器 PSW","指令寄存器 IR"],
+    answer:2, explain:"<b>解析：</b>PSW（程序状态字/状态条件寄存器）保存进位、溢出、零、符号等标志位，供后续条件判断。AC/DR/IR 都不存状态标志。" },
+{ topic:"cpu", q:"冯诺依曼结构中，程序和数据（　）。",
+    options:["存放在不同的存储器中","存放在同一个存储器中","数据存内存、程序存磁盘","使用不同的总线分别访问"],
+    answer:1, explain:"<b>解析：</b>冯诺依曼结构程序与数据共用一个存储器、共享一条总线（取指与取数不能同时）；哈佛结构将程序与数据存储器分开，DSP 采用哈佛结构。" },
+{ topic:"flynn", q:"下列计算机中，属于 SIMD（单指令流多数据流）结构的是（　）。",
+    options:["阵列处理机","单处理机","多处理机","个人 PC"],
+    answer:0, explain:"<b>解析：</b>SIMD 一个控制部件管理多个处理单元、同时对多份数据执行同一条指令，典型是阵列（向量）处理机。单处理机/PC 是 SISD，多处理机是 MIMD。" },
+{ topic:"cisc-risc", q:"以下关于 RISC 的叙述中，不正确的是（　）。",
+    options:["RISC 指令长度固定","RISC 大多数指令在一个时钟周期内完成","RISC 普遍采用微程序控制","RISC 寄存器数量多"],
+    answer:2, explain:"<b>解析：</b>RISC 普遍采用「硬布线控制」，微程序控制是 CISC 的特点，两者恰好相反。其余三项均正确。" },
+{ topic:"pipeline", q:"某流水线各段执行时间相同，流水线周期为 5△t，则其理论最大吞吐率为（　）。",
+    options:["1/5△t","1/10△t","5△t","10△t"],
+    answer:0, explain:"<b>解析：</b>最大吞吐率 = 1/流水线周期 = 1/5△t。注意吞吐率是频率（时间的倒数），不是时间；5△t、10△t 是时间维度，直接排除。" },
+{ topic:"bus", q:"按功能划分，总线可分为数据总线、地址总线和（　）。",
+    options:["控制总线","系统总线","内部总线","局部总线"],
+    answer:0, explain:"<b>解析：</b>总线按功能分三类：数据总线（传数据）、地址总线（传地址）、控制总线（传控制信号）。系统/内部/局部总线是按范围或位置的另一种分法，是干扰项。" }
+];
+
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

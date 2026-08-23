@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案例分析题 — 云原生架构 · 旅行公司云原生改造</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(77,124,255,.15),transparent 30%,transparent 70%,rgba(0,212,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(77,124,255,.05)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--blue),var(--cyan),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(77,124,255,.15),rgba(0,212,255,.1));border:1px solid rgba(77,124,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(77,124,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--blue);text-shadow:0 0 12px rgba(77,124,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--blue);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--blue);border-radius:50%;box-shadow:0 0 6px rgba(77,124,255,.25)}
+  .body{padding:26px 44px 30px;position:relative;z-index:1}
+  .case-head{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+  .case-head .exam-badge{font-family:var(--font-mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--cyan));padding:4px 12px;border-radius:4px;box-shadow:0 0 14px rgba(77,124,255,.3)}
+  .case-head .exam-title{font-size:13.5px;font-weight:700}
+  .case-head .exam-sub{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-left:auto}
+  .scenario{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-left:2px solid var(--blue);border-radius:var(--radius);padding:16px 18px;margin-bottom:20px}
+  .scenario-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.14em;margin-bottom:8px}
+  .scenario p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.75}
+  .scenario ul{list-style:none;padding-left:0;margin-top:6px}.scenario ul li{font-size:12.5px;padding:2px 0 2px 18px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .scenario ul li::before{content:'';position:absolute;left:6px;top:9px;width:4px;height:4px;border-radius:50%;background:rgba(77,124,255,.5)}
+  .scenario strong{color:var(--cyan)}
+  .diagram{margin:16px 0 20px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:6px 12px;font-size:11px;font-weight:500;color:rgba(255,255,255,.7);text-align:center;white-space:nowrap;max-width:92%}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:4px 0}
+  .question{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);margin-bottom:16px;overflow:hidden}
+  .question-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.04)}
+  .question-head .q-tag{font-family:var(--font-mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--blue),var(--cyan));padding:3px 10px;border-radius:4px}
+  .question-head .q-title{font-size:13px;font-weight:600}
+  .question-head .q-score{font-family:var(--font-mono);font-size:11px;color:var(--amber);margin-left:auto}
+  .question-body{padding:14px 16px}
+  .question-body p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.75}
+  .question-body ul{list-style:none;padding-left:0;margin-top:6px}.question-body ul li{font-size:12.5px;padding:2px 0 2px 18px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .question-body ul li::before{content:'';position:absolute;left:6px;top:9px;width:4px;height:4px;border-radius:50%;background:rgba(77,124,255,.5)}
+  .answer{display:none;margin:6px 16px 14px;padding:14px 16px;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15);border-left:2px solid var(--green);border-radius:var(--radius);font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.75}
+  .answer.show{display:block}
+  .answer b{color:var(--green)}.answer .ans-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:6px;display:block}
+  .answer ul{list-style:none;padding-left:0;margin-top:4px}.answer ul li{font-size:12.5px;padding:1px 0 1px 18px;position:relative;color:rgba(255,255,255,.8);line-height:1.6}
+  .answer ul li::before{content:'\00B7';position:absolute;left:4px;color:var(--green)}
+  .reveal{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green);border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.07);padding:6px 16px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .reveal:hover{background:rgba(52,211,153,.14)}
+  .reveal.open{color:var(--text-secondary);border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.02)}
+  .qa-actions{margin-top:6px;padding:0 16px 16px;display:flex;gap:10px;align-items:center}
+  .foot{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;font-family:var(--font-mono);font-size:12px;margin-top:8px}
+  .foot a{color:var(--text-muted);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:1px}
+  .foot a:hover{color:var(--cyan);border-color:var(--cyan)}
+  .foot a.note-link{color:var(--blue);border-color:rgba(77,124,255,.3)}
+  .foot a.quiz-link{color:var(--green);border-color:rgba(52,211,153,.3);font-weight:700}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.header{padding:22px 20px}.header-meta{flex-wrap:wrap;gap:12px}.body{padding:18px 18px 24px}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">CN</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">架构直播4 · 案例分析上 / 云原生架构</div>
+        <div class="header-title">案例分析题 — 旅行公司云原生改造</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>试题 · 案例分析（25 分）</div><div class="meta-item"><span class="meta-dot"></span>云原生 8 层架构</div><div class="meta-item"><span class="meta-dot"></span>3 个小问 · 可展开参考答案</div></div>
+  </div>
+  <div class="body">
+    <div class="case-head">
+      <div class="exam-badge">试题二</div>
+      <div class="exam-title">阅读以下关于某旅行公司云原生改造的说明，回答问题 1 至问题 3。</div>
+      <div class="exam-sub">P2 · 云原生架构</div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-label">【说明】</div>
+      <p>某旅行公司主体由两家公司合并后出现两个问题：<strong>技术体系不同</strong>需整合为一体，以及<strong>节假日高并发流量</strong>。公司分三阶段推进云原生改造：</p>
+      <ul>
+        <li><b>第一阶段</b>：为提升集群资源利用率、降低使用成本，用云原生思维重构部分技术体系，将多套旧有系统合并、收拢到以云原生应用为核心的私有云平台，并把 IDC、物理网络、虚拟网络、计算资源、存储资源经 IaaS / PaaS 虚拟化封装、切割、再投产后实现自动化。</li>
+        <li><b>第二阶段</b>：随着集群规模扩大、部分机器频繁故障，<b>保障服务稳定性成为首要任务</b>；基于公有云、私有云、离线专属云等动态计算环境，用<b>声明式 API、不可变基础设施、服务网格、容器服务</b>构建容错性好、易管理易观察的应用。</li>
+        <li><b>第三阶段</b>：通过基础组件、服务云原生改造与服务依赖梳理，使应用不再关心底层资源/机房/运行时间/供应商；利用标准云原生应用模型实现跨地域、跨云自动化灾备、自动部署，并向云原生场景下的 <b>DevOps</b> 演进。</li>
+      </ul>
+    </div>
+
+    <div class="diagram">
+      <div class="diagram-label">◆ 云原生平台 8 层架构（自下而上）</div>
+      <div>
+        <div class="flow-row"><div class="flow-box accent">⑧ 应用场景层<br><small>云原生应用 / AI大数据 / 音视频 / Serverless / 在离线</small></div></div>
+        <div class="flow-v-arrow">↑</div>
+        <div class="flow-row"><div class="flow-box">⑦ 平台能力层<br><small>集群管理 · 安全隔离 · 监控报警 · DevOps</small></div></div>
+        <div class="flow-v-arrow">↑</div>
+        <div class="flow-row"><div class="flow-box primary">⑥ 基础平台层<br><small>Kubernetes + 机器学习平台（技术底座）</small></div></div>
+        <div class="flow-v-arrow">↑</div>
+        <div class="flow-row"><div class="flow-box">⑤ ServiceAPI 接口汇聚层<br><small>封装为标准化 API，屏蔽底层复杂度</small></div></div>
+        <div class="flow-v-arrow">↑</div>
+        <div class="flow-row"><div class="flow-box">④ 资源管理层<br><small>统一管理 KVM(虚拟化) / Docker(容器) / K8s(编排)</small></div></div>
+        <div class="flow-v-arrow">↑</div>
+        <div class="flow-row"><div class="flow-box">③ 基础资源层<br><small>计算(CPU/GPU) · 容器网络 · 存储 · 运行时(Docker/Kata)</small></div></div>
+        <div class="flow-v-arrow">↑</div>
+        <div class="flow-row"><div class="flow-box">② OS 层<br><small>Linux / Windows</small></div></div>
+        <div class="flow-v-arrow">↑</div>
+        <div class="flow-row"><div class="flow-box">① 机器资源池<br><small>物理机 / 虚拟机 / 混合云（硬件基石）</small></div></div>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 1</span><span class="q-title">该改造分三阶段进行，请分别说明各阶段的主要目标，并指出第二阶段的首要任务。</span><span class="q-score">8 分</span></div>
+      <div class="question-body">
+        <p>该公司合并后有「技术体系各异」与「高并发流量」两大挑战，分三阶段落地。请按阶段概括目标，并明确<b>第二阶段</b>的首要任务是什么、采用了哪些技术来支撑。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a1">查看参考答案</button></div>
+      <div class="answer" id="a1">
+        <span class="ans-label">参考答案</span>
+        <ul>
+          <li><b>第一阶段</b>：提升集群<b>资源利用率、降低资源使用成本</b>；将多套旧有系统合并到以云原生应用为核心的私有云平台，用 IaaS / PaaS 自动化封装调度。</li>
+          <li><b>第二阶段</b>：<b>保障服务稳定性</b>（集群规模扩大、部分机器频繁故障）；用<b>声明式 API、不可变基础设施、服务网格、容器服务</b>构建弹性、可观测、容错好的应用。</li>
+          <li><b>第三阶段</b>：实现<b>跨地域 / 跨云自动化灾备、自动部署</b>，使应用与底层资源完全解耦，并向云原生 <b>DevOps</b> 演进。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 2</span><span class="q-title">结合 8 层架构图，说明「机器资源池、基础资源层、基础平台层」的作用，并指出体现容器编排的层次。</span><span class="q-score">8 分</span></div>
+      <div class="question-body">
+        <p>图中给出了云原生平台自下而上的 8 层。请分别说明<b>机器资源池、基础资源层、基础平台层</b>所承担的功能，并指出<b>容器编排（Kubernetes）</b>主要发生在哪一层，为什么这一层是「技术底座」。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a2">查看参考答案</button></div>
+      <div class="answer" id="a2">
+        <span class="ans-label">参考答案</span>
+        <ul>
+          <li><b>机器资源池</b>：提供物理机、虚拟机、混合云机器等基础硬件资源，是整个架构的<b>硬件基石</b>。</li>
+          <li><b>基础资源层</b>：封装计算（CPU/GPU）、容器网络、存储、运行时（Docker/Kata 等），向上提供「计算 / 网络 / 存储 / 容器运行」能力。</li>
+          <li><b>基础平台层</b>：依托 <b>Kubernetes（容器编排）</b>与机器学习平台提供云原生编排、AI / 大数据支撑，是业务「<b>技术底座</b>」。</li>
+          <li><b>容器编排</b>还体现在<b>资源管理层</b>——它统一管理 KVM（虚拟化）、Docker（容器）、Kubernetes（编排），简化虚拟机与容器的生命周期调度。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 3</span><span class="q-title">结合云原生内涵，说明为何采用「声明式 API + 服务网格 + 混合云」能同时支撑弹性与稳定性。</span><span class="q-score">9 分</span></div>
+      <div class="question-body">
+        <p>为了应对节假日高并发与机器故障，公司引入混合云环境、容器云平台、声明式 API、服务网格。请结合<b>云原生「最大化剥离非业务代码」的内涵</b>与<b>7 原则（服务化 / 弹性 / 可观测 / 韧性 / 自动化 / 零信任 / 持续演进）</b>说明理由。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a3">查看参考答案</button></div>
+      <div class="answer" id="a3">
+        <span class="ans-label">参考答案</span>
+        <ul>
+          <li><b>声明式 API</b>：把期望状态交给平台，平台自动收敛到该状态，配合自动修复与弹性伸缩，体现<b>自动化、弹性</b>，降低人工干预故障风险。</li>
+          <li><b>服务网格（Service Mesh）</b>：把连接、安全、流量控制、可观测下沉为平台基础设施，与业务解耦，体现<b>服务化、微服务化</b>；在控制平面统一配置限流、熔断、灰度，提升<b>韧性</b>与可观测。</li>
+          <li><b>混合云环境</b>：公有云 + 私有云 + 离线专属云互补——上量时弹性扩容（弹性）、高峰期分散流量（韧性），敏感数据留私有云（零信任 / 安全），是应对节假日高并发的关键。</li>
+          <li>整体符合云原生「把非功能特性交给云、专注业务代码」的内涵，进而支撑<b>第三阶段的 DevOps 与跨云灾备</b>。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot">
+      <a href="cloud-native.html">← 云原生 · 笔记</a>
+      <a href="quiz-cloud-native.html">选择题题库</a>
+      <a href="index.html">返回索引</a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.reveal').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const el=document.getElementById(btn.dataset.target);
+    const open=el.classList.toggle('show');
+    btn.textContent=open?'收起参考答案':'查看参考答案';
+    btn.classList.toggle('open',open);
+  });
+});
+</script>
+</body>
+</html>

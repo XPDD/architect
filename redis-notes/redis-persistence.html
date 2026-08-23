@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — Redis 持久化与淘汰策略</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25);flex-shrink:0}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);text-align:center;white-space:nowrap}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-arrow{display:flex;align-items:center;justify-content:center;width:22px;color:rgba(255,255,255,.15);font-size:14px;flex-shrink:0}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:4px 0}
+  .vs-block{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:10px 0}
+  .vs-col{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:12px 14px}
+  .vs-col.vs-old{border-color:rgba(251,191,36,.2)}.vs-col.vs-new{border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.04)}
+  .vs-title{font-size:12px;font-weight:700;margin-bottom:8px}.vs-old .vs-title{color:var(--amber)}.vs-new .vs-title{color:var(--cyan)}
+  .vs-col ul{list-style:none}.vs-col ul li{font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.6;padding-left:14px;position:relative}
+  .vs-col ul li::before{content:'\00B7';position:absolute;left:2px;color:var(--text-muted)}
+  .vs-arrow{display:flex;align-items:center;color:var(--cyan);font-size:18px}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table thead th:first-child{border-radius:var(--radius) 0 0 0}.compare-table thead th:last-child{border-radius:0 var(--radius) 0 0}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:last-child td:first-child{border-radius:0 0 0 var(--radius)}.compare-table tbody tr:last-child td:last-child{border-radius:0 0 var(--radius) 0}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:rgba(77,124,255,.15);border:1px solid rgba(77,124,255,.25);color:var(--blue);font-family:var(--font-mono);font-size:10px;font-weight:700;margin-bottom:4px}
+  .card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.card-grid{grid-template-columns:1fr}.vs-block{grid-template-columns:1fr;gap:8px}.vs-arrow{justify-content:center;transform:rotate(90deg)}.compare-table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">RP</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">Redis 补充强化版 · 持久化 + 过期/淘汰</div>
+        <div class="header-title">Redis 持久化 · 过期删除 · 内存淘汰</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-08</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · Redis 持久化</div><div class="meta-item"><span class="meta-dot"></span>RDB/AOF 对比 · 高频</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>RDB 和 AOF 各自机制与优缺点？</div>
+      <div class="cue-item"><span class="q-mark">?</span>RDB 执行原理 fork/copy-on-write？</div>
+      <div class="cue-item"><span class="q-mark">?</span>AOF 三种刷盘策略？</div>
+      <div class="cue-item"><span class="q-mark">?</span>过期删除哪三种、Redis 实际怎么做？</div>
+      <div class="cue-item"><span class="q-mark">?</span>内存淘汰 8 种策略 + LRU/LFU？</div>
+      <div class="cue-item"><span class="q-mark">?</span>生产环境如何选型？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>RDB vs AOF 对比</div>
+      <table class="compare-table">
+        <thead><tr><th>特性</th><th>RDB（数据快照）</th><th>AOF（追加日志）</th></tr></thead>
+        <tbody>
+          <tr><td><span class="note-highlight">机制</span></td><td>指定时间间隔把内存全量数据生成二进制快照（dump.rdb）</td><td>记录所有写操作指令到文本日志（appendonly.aof），重启重放指令恢复</td></tr>
+          <tr><td><span class="hl-purple">文件体积</span></td><td>压缩二进制、体积小</td><td>纯文本、体积大（可重写压缩）</td></tr>
+          <tr><td><span class="hl-green">恢复速度</span></td><td>快（直接加载二进制）</td><td>慢（需逐条执行命令）</td></tr>
+          <tr><td><span class="hl-orange">数据安全</span></td><td>可能丢失最后一次快照后数据</td><td>按刷盘策略可做到秒级/实时（最多丢 1 秒）</td></tr>
+          <tr><td><span class="note-highlight">性能影响</span></td><td>fork 子进程、有短暂阻塞</td><td>持续写入，fsync 策略影响性能</td></tr>
+          <tr><td><span class="hl-purple">适用场景</span></td><td>容灾备份、数据完整性要求不高（缓存）</td><td>数据完整性要求高、不能接受丢失（计数/订单）</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p><span class="note-highlight">选型</span>：高性能可接受少量丢失→<strong>仅 RDB</strong>；数据安全→<strong>仅 AOF(everysec)</strong>；<strong>生产环境最优解＝RDB+AOF</strong>（RDB 做全量快速恢复 + AOF 做增量补充）。<span class="hl-green">混合持久化（Redis 4.0+）</span>：AOF 文件前半段是 RDB 全量、后半段是 AOF 增量日志，结合快速恢复和低丢失。</p></div>
+
+      <div class="numbered-header"><span class="num">2</span>RDB 执行原理 + AOF 刷盘策略</div>
+      <div class="note-section"><p><span class="note-highlight">RDB 执行原理（bgsave）</span>：bgsave 开始时 <strong>fork 主进程得到子进程</strong>，子进程共享主进程内存数据，完成后读取内存数据写入 RDB 文件。采用 <strong>copy-on-write（写时复制）</strong>：主进程读操作访问共享内存；写操作则<strong>拷贝一份数据</strong>再写，互不影响。</p>
+      <ul>
+        <li><span class="hl-purple">AOF 刷盘策略</span>：<strong>Always</strong>（同步刷盘，可靠性高几乎不丢数据但性能影响大）；<strong>everysec</strong>（每秒刷盘，性能适中、最多丢 1 秒——默认/较优）；<strong>no</strong>（操作系统控制，性能最好但可能丢大量数据）。</li>
+        <li><span class="hl-green">AOF 重写（bgrewriteaof）</span>：合并同一 key 的多次写为最后一次，用最少命令达到相同效果，避免文件过大。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">3</span>过期删除策略</div>
+      <div class="note-section"><ul>
+        <li><span class="note-highlight">惰性删除</span>：不主动检查，只有当客户端<strong>访问该 key</strong> 时才检查是否过期，过期则删。优点极度省 CPU；缺点浪费内存（一直没人访问就一直占）。</li>
+        <li><span class="hl-purple">定时删除</span>：设过期时间时创建<strong>定时器</strong>，到点立刻删。优点内存利用率极高；缺点<strong>极度消耗 CPU</strong>（高并发会阻塞主线程），Redis 几乎不用。</li>
+        <li><span class="hl-green">定期删除</span>：每隔固定时间（默认 <strong>100ms</strong>）<strong>随机抽取</strong>一部分带过期时间的 key 检查删除。优点折中性价比最高；缺点有少量过期键漏清。</li>
+        <li><span class="hl-orange">Redis 实际做法</span>：<strong>惰性删除 + 定期删除配合</strong>——日常靠定期删除批量清理，零散靠惰性删除兜底；都清理不掉时<strong>内存满了触发淘汰策略</strong>（LRU）。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">4</span>内存淘汰策略</div>
+      <div class="note-section"><p><span class="note-highlight">触发</span>：Redis 先执行"惰性删除 + 定期删除"清理过期 key，如果内存仍达 <code>maxmemory</code> 上限，就触发<strong>内存淘汰策略</strong>（最后一道内存保障）。</p>
+      <ul>
+        <li><span class="note-highlight">LRU</span>（最近最久使用）：淘汰<strong>访问时间最旧</strong>的数据（当前时间-最后访问时间，值越大越淘汰）。</li>
+        <li><span class="hl-purple">LFU</span>（最近最少使用）：淘汰<strong>访问频率最低</strong>的数据（统计访问频率，值越小越淘汰）。</li>
+        <li>分两类范围：<strong>volatile-xxx</strong>（只淘汰设了过期时间的 key）、<strong>allkeys-xxx</strong>（淘汰所有 key）。</li>
+      </ul></div>
+      <table class="compare-table">
+        <thead><tr><th>策略</th><th>核心逻辑</th><th>适用场景</th></tr></thead>
+        <tbody>
+          <tr><td><span class="note-highlight">volatile-lru</span></td><td>淘汰过期键中最近最久未用的</td><td>90% 生产场景（有核心永久数据）</td></tr>
+          <tr><td><span class="hl-purple">allkeys-lru</span></td><td>淘汰所有键中最久未用的</td><td>纯缓存场景（数据可重建）</td></tr>
+          <tr><td><span class="hl-green">volatile-lfu</span></td><td>淘汰过期键中访问频率最低的</td><td>资讯/电商（按热度排序）</td></tr>
+          <tr><td><span class="hl-orange">noeviction</span></td><td>不淘汰，写请求报错</td><td>金融/支付（数据绝不能丢，Redis 默认）</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p><strong>使用建议</strong>：优先 <strong>allkeys-lru</strong>（有冷热数据区分时）；数据访问频率差别不大用 <strong>allkeys-random</strong>；有置顶需求用 <strong>volatile-lru</strong>（置顶不设过期）；短时高频访问用 <strong>lfu</strong>。<strong>Redis 默认 noeviction</strong>（内存不足写入报 OOM，读不受影响）。经典问答：DB 1000 万数据、Redis 只缓存 20 万且要留热点 → 用 <strong>allkeys-lru</strong>。</p></div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>Redis 持久化说人话：</strong>RDB 就是<strong>"定期拍全家福"</strong>——把当前所有数据存成一张快照照片（体积小、恢复快，但两次拍照之间丢的数据补不回）；AOF 是<strong>"写日记"</strong>——每一条写命令都记下来，坏了就重新念一遍日记恢复（不丢数据但慢）。所以聪明做法是<strong>RDB 拍照 + AOF 日记一起开</strong>（混合持久化）。过期删除三种策略：<strong>懒人式（惰性删除，用到才查）、自爆式（定时删除，费 CPU 几乎不用）、抽查式（定期删除，性价比最高）</strong>；Redis 实际是<strong>懒人+抽查</strong>混用，兜底再靠 LRU 汰旧。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text"><strong>RDB</strong>（快照，体积小、恢复快、可能丢数据)、<strong>AOF</strong>（日志，体积大、恢复慢、几乎不丢）；生产环境 <strong>RDB+AOF 混合</strong>；RDB 用 <strong>fork+copy-on-write</strong>，AOF 刷盘<strong>always/everysec/no</strong> 三档；过期删除<strong>惰性 + 定期</strong>；内存淘汰 8 种，常用<strong>allkeys-lru</strong>（留热点）、<strong>volatile-lru</strong>（有永久数据）、默认 <strong>noeviction</strong>。重点应对 RDB/AOF 对比与淘汰策略题。</div>
+      <div class="summary-tags"><span class="tag primary">RDB</span><span class="tag">AOF</span><span class="tag">混合持久化</span><span class="tag">过期删除</span><span class="tag">内存淘汰</span><span class="tag">LRU/LFU</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="quiz-redis-persistence.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 持久化练习（选择题）</a>
+</div>
+</body>
+</html>
