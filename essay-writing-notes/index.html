@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架构论文写作 · 知识索引</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:36px 0}
+  .container{max-width:860px;margin:0 auto;padding:0 20px}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+  .hero{text-align:center;padding:44px 20px 32px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:28px;overflow:hidden;position:relative}
+  .hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .hero-badge{font-family:var(--mono);font-size:10px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:8px}
+  .hero h1{font-size:28px;font-weight:800}.hero h1 .accent{color:var(--cyan);text-shadow:0 0 20px rgba(0,212,255,.3)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:8px}
+  .hero-stats{display:flex;justify-content:center;gap:18px;margin-top:18px;flex-wrap:wrap}
+  .hero-stat{padding:5px 14px;border-radius:4px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:13px;color:var(--text2)}
+  .hero-stat strong{color:var(--cyan)}
+  .part-section{margin-bottom:24px}
+  .part-header{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);border-left:3px solid var(--cyan);margin-bottom:10px}
+  .part-num{font-family:var(--mono);font-size:24px;font-weight:800;color:var(--cyan);min-width:36px}
+  .part-info h2{font-size:16px;font-weight:700}.part-info span{font-size:12px;color:var(--muted)}
+  .note-card{display:flex;align-items:center;gap:14px;padding:14px 18px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;text-decoration:none;color:inherit;transition:border-color .2s,background .2s}
+  .note-card:hover{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.02)}
+  .note-icon{width:38px;height:38px;border-radius:var(--radius);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:13px;font-weight:700}
+  .note-icon.cyan{background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.2);color:var(--cyan)}
+  .note-icon.blue{background:rgba(77,124,255,.1);border:1px solid rgba(77,124,255,.2);color:var(--blue)}
+  .note-icon.green{background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.2);color:var(--green)}
+  .note-icon.purple{background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.2);color:var(--purple)}
+  .note-icon.amber{background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.2);color:var(--amber)}
+  .note-info{flex:1}.note-info h3{font-size:14px;font-weight:700;margin-bottom:2px}
+  .note-info p{font-size:12px;color:var(--muted);line-height:1.5}
+  .note-arrow{color:var(--muted);font-size:16px}
+  .note-card:hover .note-arrow{color:var(--cyan)}
+  .footer{text-align:center;padding:20px;font-size:12px;color:var(--muted)}
+  .footer a{color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2)}
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="../index.html">← 返回总索引</a>
+  <div class="hero">
+    <div class="hero-badge">论文专题 · ESSAY WRITING</div>
+    <h1>架构论文写作 <span class="accent">康奈尔笔记库</span></h1>
+    <div class="hero-sub">软考高级架构师 · 考试总览 · 评分标准 · 写作心法 · 万能模板 · 范文鉴赏 · 论题预测</div>
+    <div class="hero-stats">
+      <div class="hero-stat">笔记 <strong>8</strong> 份</div>
+      <div class="hero-stat">范文 <strong>7</strong> 篇</div>
+      <div class="hero-stat">预测论题 <strong>4</strong> 道</div>
+    </div>
+  </div>
+
+  <div class="part-section">
+    <div class="part-header"><div class="part-num">01</div><div class="part-info"><h2>考试总览与写作方法论</h2><span>考试方式 · 真题趋势 · 评分标准 · 万能模板</span></div></div>
+
+    <a class="note-card" href="essay-exam-overview.html"><div class="note-icon cyan">总</div><div class="note-info"><h3>论文考试总览 — 考试方式 + 真题趋势</h3><p>四选一机试 · 45分及格 · 2023-2025五大出题特点 · 三问结构共性</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="essay-tips.html"><div class="note-icon green">心</div><div class="note-info"><h3>四大心得 + 评分标准</h3><p>前沿化 · 真实性 · 决策过程 · 量化成果 + 扣分/加分/不及格规则</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="essay-template.html"><div class="note-icon blue">模</div><div class="note-info"><h3>万能模板 + 常见问题</h3><p>摘要八件套 · 背景万金油 · 正文贴题 · 结尾找平 · 六大官方答疑</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="essay-scoring.html"><div class="note-icon amber">评</div><div class="note-info"><h3>论文鉴赏评分标准 — 六段采分点详解</h3><p>六段六采分点 · 摘要六要素 · 背景可复用 · 总分原则 · 子3三点论证 · 结尾字数策略（鉴赏/自查同用一把尺子）</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="essay-structure.html"><div class="note-icon cyan">结</div><div class="note-info"><h3>论文结构与评分标准 — 六段式写作模板</h3><p>摘要六要素 · 背景350-450字 · 子问题2总分原则 · 子问题3三分点 · 结尾字数策略</p></div><div class="note-arrow">→</div></a>
+  </div>
+
+  <div class="part-section">
+    <div class="part-header"><div class="part-num">02</div><div class="part-info"><h2>范文鉴赏</h2><span>7 篇高分范文 · 每篇亮点 + 常见失误</span></div></div>
+
+    <a class="note-card" href="essay-samples.html"><div class="note-icon amber">范</div><div class="note-info"><h3>七篇范文鉴赏 — 层次架构 → 云原生</h3><p>层次C/S · SOA · UML建模 · 架构风格 · ATAM评估 · 微服务 · 云原生，逐篇点评写法得失</p></div><div class="note-arrow">→</div></a>
+  </div>
+
+  <div class="part-section">
+    <div class="part-header"><div class="part-num">03</div><div class="part-info"><h2>论题预测</h2><span>2026上半年 · 2025年11月 · 知识点详解</span></div></div>
+
+    <a class="note-card" href="essay-forecast-2026.html"><div class="note-icon rose">26</div><div class="note-info"><h3>2026年上半年论文预测 — 官方三方向</h3><p>架构（DDD/服务网格/云原生/高并发）· 数据库（大数据架构/数据安全）· AI大模型架构 · 服务网格首点名</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="essay-forecast.html"><div class="note-icon blue">预</div><div class="note-info"><h3>2025年11月论文预测 — 四论题考点梳理</h3><p>云原生微服务治理 · 数据库多模架构 · 高并发性能优化 · AIGC影响</p></div><div class="note-arrow">→</div></a>
+
+    <a class="note-card" href="essay-forecast-knowledge.html"><div class="note-icon green">知</div><div class="note-info"><h3>预测论题知识点详解 — 考点 · 对比 · 论文写法</h3><p>熔断/降级/限流 · 令牌桶vs漏桶 · 多模选型 · AIGC三方向 + 论点寻找方式 + 每论题三问分论点</p></div><div class="note-arrow">→</div></a>
+  </div>
+
+  <div class="part-section">
+    <div class="part-header"><div class="part-num">04</div><div class="part-info"><h2>知识体系</h2><span>写作流程 · 实体关系</span></div></div>
+
+    <a class="note-card" href="essay-map.html"><div class="note-icon purple">图</div><div class="note-info"><h3>论文写作知识地图 — 流程 + E-R 关系</h3><p>六段写作主线 · 评分要素关系 · 范文技术栈对照</p></div><div class="note-arrow">→</div></a>
+  </div>
+
+  <div class="footer">
+    <a href="essay-exam-overview.html">考试总览</a> · <a href="essay-scoring.html">评分标准</a> · <a href="essay-tips.html">写作心法</a> · <a href="essay-template.html">万能模板</a> · <a href="essay-structure.html">六段结构</a> · <a href="essay-samples.html">范文鉴赏</a> · <a href="essay-forecast-2026.html">2026预测</a> · <a href="essay-forecast.html">2025.11预测</a> · <a href="../question-bank/exam-essay-writing-up.html">▶ 题库（上）</a> · <a href="../question-bank/exam-essay-writing.html">▶ 题库（下）</a>
+  </div>
+</div>
+</body>
+</html>
