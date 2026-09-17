@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案例分析 · 复习导航与步骤</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-elevated: #1a2030;
+    --border-default: rgba(255,255,255,.06); --border-subtle: rgba(255,255,255,.04);
+    --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --blue: #4d7cff; --purple: #a78bfa; --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(248,113,113,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(251,191,36,.03) 0%, transparent 50%);
+    line-height: 1.6; min-height: 100vh; padding: 36px 0;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+  .back-link { display: inline-block; margin-bottom: 20px; color: var(--rose); text-decoration: none; font-family: var(--font-mono); font-size: 12px; }
+
+  .page-header {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 30px 36px; margin-bottom: 28px;
+    box-shadow: 0 0 0 1px rgba(248,113,113,.04), 0 4px 32px rgba(0,0,0,.3);
+    position: relative; overflow: hidden;
+  }
+  .page-header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--rose), var(--amber), transparent);
+  }
+  .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--rose); letter-spacing: .2em; margin-bottom: 6px; }
+  .header-title { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; }
+  .header-sub { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+  .stats-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .stat-pill {
+    font-family: var(--font-mono); font-size: 11px; padding: 5px 14px; border-radius: 3px;
+    background: rgba(248,113,113,.08); border: 1px solid rgba(248,113,113,.15); color: var(--rose); font-weight: 600;
+  }
+  .stat-pill.mid { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.2); color: var(--amber); }
+  .stat-pill.ok { background: rgba(52,211,153,.08); border-color: rgba(52,211,153,.2); color: var(--green); }
+
+  .section { margin-bottom: 30px; }
+  .section-title {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--rose); letter-spacing: .1em;
+    margin-bottom: 14px; padding: 10px 16px;
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius);
+    border-left: 3px solid var(--rose);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  }
+  .section-title .sec-tag { font-size: 10px; color: var(--text-muted); font-weight: 400; letter-spacing: 0; }
+
+  /* 考试规则 */
+  .rule-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .rule-cell { background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius); padding: 14px 16px; }
+  .rule-cell .rc-k { font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: .08em; margin-bottom: 6px; }
+  .rule-cell .rc-v { font-size: 14px; font-weight: 700; color: var(--text-primary); }
+  .rule-cell .rc-s { font-size: 11px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5; }
+
+  /* 复习步骤 */
+  .step-card {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 20px 24px; margin-bottom: 12px; position: relative; overflow: hidden;
+  }
+  .step-card::before { content:''; position:absolute; top:0; left:0; bottom:0; width:3px; background: linear-gradient(180deg, var(--rose), var(--amber)); }
+  .step-head { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+  .step-num {
+    font-family: var(--font-mono); font-size: 22px; font-weight: 800; color: var(--rose);
+    width: 44px; height: 44px; border-radius: 8px; background: rgba(248,113,113,.08);
+    border: 1px solid rgba(248,113,113,.2); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .step-title { font-size: 15px; font-weight: 700; }
+  .step-time { font-family: var(--font-mono); font-size: 11px; color: var(--amber); margin-left: auto; background: rgba(251,191,36,.08); border: 1px solid rgba(251,191,36,.2); padding: 3px 10px; border-radius: 3px; }
+  .step-body { font-size: 13px; color: var(--text-secondary); line-height: 1.8; }
+  .step-body b { color: var(--text-primary); }
+  .step-body a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(0,212,255,.3); }
+  .step-body a:hover { border-bottom-color: var(--cyan); }
+  .step-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .sl { font-family: var(--font-mono); font-size: 11px; text-decoration: none; padding: 5px 12px; border-radius: 3px; font-weight: 600; }
+  .sl.case { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.25); color: var(--rose); }
+  .sl.quiz { background: rgba(52,211,153,.1); border: 1px solid rgba(52,211,153,.25); color: var(--green); }
+  .sl.note { background: rgba(77,124,255,.1); border: 1px solid rgba(77,124,255,.25); color: var(--blue); }
+  .sl:hover { filter: brightness(1.25); }
+
+  /* 题库表 */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius); overflow: hidden; }
+  thead th {
+    text-align: left; padding: 10px 12px; color: var(--rose); font-size: 10px;
+    font-family: var(--font-mono); letter-spacing: .06em; font-weight: 600;
+    border-bottom: 1px solid rgba(248,113,113,.12); background: rgba(248,113,113,.03);
+  }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.03); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(248,113,113,.02); }
+  .tag { font-family: var(--font-mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+  .tag.case { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.25); color: var(--rose); }
+  .tag.link { background: rgba(77,124,255,.1); border: 1px solid rgba(77,124,255,.25); color: var(--blue); }
+  .tag.link a { color: inherit; text-decoration: none; }
+  .tag.link a:hover { text-decoration: underline; }
+  .tag.hot { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.25); color: var(--rose); }
+  .tag.mid { background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.25); color: var(--amber); }
+
+  .tip-card {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 18px 22px; margin-top: 14px;
+  }
+  .tip-card .tip-title { font-size: 14px; font-weight: 700; color: var(--amber); margin-bottom: 10px; font-family: var(--font-mono); letter-spacing: .05em; }
+  .tip-card ul { list-style: none; }
+  .tip-card li { font-size: 13px; color: var(--text-secondary); padding: 6px 0 6px 18px; position: relative; line-height: 1.7; }
+  .tip-card li::before { content: '▸'; position: absolute; left: 0; color: var(--amber); }
+  .tip-card li b { color: var(--text-primary); }
+
+  .footer { text-align: center; padding: 24px; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+
+  @media (max-width: 640px) {
+    .header-title { font-size: 20px; }
+    .page-header { padding: 24px 20px; }
+    .rule-grid { grid-template-columns: repeat(2, 1fr); }
+    .step-time { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back-link" href="index.html">&#8592; 返回题库</a>
+
+  <div class="page-header">
+    <div class="header-kicker">案例分析 · 复习导航</div>
+    <div class="header-title">案例题复习步骤 + 题库索引</div>
+    <div class="header-sub">传统架构 5 道真题 + 八大架构 4 道案例实战 · 附 4 步复习法与答题策略</div>
+    <div class="stats-row">
+      <span class="stat-pill">案例题 9 道</span>
+      <span class="stat-pill">对应题库 9 组</span>
+      <span class="stat-pill ok">及格线 45 / 满分 75</span>
+      <span class="stat-pill mid">选 3 题作答</span>
+    </div>
+  </div>
+
+  <!-- ═══ 考试规则 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 案例题考试规则速览</div>
+    <div class="rule-grid">
+      <div class="rule-cell"><div class="rc-k">形式</div><div class="rc-v">4 选 3</div><div class="rc-s">4 道大题选 3 道，每题 25 分</div></div>
+      <div class="rule-cell"><div class="rc-k">及格线</div><div class="rc-v">45 / 75</div><div class="rc-s">每科独立及格，一科不过全部重考</div></div>
+      <div class="rule-cell"><div class="rc-k">时长</div><div class="rc-v">上午段</div><div class="rc-s">与综合知识同场，共 240 分钟</div></div>
+      <div class="rule-cell"><div class="rc-k">题型</div><div class="rc-v">说明 + 小问</div><div class="rc-s">2-3 个小问，含填空/简答/计算</div></div>
+    </div>
+  </div>
+
+  <!-- ═══ 复习步骤 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 案例题复习步骤 <span class="sec-tag">从知识点 → 真题实战 → 答题策略</span></div>
+
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-num">1</div>
+        <div class="step-title">按板块过一遍知识点笔记</div>
+        <span class="step-time">STEP 01 · 打基础</span>
+      </div>
+      <div class="step-body">
+        案例题考的是<b>特定板块的知识点 + 应用</b>，先快速过笔记建立框架。<b>优先级</b>：架构风格 → 质量属性/评估 → 数据库 → 软件工程/结构化 → 嵌入式（传统板块），再补层次/云原生/SOA/安全（八大架构板块）。
+      </div>
+      <div class="step-links">
+        <a class="sl note" href="../traditional-case-notes/index.html">传统架构笔记库</a>
+        <a class="sl note" href="../architecture-case-notes/index.html">八大架构笔记库</a>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-num">2</div>
+        <div class="step-title">先刷对应板块选择题题库（夯实概念）</div>
+        <span class="step-time">STEP 02 · 概念</span>
+      </div>
+      <div class="step-body">
+        每个板块配了 <b>10-12 题</b>的交互题库，先做选择题把概念判断能力提上来。案例题的小问（如效用树填空、架构风格选择）本质上就是<b>选择题的进阶版</b>——概念不清，大题必丢分。
+      </div>
+      <div class="step-links">
+        <a class="sl quiz" href="../traditional-case-notes/quiz-arch-style.html">架构风格题库</a>
+        <a class="sl quiz" href="../traditional-case-notes/quiz-quality.html">质量属性题库</a>
+        <a class="sl quiz" href="../architecture-case-notes/quiz-layered.html">层次架构题库</a>
+        <a class="sl quiz" href="../architecture-case-notes/quiz-cloud-native.html">云原生题库</a>
+        <a class="sl quiz" href="../architecture-case-notes/quiz-soa.html">SOA 题库</a>
+        <a class="sl quiz" href="../architecture-case-notes/quiz-security.html">安全题库</a>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-num">3</div>
+        <div class="step-title">逐道做真题案例，先写再看参考答案</div>
+        <span class="step-time">STEP 03 · 实战</span>
+      </div>
+      <div class="step-body">
+        这是<b>最核心的一步</b>。每道案例题先自己读说明、抓题干关键词、写出答题要点，<b>再展开参考答案对照</b>。重点练三件事：<b>① 读题干找得分点</b>（如"灵活组合、配置与替换"→扩展性）② <b>用术语作答</b>（不是大白话）③ <b>按小问分数分配篇幅</b>（12 分题至少写 4-5 条）。
+      </div>
+      <div class="step-links">
+        <a class="sl case" href="../traditional-case-notes/case-arch-style.html">架构风格真题</a>
+        <a class="sl case" href="../traditional-case-notes/case-quality.html">质量属性真题</a>
+        <a class="sl case" href="../traditional-case-notes/case-se.html">软件工程真题</a>
+        <a class="sl case" href="../traditional-case-notes/case-db.html">数据库真题</a>
+        <a class="sl case" href="../traditional-case-notes/case-embedded.html">嵌入式真题</a>
+        <a class="sl case" href="../architecture-case-notes/case-layered.html">层次实战</a>
+        <a class="sl case" href="../architecture-case-notes/case-cloud-native.html">云原实战</a>
+        <a class="sl case" href="../architecture-case-notes/case-soa.html">SOA 实战</a>
+        <a class="sl case" href="../architecture-case-notes/case-security.html">安全实战</a>
+      </div>
+    </div>
+
+    <div class="step-card">
+      <div class="step-head">
+        <div class="step-num">4</div>
+        <div class="step-title">限时模拟 + 错题复盘</div>
+        <span class="step-time">STEP 04 · 冲刺</span>
+      </div>
+      <div class="step-body">
+        考前限时做 <b>3 题（75 分钟）</b>，模拟真实节奏。<b>答题顺序策略</b>：先扫 4 题说明，挑<b>最有把握的 3 题</b>（不建议碰 AI/超纲题），先答简答/填空类，计算题（可靠度、关键路径）放最后。错题回到对应笔记补，直到能<b>不看参考答案独立写出满分要点</b>。
+      </div>
+      <div class="step-links">
+        <a class="sl note" href="../architecture-notes/arch-styles.html">架构风格笔记</a>
+        <a class="sl note" href="../quality-notes/arch-evaluation.html">架构评估笔记</a>
+        <a class="sl note" href="../traditional-case-notes/db-case.html">数据库笔记</a>
+        <a class="sl note" href="../traditional-case-notes/embedded-case.html">嵌入式笔记</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ 案例题库总索引 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 案例题全量索引 <span class="sec-tag">9 道案例题 + 对应题库</span></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:22%;">板块</th>
+          <th style="width:34%;">案例题</th>
+          <th style="width:20%;">考点</th>
+          <th style="width:10%;">分值</th>
+          <th>入口</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">架构风格</td><td style="color:var(--text-secondary);">字处理软件集成开发环境</td><td style="color:var(--text-secondary);">管道-过滤器 vs 数据存储中心 · 解释器 · 隐式调用</td><td><span class="tag hot">25</span></td><td><span class="tag link"><a href="../traditional-case-notes/case-arch-style.html">案例</a></span> <span class="tag link"><a href="../traditional-case-notes/quiz-arch-style.html">题库</a></span></td></tr>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">质量属性</td><td style="color:var(--text-secondary);">在线交易系统架构评估</td><td style="color:var(--text-secondary);">效用树 · 敏感点/权衡点 · 架构风险</td><td><span class="tag hot">25</span></td><td><span class="tag link"><a href="../traditional-case-notes/case-quality.html">案例</a></span> <span class="tag link"><a href="../traditional-case-notes/quiz-quality.html">题库</a></span></td></tr>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">软件工程</td><td style="color:var(--text-secondary);">房屋租赁服务系统</td><td style="color:var(--text-secondary);">DFD · ERD · 实体 vs 类 · 用例</td><td><span class="tag hot">25</span></td><td><span class="tag link"><a href="../traditional-case-notes/case-se.html">案例</a></span> <span class="tag link"><a href="../traditional-case-notes/quiz-se.html">题库</a></span></td></tr>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">数据库</td><td style="color:var(--text-secondary);">药品销售系统</td><td style="color:var(--text-secondary);">反规范化 · 数据一致性 · Redis 排名</td><td><span class="tag hot">25</span></td><td><span class="tag link"><a href="../traditional-case-notes/case-db.html">案例</a></span> <span class="tag link"><a href="../traditional-case-notes/quiz-db.html">题库</a></span></td></tr>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">嵌入式</td><td style="color:var(--text-secondary);">软件可靠性设计</td><td style="color:var(--text-secondary);">可靠度计算 · 动态冗余 · N 版本 · 检错</td><td><span class="tag hot">25</span></td><td><span class="tag link"><a href="../traditional-case-notes/case-embedded.html">案例</a></span> <span class="tag link"><a href="../traditional-case-notes/quiz-embedded.html">题库</a></span></td></tr>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">层次架构</td><td style="color:var(--text-secondary);">电子小票服务系统</td><td style="color:var(--text-secondary);">物联网三层 · N 层分层 · 业务容器</td><td><span class="tag mid">25</span></td><td><span class="tag link"><a href="../architecture-case-notes/case-layered.html">案例</a></span> <span class="tag link"><a href="../architecture-case-notes/quiz-layered.html">题库</a></span></td></tr>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">云原生</td><td style="color:var(--text-secondary);">旅行公司云原生改造</td><td style="color:var(--text-secondary);">三阶段改造 · 8 层架构</td><td><span class="tag mid">25</span></td><td><span class="tag link"><a href="../architecture-case-notes/case-cloud-native.html">案例</a></span> <span class="tag link"><a href="../architecture-case-notes/quiz-cloud-native.html">题库</a></span></td></tr>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">SOA</td><td style="color:var(--text-secondary);">企业异构系统 SOA 整合</td><td style="color:var(--text-secondary);">ESB · 服务注册表 · SOA vs 微服务</td><td><span class="tag mid">25</span></td><td><span class="tag link"><a href="../architecture-case-notes/case-soa.html">案例</a></span> <span class="tag link"><a href="../architecture-case-notes/quiz-soa.html">题库</a></span></td></tr>
+        <tr><td class="kpi" style="color:var(--text-primary);font-weight:600;">安全</td><td style="color:var(--text-secondary);">混合云安全生产管理系统</td><td style="color:var(--text-secondary);">混合云 · 4 层架构 · 安全体系</td><td><span class="tag mid">25</span></td><td><span class="tag link"><a href="../architecture-case-notes/case-security.html">案例</a></span> <span class="tag link"><a href="../architecture-case-notes/quiz-security.html">题库</a></span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ 答题策略 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 考场答题策略</div>
+    <div class="tip-card">
+      <div class="tip-title">CASE STRATEGY</div>
+      <ul>
+        <li><b>先扫后选</b>：快速浏览 4 道题的说明，选最熟的 3 题；<b>不熟悉的 AI/新技术题果断放弃</b>，不要赌。</li>
+        <li><b>按分分配篇幅</b>：12 分小问写 4-5 条、13 分写 5 条左右；<b>多写术语、少写废话</b>，宁可点多。</li>
+        <li><b>题干关键词 = 得分点</b>：出现"灵活/替换"→扩展性，"故障/继续运行"→容错可用性，"传感器/条件触发"→规则系统。</li>
+        <li><b>计算题（可靠度/关键路径/流水线）</b>：步骤写全，带公式，结果错了也能拿过程分。</li>
+        <li><b>时间分配</b>：3 题 × 25 分钟 = 75 分钟；答完先检查填空/术语是否规范，再做回顾。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">系统架构设计师 · 案例分析复习导航 · 2026</div>
+</div>
+</body>
+</html>

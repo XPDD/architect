@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>综合知识 · 真题考点频次统计</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-elevated: #1a2030;
+    --border-default: rgba(255,255,255,.06); --border-subtle: rgba(255,255,255,.04);
+    --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --blue: #4d7cff; --purple: #a78bfa; --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(167,139,250,.03) 0%, transparent 50%);
+    line-height: 1.6; min-height: 100vh; padding: 36px 0;
+  }
+  .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+  .back-link { display: inline-block; margin-bottom: 20px; color: var(--cyan); text-decoration: none; font-family: var(--font-mono); font-size: 12px; }
+
+  .page-header {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 30px 36px; margin-bottom: 28px;
+    box-shadow: 0 0 0 1px rgba(0,212,255,.04), 0 4px 32px rgba(0,0,0,.3);
+    position: relative; overflow: hidden;
+  }
+  .page-header::after {
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--cyan), var(--purple), transparent);
+  }
+  .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 6px; }
+  .header-title { font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; }
+  .header-sub { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+  .stats-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+  .stat-pill {
+    font-family: var(--font-mono); font-size: 11px; padding: 5px 14px; border-radius: 3px;
+    background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-weight: 600;
+  }
+  .stat-pill.hot { background: rgba(248,113,113,.08); border-color: rgba(248,113,113,.2); color: var(--rose); }
+  .stat-pill.mid { background: rgba(251,191,36,.08); border-color: rgba(251,191,36,.2); color: var(--amber); }
+
+  .section { margin-bottom: 30px; }
+  .section-title {
+    font-family: var(--font-mono); font-size: 13px; font-weight: 700; color: var(--cyan); letter-spacing: .1em;
+    margin-bottom: 14px; padding: 10px 16px;
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius);
+    border-left: 3px solid var(--cyan);
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  }
+  .section-title .sec-tag { font-size: 10px; color: var(--text-muted); font-weight: 400; letter-spacing: 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius); overflow: hidden; }
+  thead th {
+    text-align: left; padding: 10px 12px; color: var(--cyan); font-size: 10px;
+    font-family: var(--font-mono); letter-spacing: .06em; font-weight: 600;
+    border-bottom: 1px solid rgba(0,212,255,.12); background: rgba(0,212,255,.03);
+  }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.03); vertical-align: top; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover td { background: rgba(0,212,255,.02); }
+  .kpi { font-weight: 700; }
+  .kpi-high { color: var(--rose); }
+  .kpi-mid { color: var(--amber); }
+  .kpi-low { color: var(--text-muted); }
+  .bar-wrap { min-width: 120px; }
+  .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.06); overflow: hidden; margin-top: 5px; }
+  .bar > i { display: block; height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--cyan), var(--blue)); }
+  .bar > i.hot { background: linear-gradient(90deg, var(--rose), var(--amber)); }
+  .bar > i.mid { background: linear-gradient(90deg, var(--amber), var(--cyan)); }
+  .bar > i.low { background: linear-gradient(90deg, rgba(255,255,255,.25), rgba(255,255,255,.1)); }
+  .tag { font-family: var(--font-mono); font-size: 10px; padding: 2px 8px; border-radius: 3px; white-space: nowrap; }
+  .tag.hot { background: rgba(248,113,113,.1); border: 1px solid rgba(248,113,113,.25); color: var(--rose); }
+  .tag.mid { background: rgba(251,191,36,.1); border: 1px solid rgba(251,191,36,.25); color: var(--amber); }
+  .tag.low { background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1); color: var(--text-muted); }
+  .tag.link { background: rgba(77,124,255,.1); border: 1px solid rgba(77,124,255,.25); color: var(--blue); }
+  .tag.link a { color: inherit; text-decoration: none; }
+  .tag.link a:hover { text-decoration: underline; }
+
+  .tip-card {
+    background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg);
+    padding: 18px 22px; margin-top: 14px;
+  }
+  .tip-card .tip-title { font-size: 14px; font-weight: 700; color: var(--amber); margin-bottom: 10px; font-family: var(--font-mono); letter-spacing: .05em; }
+  .tip-card ul { list-style: none; }
+  .tip-card li { font-size: 13px; color: var(--text-secondary); padding: 6px 0 6px 18px; position: relative; line-height: 1.7; }
+  .tip-card li::before { content: '▸'; position: absolute; left: 0; color: var(--amber); }
+  .tip-card li b { color: var(--text-primary); }
+  .tip-card a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(0,212,255,.3); }
+  .tip-card a:hover { border-bottom-color: var(--cyan); }
+
+  .footer { text-align: center; padding: 24px; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); }
+
+  @media (max-width: 640px) {
+    .header-title { font-size: 20px; }
+    .page-header { padding: 24px 20px; }
+    .bar-wrap { min-width: 70px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <a class="back-link" href="index.html">&#8592; 返回题库</a>
+
+  <div class="page-header">
+    <div class="header-kicker">综合知识 · 历年真题考频</div>
+    <div class="header-title">真题考点频次统计表</div>
+    <div class="header-sub">基于现有题库真题样本（架构风格 29 题 + 软件工程 40 题 + 数据库 12 题）统计 · 复习优先级一目了然</div>
+    <div class="stats-row">
+      <span class="stat-pill">真题样本 81 题</span>
+      <span class="stat-pill">覆盖场次 2025上/2025下/2026上</span>
+      <span class="stat-pill hot">高频考点 3 组</span>
+      <span class="stat-pill mid">中频考点 4 组</span>
+    </div>
+  </div>
+
+  <!-- ═══ 复习优先级总表 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 复习优先级总表 <span class="sec-tag">先抓高频，再补中频</span></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:22%;">知识板块</th>
+          <th style="width:14%;">题量</th>
+          <th style="width:20%;">考频</th>
+          <th style="width:12%;">优先级</th>
+          <th>复习入口</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="kpi">软件架构设计（风格/评估/质量属性）</td>
+          <td class="kpi kpi-high">29</td>
+          <td class="bar-wrap"><div class="bar"><i class="hot" style="width:100%"></i></div></td>
+          <td><span class="tag hot">高</span></td>
+          <td><span class="tag link"><a href="exam-arch-styles.html">真题·架构风格</a></span> <span class="tag link"><a href="../architecture-notes/arch-styles.html">笔记</a></span></td>
+        </tr>
+        <tr>
+          <td class="kpi">软件工程（测试/模型/UML/设计模式）</td>
+          <td class="kpi kpi-high">40</td>
+          <td class="bar-wrap"><div class="bar"><i class="hot" style="width:100%"></i></div></td>
+          <td><span class="tag hot">高</span></td>
+          <td><span class="tag link"><a href="exam-software-engineering.html">真题·软工</a></span> <span class="tag link"><a href="../software-engineering-notes/index.html">笔记</a></span></td>
+        </tr>
+        <tr>
+          <td class="kpi">数据库设计（关系代数/范式/并发）</td>
+          <td class="kpi kpi-mid">12</td>
+          <td class="bar-wrap"><div class="bar"><i class="mid" style="width:42%"></i></div></td>
+          <td><span class="tag mid">中</span></td>
+          <td><span class="tag link"><a href="exam-database.html">真题·数据库</a></span> <span class="tag link"><a href="../database-design-notes/index.html">笔记</a></span></td>
+        </tr>
+        <tr>
+          <td class="kpi">操作系统 / 网络（PV·死锁·IP·子网）</td>
+          <td class="kpi kpi-mid">—</td>
+          <td class="bar-wrap"><div class="bar"><i class="mid" style="width:36%"></i></div></td>
+          <td><span class="tag mid">中</span></td>
+          <td><span class="tag link"><a href="../os-notes/os-quiz.html">OS 题库</a></span> <span class="tag link"><a href="../network-notes/net-quiz.html">网络题库</a></span></td>
+        </tr>
+        <tr>
+          <td class="kpi">信息安全（加密/攻击/评估）</td>
+          <td class="kpi kpi-mid">—</td>
+          <td class="bar-wrap"><div class="bar"><i class="mid" style="width:32%"></i></div></td>
+          <td><span class="tag mid">中</span></td>
+          <td><span class="tag link"><a href="../security-notes/security-quiz.html">安全题库</a></span></td>
+        </tr>
+        <tr>
+          <td class="kpi">新技术（云原生/微服务/AI/大数据）</td>
+          <td class="kpi kpi-low">2</td>
+          <td class="bar-wrap"><div class="bar"><i class="low" style="width:18%"></i></div></td>
+          <td><span class="tag low">中·趋势</span></td>
+          <td><span class="tag link"><a href="../architecture-case-notes/cloud-native.html">云原生</a></span> <span class="tag link"><a href="../architecture-case-notes/soa.html">SOA</a></span></td>
+        </tr>
+        <tr>
+          <td class="kpi">计算机基础（组成/Cache/可靠性）</td>
+          <td class="kpi kpi-low">—</td>
+          <td class="bar-wrap"><div class="bar"><i class="low" style="width:15%"></i></div></td>
+          <td><span class="tag low">低</span></td>
+          <td><span class="tag link"><a href="../computer-system-notes/computer-system-quiz.html">计组题库</a></span></td>
+        </tr>
+        <tr>
+          <td class="kpi">数学经济 / 知识产权 / 标准化</td>
+          <td class="kpi kpi-low">—</td>
+          <td class="bar-wrap"><div class="bar"><i class="low" style="width:12%"></i></div></td>
+          <td><span class="tag low">低·记忆</span></td>
+          <td><span class="tag low">教材速刷</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ 架构风格 真题考频明细 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 架构风格 + 评估 · 真题考频明细 <span class="sec-tag">2025下 + 2026上 综合知识 · 29 题</span></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:26%;">考点</th>
+          <th style="width:10%;">题数</th>
+          <th style="width:18%;">真题位置</th>
+          <th style="width:12%;">考频</th>
+          <th>核心要点</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="kpi">架构风格识别（层次/数据流/黑板/独立构件）</td><td class="kpi kpi-high">9</td><td style="color:var(--text-muted);">25下 33/48/58 · 26上 10/17/43/51/55/61</td><td><span class="tag hot">高</span></td><td style="color:var(--text-secondary);">C/S=层次、管道过滤器=数据流、黑板=知识源、规则系统=智能家居、事件驱动=松耦合</td></tr>
+        <tr><td class="kpi">质量属性（运行期/开发期 + 具体辨析）</td><td class="kpi kpi-high">7</td><td style="color:var(--text-muted);">25下 59 · 26上 2/58/68/69/70 + Q61</td><td><span class="tag hot">高</span></td><td style="color:var(--text-secondary);">运行期：性能/安全/可用/易用/可靠；开发期：可修改/可测试/可维护/可扩展/可移植</td></tr>
+        <tr><td class="kpi">架构评估（SAAM/ATAM/CBAM/效用树）</td><td class="kpi kpi-high">6</td><td style="color:var(--text-muted);">25下 50/62 · 26上 41/58/68 + 25下 Q47</td><td><span class="tag hot">高</span></td><td style="color:var(--text-secondary);">SAAM 最早；CBAM=ROI；效用树=重要性×难度；最终用户必须参与</td></tr>
+        <tr><td class="kpi">DSSA 领域工程</td><td class="kpi kpi-mid">3</td><td style="color:var(--text-muted);">25下 47/49 · 26上 18</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">领域分析→领域模型/字典；过程特征=并发+递归+反复（喷泉）</td></tr>
+        <tr><td class="kpi">ABSD 架构驱动</td><td class="kpi kpi-mid">2</td><td style="color:var(--text-muted);">25下 28 · 26上 13</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">三核心=功能分解+风格驱动+软件模板；递归细化产物=构件和类</td></tr>
+        <tr><td class="kpi">微服务 / 架构风格扩展</td><td class="kpi kpi-mid">2</td><td style="color:var(--text-muted);">25下 65 · 26上 64</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">微服务独立部署；超时/熔断/限流/降级场景区分</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ 软件工程 真题考频明细 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 软件工程 · 真题考频明细 <span class="sec-tag">2025上 / 2025下 / 2026上 · 40 题</span></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:26%;">考点</th>
+          <th style="width:10%;">题数</th>
+          <th style="width:12%;">考频</th>
+          <th>核心要点</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="kpi">软件测试（覆盖/方法/流程）</td><td class="kpi kpi-high">16</td><td><span class="tag hot">高</span></td><td style="color:var(--text-secondary);">黑盒 vs 白盒、覆盖关系、测试左移、冒烟/回归/压力、基准测试</td></tr>
+        <tr><td class="kpi">开发模型（敏捷/螺旋/V）</td><td class="kpi kpi-mid">4</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">Scrum 三角色+站会；螺旋=风险驱动；V 模型=开发测试对应</td></tr>
+        <tr><td class="kpi">结构化分析（DFD/行为模型）</td><td class="kpi kpi-mid">4</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">面向数据流；DFD 四要素；状态转换图=行为模型</td></tr>
+        <tr><td class="kpi">UML 建模（用例/部署/活动图）</td><td class="kpi kpi-mid">4</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">用例三种关系；部署图=物理结构；Fork/Decision 区别</td></tr>
+        <tr><td class="kpi">设计模式（创建型/结构型）</td><td class="kpi kpi-mid">3</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">创建型5种；装饰器基于抽象构件；单例=创建型</td></tr>
+        <tr><td class="kpi">4+1 视图 &amp; RUP</td><td class="kpi kpi-mid">3</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">物理=映射、进程=运行状态；RUP 细化阶段定架构</td></tr>
+        <tr><td class="kpi">需求管理 / 内聚耦合 / 逆向复用</td><td class="kpi kpi-mid">6</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">CCB 管基线变更；内聚高→低排序；系统复用=有计划</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ 数据库 真题考频明细 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 数据库 · 真题考频明细 <span class="sec-tag">2025上 / 2025下 / 2026上 · 12 题</span></div>
+    <table>
+      <thead>
+        <tr>
+          <th style="width:26%;">考点</th>
+          <th style="width:10%;">题数</th>
+          <th style="width:12%;">考频</th>
+          <th>核心要点</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="kpi">关系代数 / 集合运算</td><td class="kpi kpi-mid">7</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">基本运算5+派生；R−(R−S)=R∩S；自然连接基数范围</td></tr>
+        <tr><td class="kpi">模式分解 / 候选码 / 规范化</td><td class="kpi kpi-mid">4</td><td><span class="tag mid">中</span></td><td style="color:var(--text-secondary);">闭包求候选码；无损连接判定（公共属性超键）；保持函数依赖</td></tr>
+        <tr><td class="kpi">并发控制（锁）</td><td class="kpi kpi-low">1</td><td><span class="tag low">低</span></td><td style="color:var(--text-secondary);">S 锁可读不可写；相容矩阵 S-S 相容、S-X 冲突</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══ 复习建议 ═══ -->
+  <div class="section">
+    <div class="section-title">&#x25B6; 选择题复习建议（按考频排序）</div>
+    <div class="tip-card">
+      <div class="tip-title">REVIEW PLAN</div>
+      <ul>
+        <li><b>第一梯队（拿分主力）</b>：架构风格识别 + 质量属性辨析 + 架构评估方法。三块合计 <b>22 题 / 29 题</b>，先刷 <a href="exam-arch-styles.html">架构风格真题</a>，错题回 <a href="../architecture-notes/arch-styles.html">架构风格笔记</a>。</li>
+        <li><b>第二梯队（题量最大）</b>：软件工程测试部分占 16/40 题，重点刷 <a href="exam-software-engineering.html">软工真题</a>，配合 <a href="../software-engineering-notes/se-testing.html">测试笔记</a>。</li>
+        <li><b>第三梯队（稳拿中频）</b>：数据库关系代数 + 候选码求法、OS 的 PV/死锁、网络子网计算，各配一套题库快速过。</li>
+        <li><b>性价比之王</b>：新技术（云原生/微服务）近年逐年加码，看 <a href="../architecture-case-notes/cloud-native.html">云原生</a> 与 <a href="../architecture-case-notes/soa.html">SOA</a> 两页即可覆盖。</li>
+        <li><b>最后冲刺</b>：数学经济管理、知识产权、标准化属纯记忆，考前 1-2 天集中刷即可，不必过早投入。</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer">系统架构设计师 · 综合知识真题考频 · 2026</div>
+</div>
+</body>
+</html>
