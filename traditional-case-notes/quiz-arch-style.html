@@ -94,6 +94,18 @@ const QUESTIONS = [
    options:["实现视图（View）和模型（Model）的双向绑定","完全去除视图层","必须使用原生 HTML 表单","不支持组件化开发"],
    answer:0, explain:"<b>MVVM</b> 主要目的是分离 View 和 Model，实现<b>双向绑定</b>，优点：低耦合、可重用、独立开发、可测试。"},
 
+  {topic:"MVC家族", q:"下列属于引入 MVP 以替代 MVC 的主要原因的是（　）。",
+   options:["MVC 中 View 与 Model 可直接联系导致耦合、View 依赖 UI 难以单元测试","MVP 可以完全去除 View 层","MVP 不再需要 Model 层","MVP 用 Controller 取代 Presenter"],
+   answer:0, explain:"MVC 痛点：<b>View 可直接读 Model 造成耦合</b>，且 View 依赖具体 UI 环境<b>难以单元测试</b>。MVP 用 Presenter 切断 View 与 Model，View 变薄、逻辑集中到 Presenter，配合 View 接口可用 Mock 单测。"},
+
+  {topic:"MVC家族", q:"关于主流框架所属的架构模式，下列说法正确的是（　）。",
+   options:["Vue 属于 MVP 模式，需手写 Presenter","React 是纯 View 层 + 单向数据流（Flux 系），既非 MVP 也非 MVVM","Angular 属于 MVP 模式","Android 原生只能使用 MVC"],
+   answer:1, explain:"Vue 是 <b>MVVM</b>（v-model 双向绑定）；<b>React 是纯 View 层 + 单向数据流</b>（Flux/Redux 系），既非 MVP 也非 MVVM；Angular 属 MVVM 倾向；Android 常用 MVP/MVVM。"},
+
+  {topic:"MVC家族", q:"Android 开发中，MVP 相比 MVC 最大的可测试性优势在于（　）。",
+   options:["Presenter 通过 View 接口与 View 交互，可 Mock 掉 View 做纯 JVM 单元测试","Model 层被完全删除","View 包含全部业务逻辑","测试必须启动模拟器运行界面"],
+   answer:0, explain:"MVP 中 <b>Presenter 只依赖 View 接口</b>，测试时用 Mock 实现该接口即可在 JVM 上单测，无需模拟器；这正是它比 MVC 可测性更好的核心。"},
+
   {topic:"非功能需求", q:"决定系统架构设计的非功能性需求主要有四类，其中「带有文化背景因素的系统需求」是（　）。",
    options:["操作性需求","性能需求","安全性需求","文化需求"],
    answer:3, explain:"四类：<b>操作性需求</b>（与用户操作相关）、<b>性能需求</b>（响应时间/吞吐量等）、<b>安全性需求</b>（阻止非授权）、<b>文化需求</b>（文化背景因素，如多语言）。"},
