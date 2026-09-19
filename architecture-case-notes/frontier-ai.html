@@ -102,6 +102,7 @@
       <div class="cue-item"><span class="q-mark">?</span>基础架构图 5 层是什么？</div>
       <div class="cue-item"><span class="q-mark">?</span>完整架构图的 6 层是什么？</div>
       <div class="cue-item"><span class="q-mark">?</span>RAG 原理与工作流程？</div>
+      <div class="cue-item"><span class="q-mark">?</span>知识图谱中本体 Ontology 的作用？</div>
     </div>
     <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
 
@@ -193,12 +194,24 @@
       </div>
       <div class="note-section"><p>检索模块：用<strong>预训练双塔模型（dual-encoder）</strong>高效向量化检索。生成模块：用<strong>T5 或 BART</strong>等强生成模型处理输入，输出连贯准确的信息。</p></div>
 
-      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>前沿技术说人话：</strong><b>大模型</b>就是「参数巨大的深度学习模型」，按输入分<b>语言（NLP）、视觉（CV）、多模态</b>三大类；麻烦的是<b>数据安全、成本贵、会编造内容、成本难控</b>。架构图记得两版：<b>基础版 5 层</b>（基础→数据→模型→平台→表现），<b>完整版 6 层</b>（基础设施→云原生→框架→模型→能力→模型服务）。<b>RAG</b> 就是「<b>先检索再生成</b>」——拿用户问题先去知识库搜相关文档，拼成增强上下文喂给 LLM，这样回答更准、不会瞎编。</p></div>
+      <div class="numbered-header"><span class="num">7</span>知识图谱与本体 Ontology</div>
+      <div class="note-section">
+        <p><span class="note-highlight">知识图谱</span>：以<strong>图结构</strong>表示实体及其关系的知识库，基本单位是<span class="hl-purple">三元组（头实体 — 关系 — 尾实体）</span>，如「北京 — 是首都 — 中国」。</p>
+        <p><span class="note-highlight">本体（Ontology）</span>：知识图谱的<strong>模式层（Schema）</strong>，形式化地<strong>定义领域内的概念、属性、关系与约束</strong>，为上层实例数据提供统一的语义规范。</p>
+        <ul>
+          <li><span class="hl-green">本体 = 模式层</span>：规定"有哪些概念、概念间关系、约束规则"（类似数据库的<strong>表结构/模式</strong>）。</li>
+          <li><span class="hl-orange">实例数据 = 数据层</span>：具体的三元组事实，存放在知识库中（类似表里的<strong>一行行记录</strong>）。</li>
+          <li>易错排除：本体<strong>不负责</strong>存储全部实例数据、不是数据库备份、也不能自动生成查询结果。</li>
+        </ul>
+        <div class="tip" style="font-size:12px;color:rgba(255,255,255,.6);">&#x26A0; 一句话：<strong>本体是"规则/骨架"，实例是"数据/血肉"</strong>——本体给出语义框架，实例按框架填充。</div>
+      </div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>前沿技术说人话：</strong><b>大模型</b>就是「参数巨大的深度学习模型」，按输入分<b>语言（NLP）、视觉（CV）、多模态</b>三大类；麻烦的是<b>数据安全、成本贵、会编造内容、成本难控</b>。架构图记得两版：<b>基础版 5 层</b>（基础→数据→模型→平台→表现），<b>完整版 6 层</b>（基础设施→云原生→框架→模型→能力→模型服务）。<b>RAG</b> 就是「<b>先检索再生成</b>」——拿用户问题先去知识库搜相关文档，拼成增强上下文喂给 LLM，这样回答更准、不会瞎编。<b>本体</b>则像知识图谱的"<b>schema/字典</b>"：先规定好有哪些概念、关系和规则（骨架），实例数据再按这个骨架往里填。</p></div>
     </div>
     <div class="cornell-summary">
       <h3>&#x25B8; 总结</h3>
-      <div class="summary-text">前沿技术是<strong>命题大势</strong>：大模型定义（大规模参数/深度网络/强泛化）、特点（规模大/大数据/强算力/预训练迁移/自监督/多域融合/自动化）、分类（<strong>语言/视觉/多模态</strong>）、四大挑战（数据安全/成本高/内容不可信/成本难控）；架构图记 <strong>基础 5 层</strong>与<strong>完整 6 层</strong>；<strong>RAG</strong>＝检索（双塔向量化）＋生成（T5/BART），流程「query→检索→增强上下文→Prompt→LLM→回答」，能提升知识密集任务的回答准确性。</div>
-      <div class="summary-tags"><span class="tag primary">前沿技术</span><span class="tag">AI大模型</span><span class="tag">语言/视觉/多模态</span><span class="tag">架构图</span><span class="tag">RAG</span><span class="tag">检索增强</span><span class="tag">命题大势</span></div>
+      <div class="summary-text">前沿技术是<strong>命题大势</strong>：大模型定义（大规模参数/深度网络/强泛化）、特点（规模大/大数据/强算力/预训练迁移/自监督/多域融合/自动化）、分类（<strong>语言/视觉/多模态</strong>）、四大挑战（数据安全/成本高/内容不可信/成本难控）；架构图记 <strong>基础 5 层</strong>与<strong>完整 6 层</strong>；<strong>RAG</strong>＝检索（双塔向量化）＋生成（T5/BART），流程「query→检索→增强上下文→Prompt→LLM→回答」，能提升知识密集任务的回答准确性；<strong>知识图谱</strong>用三元组表示知识，<strong>本体 Ontology＝模式层</strong>，定义概念/属性/关系/约束。</div>
+      <div class="summary-tags"><span class="tag primary">前沿技术</span><span class="tag">AI大模型</span><span class="tag">语言/视觉/多模态</span><span class="tag">架构图</span><span class="tag">RAG</span><span class="tag">知识图谱</span><span class="tag">本体Ontology</span><span class="tag">命题大势</span></div>
     </div>
   </div>
 </div>
