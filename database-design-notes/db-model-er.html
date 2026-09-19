@@ -81,6 +81,7 @@
       <div class="cue-item"><span class="q-mark">?</span>E-R 图中椭圆/长方形/菱形各表示什么？</div>
       <div class="cue-item"><span class="q-mark">?</span>弱实体 vs 强实体的区别？</div>
       <div class="cue-item"><span class="q-mark">?</span>1:1、1:N、M:N 联系如何转关系模式？</div>
+      <div class="cue-item"><span class="q-mark">?</span>自反（递归/一元）联系指什么？多元联系呢？</div>
     </div>
     <div class="cornell-notes">
       <div class="notes-header">&#x25B8; 核心要点</div>
@@ -108,6 +109,25 @@
         </ul>
       </div>
 
+      <div class="numbered-header"><span class="num">2.1</span>联系的分类（易漏考点）</div>
+      <div class="note-section">
+        <p>联系可按<strong>参与实体集的个数</strong>和<strong>基数</strong>两个维度分类。</p>
+        <ul>
+          <li><span class="note-highlight">一元联系（自反联系 / 递归联系）</span>：<b>同一实体集内部的实例之间</b>发生联系。例："员工"管理"员工"、"零件"由"零件"组装而成。<span class="hl-orange">这就是常考的"同一实体集的一个实例与该实体集的多个实例发生联系"。</span></li>
+          <li><span class="hl-purple">二元联系</span>：两个实体集之间的联系，最常见（学生—课程 选修）。</li>
+          <li><span class="hl-green">三元 / 多元联系</span>：三个及以上实体集同时参与的联系（供应商—零件—项目 供应）。</li>
+        </ul>
+        <table class="compare-table">
+          <thead><tr><th>按个数分</th><th>含义</th><th>例子</th></tr></thead>
+          <tbody>
+            <tr><td><span class="note-highlight">一元（自反/递归）</span></td><td>同一实体集内部实例之间的联系</td><td>员工管理员工、零件组装零件</td></tr>
+            <tr><td>二元</td><td>两个实体集之间（最常见）</td><td>学生—课程</td></tr>
+            <tr><td>多元（三元及以上）</td><td>多个实体集同时参与</td><td>供应商—零件—项目</td></tr>
+          </tbody>
+        </table>
+        <div class="tip">&#x26A0; 别混淆：<b>"一元/二元/多元"看参与的是几个实体集</b>；<b>"1:1 / 1:N / M:N"看实例对应的数量关系（基数）</b>。二者相互独立——一元联系同样可以是 1:1、1:N 或 M:N（如"员工管理员工"是 1:N 自反，"零件组装零件"是 M:N 自反）。</div>
+      </div>
+
       <div class="numbered-header"><span class="num">3</span>E-R 转关系模型（高频考点）</div>
       <div class="note-section">
         <table class="compare-table">
@@ -132,8 +152,8 @@
     </div>
     <div class="cornell-summary">
       <h3>&#x25B8; 总结</h3>
-      <div class="summary-text">数据模型三要素=数据结构+数据操作+约束条件。E-R 图：<strong>椭圆属性、长方形实体、菱形联系</strong>。E-R 转关系模型：<strong>1:1 放任一端、1:N 放 N 端、M:N 必须单独成表且主键为双方联合主键</strong>。</div>
-      <div class="summary-tags"><span class="tag primary">E-R 模型</span><span class="tag warn">联系转换</span><span class="tag">弱实体</span></div>
+      <div class="summary-text">数据模型三要素=数据结构+数据操作+约束条件。E-R 图：<strong>椭圆属性、长方形实体、菱形联系</strong>。联系分两类维度：按参与实体集个数分<strong>一元（自反/递归，同实体集内部联系）/二元/多元</strong>，按基数分 1:1 / 1:N / M:N。E-R 转关系模型：<strong>1:1 放任一端、1:N 放 N 端、M:N 必须单独成表且主键为双方联合主键</strong>。</div>
+      <div class="summary-tags"><span class="tag primary">E-R 模型</span><span class="tag warn">联系转换</span><span class="tag">联系分类·自反</span><span class="tag">弱实体</span></div>
     </div>
   </div>
   <div class="footer-nav">
