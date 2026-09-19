@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>前沿技术 AI/RAG · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>前沿技术 AI/RAG · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"大模型定义", q:"关于大模型的定义，正确的是（　）。",
+   options:["规模参数很小，仅用于简单任务","具有大规模参数和复杂计算结构，由深度神经网络构建，用于提升表达能力和预测性能","只能处理单一任务","无需训练海量数据"],
+   answer:1, explain:"<strong>大模型</strong>＝具有大规模参数和复杂计算结构的机器学习模型，通常由深度神经网络构建，拥有数十亿甚至数千亿参数，通过训练海量数据学习复杂模式，具有更强泛化能力。"},
+
+  {topic:"大模型特点", q:"下列不属于大模型特点的是（　）。",
+   options:["巨大的规模（数十亿参数）","大数据训练（TB 甚至 PB 级）","强大的计算资源（数百上千 GPU）","只能进行监督学习，无法自监督与迁移学习"],
+   answer:3, explain:"大模型特点含<strong>迁移学习与预训练、自监督学习</strong>等；「只能监督学习」错误，大模型正是通过预训练+微调、自监督学习来提升效能。"},
+
+  {topic:"大模型分类", q:"大模型按输入数据类型不同，可分为（　）。",
+   options:["语言大模型（NLP）、视觉大模型（CV）、多模态大模型","只有语言大模型","只有视觉大模型","大量模型、小量模型、中等模型"],
+   answer:0, explain:"按输入数据类型分<strong>语言大模型（NLP）、视觉大模型（CV）、多模态大模型</strong>三大类。"},
+
+  {topic:"大模型分类", q:"能同时处理文本、图像、音频等多种数据类型，结合 NLP 与 CV 能力的大模型属于（　）。",
+   options:["语言大模型","视觉大模型","多模态大模型","推理大模型"],
+   answer:2, explain:"<strong>多模态大模型</strong>能处理文本、图像、音频等多模态数据，结合 NLP 与 CV 能力。代表：DALL-E、DingoDB、悟空画画、Midjourney。"},
+
+  {topic:"大模型分类", q:"属于「视觉大模型（CV）」代表的是（　）。",
+   options:["GPT","VIT（Google）","BERT","LangChain"],
+   answer:1, explain:"<strong>视觉大模型（CV）</strong>代表：VIT 系列（Google）、文心 UFO、华为盘古 CV、INTERN（商汤）；GPT/BERT 属于语言大模型。"},
+
+  {topic:"大模型挑战", q:"大模型面临的挑战包括（　）。",
+   options:["数据安全隐患、成本高昂、无法保障内容可信、成本不可控","模型太小，无法处理复杂任务","完全不会编造内容","无需考虑数据隐私"],
+   answer:0, explain:"大模型四大挑战：<strong>数据安全隐患、成本高昂、无法保障内容可信（会编造）、无法实现成本可控</strong>。"},
+
+  {topic:"基础架构", q:"大模型基础架构图的 5 层，自上而下正确的是（　）。",
+   options:["表现层（应用层）、平台层、模型层、数据层、基础层","基础层、数据层、模型层、平台层、表现层","数据层、基础层、模型层、表现层、平台层","模型层、基础层、数据层、平台层、表现层"],
+   answer:0, explain:"<strong>基础架构 5 层</strong>：表现层（应用）→ 平台层 → 模型层 → 数据层 → 基础层。基础层提供硬件（A100、数据服务器），数据层存企业垂域数据。"},
+
+  {topic:"完整架构", q:"AI 大模型完整架构图的 6 层，从底层到顶层正确的是（　）。",
+   options:["基础设施层→云原生层→框架层→模型层→能力层→模型服务层","模型服务层→基础设施层→框架层→模型层→云原生层→能力层","框架层→基础设施层→模型层→能力层→云原生层→模型服务层","能力层→模型层→框架层→云原生层→基础设施层→模型服务层"],
+   answer:0, explain:"<strong>完整 6 层由底到顶</strong>：基础设施层（GPU/NPU/CPU）→ 云原生层（私有云/政务云/算力中心）→ 框架层（PyTorch/TensorFlow）→ 模型层（数据准备/训练/多模态/CV/NLP/推理部署/评测）→ 能力层（多模态生成）→ 模型服务层（封装/调度/安全）。"},
+
+  {topic:"完整架构", q:"AI 大模型架构中，「模型层」的内容不包括（　）。",
+   options:["数据准备（采集、存储、清洗、标注）","模型训练（训练、微调、量化、蒸馏）","推理部署层（VLLM、Ollama 等）","权限与安全控制（角色/菜单权限）"],
+   answer:3, explain:"<strong>模型层</strong>含数据准备、模型训练、多模态、CV、NLP、推理部署层、评测与数据集管理；<strong>权限与安全控制属于模型服务层（下层）</strong>。"},
+
+  {topic:"模型服务层", q:"连接「底层能力」与「上层应用」的核心枢纽，负责大模型能力的封装、调度、增强并保障服务安全的是（　）。",
+   options:["基础设施层","框架层","模型层","模型服务层"],
+   answer:3, explain:"<strong>模型服务层</strong>是核心枢纽：上层（大模型知识问答：Embedding/Prompt/CoT/MCP/RAG）、中层（工具与数据支撑）、下层（权限与安全控制）。"},
+
+  {topic:"RAG", q:"RAG（检索增强生成）中，负责「从大规模知识库中检索与查询相关文档」的模块是（　）。",
+   options:["生成模块（Generator）","检索模块（Retriever）","平台层","模型服务层"],
+   answer:1, explain:"<strong>检索模块（Retriever）</strong>负责从知识库检索信息，多用预训练双塔模型进行高效向量化检索；生成模块（Generator）用 T5/BART 等生成回答。"},
+
+  {topic:"RAG", q:"RAG 的核心思想是（　）。",
+   options:["完全放弃外部知识库","通过检索和生成的有机结合，弥补生成模型在知识密集型任务上的不足","只生成不检索","只做向量相似度计算，不生成"],
+   answer:1, explain:"<strong>RAG 核心思想</strong>＝检索与生成有机结合，弥补生成模型（如 GPT-4/DeepSeek）在处理知识密集型任务时的不足，使回答更具可信度和准确性。"},
+
+  {topic:"RAG", q:"RAG 工作流程的正确顺序是（　）。",
+   options:["用户查询→转发检索模块→从知识库检索→返回结果→生成增强上下文→构建 Prompt→交 LLM 生成→回传交互层→返回用户","用户查询→直接让 LLM 编答案","用户查询→只检索不生成","构建 Prompt 后直接返回"],
+   answer:0, explain:"<strong>RAG 流程</strong>：用户 query → 检索模块 → 知识库检索并返回 → 整合生成<strong>增强上下文</strong> → 构建 <strong>Prompt（Prompt+Query+增强上下文）</strong> → 交给 LLM 生成 → 回传交互层 → 返回用户。"},
+
+  {topic:"RAG", q:"RAG 生成模块通常使用的强生成模型是（　）。",
+   options:["T5 或 BART","双塔模型（dual-encoder）","只使用 BERT 检索","不使用任何模型"],
+   answer:0, explain:"检索模块用<strong>预训练双塔模型（dual-encoder）</strong>向量化；<strong>生成模块</strong>用 <strong>T5 或 BART</strong> 等强生成模型处理输入，输出连贯准确的内容。"},
+];
+</script>
+<script>
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '前沿技术这把稳了，命题大势拿分！' : pct >= 60 ? '基本掌握，建议回顾前沿技术笔记。' : '还需加强，建议重读前沿技术笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

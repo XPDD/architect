@@ -47,6 +47,12 @@
   .answer ul{list-style:none;padding-left:0;margin-top:4px}.answer ul li{font-size:12.5px;padding:1px 0 1px 18px;position:relative;color:rgba(255,255,255,.8);line-height:1.6}
   .answer ul li::before{content:'\00B7';position:absolute;left:4px;color:var(--green)}
   .answer p{font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.7}
+  .fig{overflow-x:auto;margin:14px 0 6px;padding:12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius)}
+  .fig-label{font-family:var(--font-mono);font-size:9.5px;font-weight:700;color:var(--amber);letter-spacing:.12em;margin:0 0 10px;text-align:center}
+  .fig svg{display:block;margin:0 auto;min-width:620px}
+  .legend{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;font-size:10px;color:rgba(255,255,255,.6);margin-top:4px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
   .reveal{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green);border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.07);padding:6px 16px;border-radius:var(--radius);cursor:pointer;transition:.15s}
   .reveal:hover{background:rgba(52,211,153,.14)}
   .reveal.open{color:var(--text-secondary);border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.02)}
@@ -95,6 +101,106 @@
       <div class="question-head"><span class="q-tag">问题 1</span><span class="q-title">给出顶层 DFD 中外部实体、加工、数据存储的名称。</span><span class="q-score">12 分</span></div>
       <div class="question-body">
         <p>若采用<b>结构化方法</b>对房屋租赁服务系统进行分析，得到如图 2-1 所示的<b>顶层 DFD</b>。请使用题干中给出的词语，给出图 2-1 中外部实体 <b>E1~E2</b>、加工 <b>P1~P6</b> 以及数据存储 <b>D1~D4</b> 的名称。</p>
+        <div class="fig">
+          <div class="fig-label">图 2-1 · 房屋租赁服务系统 — 顶层数据流图（含待填空位）</div>
+          <svg viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="顶层 DFD">
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="rgba(255,255,255,.55)"/>
+              </marker>
+            </defs>
+
+            <g font-family="Inter,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" text-anchor="middle">
+              <g stroke="rgba(255,255,255,.22)" stroke-width="1.2" fill="none" marker-end="url(#arr)">
+                <line x1="110" y1="200" x2="170" y2="66"/>
+                <line x1="110" y1="204" x2="170" y2="162"/>
+                <line x1="172" y1="162" x2="112" y2="208"/>
+                <line x1="110" y1="208" x2="170" y2="258"/>
+                <line x1="730" y1="200" x2="640" y2="66"/>
+                <line x1="730" y1="204" x2="640" y2="162"/>
+                <line x1="638" y1="162" x2="728" y2="208"/>
+                <line x1="730" y1="208" x2="640" y2="262"/>
+                <line x1="250" y1="84" x2="360" y2="47"/>
+                <line x1="250" y1="184" x2="360" y2="127"/>
+                <line x1="250" y1="284" x2="360" y2="127"/>
+                <line x1="640" y1="84" x2="510" y2="207"/>
+                <line x1="640" y1="184" x2="510" y2="127"/>
+                <line x1="640" y1="284" x2="510" y2="287"/>
+              </g>
+
+              <g fill="rgba(255,255,255,.55)" font-size="9" font-weight="600" font-family="var(--font-mono)">
+                <text x="122" y="118" text-anchor="end">房主信息</text>
+                <text x="122" y="180" text-anchor="end">房屋信息</text>
+                <text x="128" y="200" text-anchor="start">费用单</text>
+                <text x="122" y="248" text-anchor="end">变更请求</text>
+                <text x="700" y="118" text-anchor="start">租赁者信息</text>
+                <text x="700" y="180" text-anchor="start">查询请求</text>
+                <text x="708" y="200" text-anchor="end">待租赁房屋信息</text>
+                <text x="700" y="248" text-anchor="start">看房请求</text>
+                <text x="586" y="150" text-anchor="middle">读取</text>
+              </g>
+
+              <g fill="rgba(255,255,255,.7)" font-size="10" font-weight="500">
+                <rect x="110" y="180" width="90" height="48" rx="8" fill="rgba(251,191,36,.09)" stroke="#fbbf24" stroke-width="1.3"/>
+                <text x="65" y="202" font-size="12" font-weight="700" fill="#fbbf24">E1</text>
+                <text x="65" y="218" fill="#ffe9bd">房主</text>
+
+                <rect x="730" y="180" width="90" height="48" rx="8" fill="rgba(251,191,36,.09)" stroke="#fbbf24" stroke-width="1.3"/>
+                <text x="775" y="202" font-size="12" font-weight="700" fill="#fbbf24">E2</text>
+                <text x="775" y="218" fill="#ffe9bd">租赁者</text>
+              </g>
+
+              <g fill="rgba(255,255,255,.82)">
+                <rect x="170" y="40" width="160" height="44" rx="8" fill="rgba(0,212,255,.09)" stroke="#00d4ff" stroke-width="1.3"/>
+                <text x="250" y="62" font-size="12" font-weight="700" fill="#8feaff">P1</text>
+                <text x="250" y="77" font-size="10" fill="rgba(255,255,255,.8)">登记房主信息</text>
+
+                <rect x="170" y="140" width="160" height="44" rx="8" fill="rgba(0,212,255,.09)" stroke="#00d4ff" stroke-width="1.3"/>
+                <text x="250" y="162" font-size="12" font-weight="700" fill="#8feaff">P2</text>
+                <text x="250" y="177" font-size="10" fill="rgba(255,255,255,.8)">登记房屋信息</text>
+
+                <rect x="170" y="240" width="160" height="44" rx="8" fill="rgba(0,212,255,.09)" stroke="#00d4ff" stroke-width="1.3"/>
+                <text x="250" y="262" font-size="12" font-weight="700" fill="#8feaff">P6</text>
+                <text x="250" y="277" font-size="10" fill="rgba(255,255,255,.8)">变更房屋状态</text>
+
+                <rect x="560" y="40" width="160" height="44" rx="8" fill="rgba(0,212,255,.09)" stroke="#00d4ff" stroke-width="1.3"/>
+                <text x="640" y="62" font-size="12" font-weight="700" fill="#8feaff">P3</text>
+                <text x="640" y="77" font-size="10" fill="rgba(255,255,255,.8)">登记租赁者信息</text>
+
+                <rect x="560" y="140" width="160" height="44" rx="8" fill="rgba(0,212,255,.09)" stroke="#00d4ff" stroke-width="1.3"/>
+                <text x="640" y="162" font-size="12" font-weight="700" fill="#8feaff">P4</text>
+                <text x="640" y="177" font-size="10" fill="rgba(255,255,255,.8)">查询租赁房屋信息</text>
+
+                <rect x="560" y="240" width="160" height="44" rx="8" fill="rgba(0,212,255,.09)" stroke="#00d4ff" stroke-width="1.3"/>
+                <text x="640" y="262" font-size="12" font-weight="700" fill="#8feaff">P5</text>
+                <text x="640" y="277" font-size="10" fill="rgba(255,255,255,.8)">安排看房</text>
+              </g>
+
+              <g fill="rgba(255,255,255,.82)">
+                <rect x="360" y="30" width="150" height="34" rx="4" fill="rgba(52,211,153,.06)" stroke="#34d399" stroke-width="1.3"/>
+                <text x="435" y="45" font-size="12" font-weight="700" fill="#7ce9c3">D1</text>
+                <text x="435" y="58" font-size="10" fill="rgba(255,255,255,.8)">房主信息文件</text>
+
+                <rect x="360" y="110" width="150" height="34" rx="4" fill="rgba(52,211,153,.06)" stroke="#34d399" stroke-width="1.3"/>
+                <text x="435" y="125" font-size="12" font-weight="700" fill="#7ce9c3">D3</text>
+                <text x="435" y="138" font-size="10" fill="rgba(255,255,255,.8)">房屋信息文件</text>
+
+                <rect x="360" y="190" width="150" height="34" rx="4" fill="rgba(52,211,153,.06)" stroke="#34d399" stroke-width="1.3"/>
+                <text x="435" y="205" font-size="12" font-weight="700" fill="#7ce9c3">D2</text>
+                <text x="435" y="218" font-size="10" fill="rgba(255,255,255,.8)">租赁者信息文件</text>
+
+                <rect x="360" y="270" width="150" height="34" rx="4" fill="rgba(52,211,153,.06)" stroke="#34d399" stroke-width="1.3"/>
+                <text x="435" y="285" font-size="12" font-weight="700" fill="#7ce9c3">D4</text>
+                <text x="435" y="298" font-size="10" fill="rgba(255,255,255,.8)">看房记录文件</text>
+              </g>
+            </g>
+          </svg>
+          <div class="legend">
+            <span><i style="background:#fbbf24"></i>外部实体</span>
+            <span><i style="background:#00d4ff"></i>加工</span>
+            <span><i style="background:#34d399"></i>数据存储</span>
+          </div>
+        </div>
       </div>
       <div class="qa-actions"><button class="reveal" data-target="a1">查看参考答案</button></div>
       <div class="answer" id="a1">
@@ -111,6 +217,60 @@
       <div class="question-head"><span class="q-tag">问题 2</span><span class="q-title">给出 ERD 中实体 (1)~(5) 的名称。</span><span class="q-score">5 分</span></div>
       <div class="question-body">
         <p>若采用<b>信息工程（Information Engineering）方法</b>分析，得到如图 2-2 所示的 <b>ERD</b>。请给出图 2-2 中实体 (1)~(5) 的名称。</p>
+        <div class="fig">
+          <div class="fig-label">图 2-2 · 房屋租赁服务系统 — 实体联系图（含待填空位）</div>
+          <svg viewBox="0 0 760 380" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ERD">
+            <defs>
+              <marker id="arr2" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z" fill="rgba(255,255,255,.5)"/>
+              </marker>
+            </defs>
+
+            <g font-family="Inter,-apple-system,'PingFang SC','Microsoft YaHei',sans-serif" text-anchor="middle">
+              <g stroke="rgba(255,255,255,.22)" stroke-width="1.2" fill="none">
+                <line x1="125" y1="63" x2="200" y2="63"/>
+                <line x1="245" y1="63" x2="300" y2="63"/>
+                <line x1="375" y1="86" x2="380" y2="176"/>
+                <line x1="200" y1="173" x2="335" y2="196"/>
+                <line x1="560" y1="173" x2="435" y2="196"/>
+                <line x1="380" y1="238" x2="380" y2="290"/>
+              </g>
+
+              <g fill="rgba(255,255,255,.55)" font-size="9" font-weight="700" font-family="var(--font-mono)">
+                <text x="168" y="52" text-anchor="middle">1</text>
+                <text x="270" y="52" text-anchor="middle">N</text>
+                <text x="360" y="120" text-anchor="middle">M</text>
+                <text x="472" y="120" text-anchor="middle">N</text>
+              </g>
+
+              <g fill="rgba(255,255,255,.82)">
+                <rect x="50" y="40" width="150" height="46" rx="6" fill="rgba(77,124,255,.1)" stroke="#4d7cff" stroke-width="1.4"/>
+                <text x="125" y="65" font-size="13" font-weight="700" fill="#cfdfff">房主 <tspan fill="#fbbf24">(1)</tspan></text>
+
+                <rect x="300" y="40" width="150" height="46" rx="6" fill="rgba(77,124,255,.1)" stroke="#4d7cff" stroke-width="1.4"/>
+                <text x="375" y="65" font-size="13" font-weight="700" fill="#cfdfff">房屋 <tspan fill="#fbbf24">(2)</tspan></text>
+
+                <rect x="50" y="150" width="150" height="46" rx="6" fill="rgba(77,124,255,.1)" stroke="#4d7cff" stroke-width="1.4"/>
+                <text x="125" y="175" font-size="13" font-weight="700" fill="#cfdfff">房主 <tspan fill="#fbbf24">(3)</tspan></text>
+
+                <rect x="560" y="150" width="150" height="46" rx="6" fill="rgba(77,124,255,.1)" stroke="#4d7cff" stroke-width="1.4"/>
+                <text x="635" y="175" font-size="13" font-weight="700" fill="#cfdfff">租赁者 <tspan fill="#fbbf24">(4)</tspan></text>
+
+                <rect x="300" y="290" width="160" height="46" rx="6" fill="rgba(52,211,153,.08)" stroke="#34d399" stroke-width="1.4"/>
+                <text x="380" y="315" font-size="13" font-weight="700" fill="#cfedd9">看房记录 <tspan fill="#fbbf24">(5)</tspan></text>
+              </g>
+
+              <g fill="rgba(255,255,255,.82)">
+                <path d="M190 47 L260 63 L190 79 L120 63 z" fill="rgba(167,139,250,.14)" stroke="#a78bfa" stroke-width="1.4"/>
+                <text x="190" y="67" font-size="11" font-weight="700" fill="#d9c9ff">拥有</text>
+
+                <path d="M330 180 L380 162 L430 180 L380 240 z" fill="rgba(167,139,250,.14)" stroke="#a78bfa" stroke-width="1.4"/>
+                <text x="380" y="196" font-size="11" font-weight="700" fill="#d9c9ff">看房 / 租赁</text>
+              </g>
+            </g>
+          </svg>
+          <p style="font-size:11px;color:rgba(255,255,255,.6);text-align:center;margin-top:8px">提示：房主在两处出现 —— (1) 拥有/登记房屋（一对多），(3) 参与看房/租赁（房屋与租赁者之间为多对多，通过联系实体「看房记录」分解）。</p>
+        </div>
       </div>
       <div class="qa-actions"><button class="reveal" data-target="a2">查看参考答案</button></div>
       <div class="answer" id="a2">

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 21 章 知识产权与标准化 · 知识笔记</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--radius-lg:12px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(167,139,250,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(255,255,255,.02)0%,transparent 50%);line-height:1.7;min-height:100vh;padding:40px 16px}
+  .wrap{max-width:920px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:13px;margin-bottom:16px}
+  .hero{text-align:center;padding:44px 20px 34px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:28px;position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--purple),var(--blue),transparent)}
+  .hero-badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--purple);letter-spacing:.22em;margin-bottom:10px}
+  .hero h1{font-size:30px;font-weight:800;letter-spacing:-.02em}.hero h1 .accent{color:var(--purple);text-shadow:0 0 24px rgba(167,139,250,.3)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:10px}
+  .hero-stats{display:flex;justify-content:center;gap:18px;margin-top:20px;flex-wrap:wrap}
+  .hero-stat{padding:7px 16px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);font-size:12px;color:var(--text2)}
+  .hero-stat strong{color:var(--purple);font-family:var(--mono);font-size:16px}
+  .section{margin-bottom:26px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+  .sec-head .s-num{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 12px;border-radius:4px;color:var(--purple);background:rgba(167,139,250,.08);border:1px solid rgba(167,139,250,.2);white-space:nowrap}
+  .sec-head h2{font-size:18px;font-weight:700}
+  .sec-head .rule{flex:1;height:1px;background:var(--border)}
+  .block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+  .block h3{font-size:14px;font-weight:700;margin-bottom:8px}.block h3 .dot{color:var(--purple)}
+  .block p,.block li{font-size:13px;color:var(--text2);line-height:1.7}
+  .block ul{margin-left:18px;list-style:none}
+  .block ul li{position:relative;padding-left:14px;margin-bottom:4px}
+  .block ul li::before{content:'\203A';position:absolute;left:0;color:var(--purple)}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+  .card .c-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .card p,.card li{font-size:12px;color:var(--text2);padding-left:12px;position:relative;line-height:1.6;margin-bottom:3px}
+  .hl{color:var(--purple);font-weight:600}.hl-green{color:var(--green);font-weight:600}.hl-amber{color:var(--amber);font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+  thead th{background:rgba(255,255,255,.03);color:var(--text2);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--mono);letter-spacing:.06em;border-bottom:1px solid rgba(167,139,250,.15)}
+  tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text2);font-size:12px;line-height:1.6}
+  tbody td:first-child{color:var(--text);font-weight:600}
+  .tag-btn{display:inline-block;font-size:10px;font-family:var(--mono);color:var(--purple);background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25);border-radius:4px;padding:2px 8px;margin-right:6px}
+  .footer{text-align:center;padding:24px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  @media(max-width:640px){.hero h1{font-size:24px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← 返回总索引</a>
+
+  <div class="hero">
+    <div class="hero-badge">CHAPTER 21 · IP &amp; STANDARDIZATION</div>
+    <h1><span class="accent">知识产权与标准化</span></h1>
+    <div class="hero-sub">软考高级系统架构设计师 · 概念 · 保护期限 · 权利归属 · 侵权判断 · 标准</div>
+    <div class="hero-stats">
+      <div class="hero-stat">权利类型 <strong>7</strong> 类</div>
+      <div class="hero-stat">核心特性 <strong>4</strong> 个</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">01</span><h2>知识产权概述</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 定义</h3>
+      <p>知识产权是<span class="hl">公民、法人、非法人单位</span>对自己的<b>创造性智力成果和其他科技成果</b>依法享有的民事权利；是智力成果创造人依法享有的权利，以及在生产经营活动中标记所有人依法享有的权利的总称。</p>
+      <p>包含：<span class="hl">著作权、专利权、商标权、商业秘密权、植物新品种权、集成电路布图设计权、地理标志权</span>（7 类）。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 四大特征（高频考点）</h3>
+      <div class="grid2">
+        <div class="card"><div class="c-title">无体性</div><p>对象没有具体形体，是智力创造成果，是一种抽象财富</p></div>
+        <div class="card"><div class="c-title">专有性</div><p>除权利人同意或法律另有规定外，任何人不得享有或使用该权利</p></div>
+        <div class="card"><div class="c-title">地域性</div><p>只在授予/确认权利的国家内受保护，其他国家不受保护</p></div>
+        <div class="card"><div class="c-title">时间性</div><p>仅在法定期限内受保护，期满权利自行消灭，知识产品成为全社会共同财富</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">02</span><h2>保护期限（必背）</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 著作权（作品/软件）</h3>
+      <table>
+        <thead><tr><th>客体</th><th>权利类型</th><th>保护期限</th></tr></thead>
+        <tbody>
+          <tr><td>公民作品</td><td>署名权、修改权、保护作品完整权</td><td><span class="hl">无期限限制</span></td></tr>
+          <tr><td>公民作品</td><td>发表权、使用权、获得报酬权</td><td>作者终生 + <span class="hl">死亡后 50 年</span>（第 50 年 12 月 31 日）</td></tr>
+          <tr><td>单位作品</td><td>发表权、使用权、获得报酬权</td><td><span class="hl">50 年</span>（首次发表后第 50 年 12 月 31 日；其间未发表不保护）</td></tr>
+          <tr><td>公民软件</td><td>署名权、修改权</td><td>无期限限制</td></tr>
+          <tr><td>公民软件</td><td>发表/复制/发行/出租/信息网络传播/翻译/使用许可/获得报酬/转让权</td><td>作者终生 + 死后 <span class="hl">50 年</span>（合作开发以最后死亡作者为准）</td></tr>
+          <tr><td>单位软件</td><td>同上各项财产权</td><td>50 年（首次发表后第 50 年 12 月 31 日；其间未发表不保护）</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 商标 / 专利 / 商业秘密</h3>
+      <table>
+        <thead><tr><th>客体</th><th>保护期限</th></tr></thead>
+        <tbody>
+          <tr><td>注册商标</td><td>有效期 <span class="hl">10 年</span>（注册人死亡/倒闭 <b>1 年后</b>未转移可<b>注销</b>；期满 <b>6 个月内</b>必须续注）</td></tr>
+          <tr><td>发明专利</td><td>保护期 <span class="hl">20 年</span>（从<b>申请日</b>起算）</td></tr>
+          <tr><td>实用新型 / 外观设计专利</td><td>保护期 <span class="hl">10 年</span>（从<b>申请日</b>起算）</td></tr>
+          <tr><td>商业秘密</td><td>不确定；一经公开公众即可使用</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">03</span><h2>知识产权人的确定</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 职务作品（作品 / 软件 / 专利）</h3>
+      <table>
+        <thead><tr><th>情形</th><th>归属</th></tr></thead>
+        <tbody>
+          <tr><td>职务作品：利用单位物质技术条件创作且单位承担责任</td><td>除<span class="hl">署名权</span>外其余著作权归<span class="hl">单位</span></td></tr>
+          <tr><td>职务作品：合同约定著作权属单位</td><td>除署名权外归单位</td></tr>
+          <tr><td>职务作品：其他（非上述）</td><td>作者拥有著作权，单位在业务范围内可<span class="hl">优先使用</span></td></tr>
+          <tr><td>职务软件：本职岗位明确开发目标 / 本职工作结果 / 用了单位资金、专用设备、未公开信息且单位担责</td><td>著作权归<span class="hl">单位</span></td></tr>
+          <tr><td>职务专利：本职工作发明 / 履行单位交付任务 / 离职退休调动后 1 年内与原单位相关</td><td>专利权归<span class="hl">单位</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 委托 / 合作 / 商标 / 专利</h3>
+      <div class="grid2">
+        <div class="card">
+          <div class="c-title">委托创作（软件）</div>
+          <p><b>有合同约定</b>→ 著作权归委托方；<b>合同未约定</b> → 著作权归<span class="hl">创作方</span>（与单位职务作品相反）</p>
+        </div>
+        <div class="card">
+          <div class="c-title">合作开发</div>
+          <p>只做组织、提供咨询/物质条件/辅助工作 → <b>不享有</b>著作权；共同创作 → 共同享有（按人头比例）；成果可分割可分开申请</p>
+        </div>
+        <div class="card">
+          <div class="c-title">商标</div>
+          <p><b>先申请先拥有</b>（除知名商标非法抢注）；同时申请 → 看<b>先使用</b>（需证据）；无法证明 → 协商，无效则<span class="hl">抽签</span>（不可不确定）</p>
+        </div>
+        <div class="card">
+          <div class="c-title">专利</div>
+          <p><b>先申请先拥有</b>；同时申请 → 协商归属，但<span class="hl">不能同时驳回</span>双方申请</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">04</span><h2>侵权判定</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 基本规则</h3>
+      <ul>
+        <li>中国公民/法人/非法人单位的作品，<span class="hl">不论是否发表，都享有著作权</span>（自动保护）。</li>
+        <li>开发软件所用的<span class="hl-green">思想、处理过程、操作方法、数学概念</span>不受保护。</li>
+        <li>著作权法不适用：法律法规/国家机关决议决定命令及官方正式译文、<b>时事新闻</b>、历法、通用数表/表格/公式。</li>
+      </ul>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 不侵权情形 vs 侵权情形</h3>
+      <div class="grid2">
+        <div class="card">
+          <div class="c-title">不构成侵权（合理使用）</div>
+          <p>个人学习/研究/欣赏；适当引用；公开演讲内容；教学或科研；复制馆藏作品；免费表演他人作品；室外公共场所艺术品临摹/绘画/摄影/录像；将汉语作品译为少数民族语言或盲文出版</p>
+        </div>
+        <div class="card">
+          <div class="c-title">构成侵权</div>
+          <p>未经许可发表他人作品；未经合作作者许可把合作作品当独作发表；未参加创作却在作品署名；歪曲篡改；剽窃；使用他人作品未付报酬；未经出版者许可使用其图书/期刊版式设计</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">05</span><h2>标准化（常识）</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 标准分类</h3>
+      <p>按适用范围由大到小：<span class="hl">国际标准、国家标准（GB/GB/T）、行业标准（如 YD、SL 等）、地方标准（DB）、企业标准（Q）</span>。</p>
+      <p>按约束力：<span class="hl">强制性标准（必须执行）</span> 与 <span class="hl">推荐性标准（自愿采用，代号含 /T）</span>。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 编写原则</h3>
+      <p>标准编写应遵循<span class="hl">统一、简化、协调、优化</span>原则；GB/T 为推荐性国家标准。</p>
+    </div>
+  </div>
+
+  <div class="block">
+    <h3><span class="dot">▸</span> 真题速记</h3>
+    <ul>
+      <li><span class="tag-btn">真题</span>购买有注册商标的应用软件光盘 → 只享有<b>该光盘所有权</b>（不享有著作权/复制权）→ 答 <span class="hl">B</span>。</li>
+      <li><span class="tag-btn">真题</span>知识产权客体不是有形物、有地域性、有期限 → 对；"域外效力可依赖国际公约协定取得"表述存疑 → 该项不正确。</li>
+      <li><span class="tag-btn">真题</span>公民著作权<span class="hl">署名权</span>保护期 → <span class="hl">A、永久</span>。</li>
+      <li><span class="tag-btn">真题</span>甲乙独立开发同主题发明（甲先乙后）→ <span class="hl">两者都享有</span>专利申请权（独立完成各自申请）→ C。</li>
+    </ul>
+  </div>
+
+  <div class="footer">第 21 章 · 知识产权与标准化 · 软考高级架构师 · 笔记速查</div>
+</div>
+</body>
+</html>

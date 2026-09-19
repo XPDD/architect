@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知识产权与标准化 · 配套题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(167,139,250,.05)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(255,255,255,.02)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:32px 16px}
+  .wrap{max-width:860px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+  .hero{text-align:center;padding:34px 20px 26px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:20px}
+  .hero-badge{font-family:var(--mono);font-size:11px;color:var(--purple);letter-spacing:.2em;margin-bottom:8px}
+  .hero h1{font-size:24px;font-weight:800}.hero h1 .accent{color:var(--purple)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:8px}
+  .nav{position:sticky;top:12px;display:flex;flex-wrap:wrap;gap:6px;background:rgba(17,22,32,.9);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:24px;z-index:10}
+  .nav a{font-size:12px;color:var(--text2);text-decoration:none;padding:4px 11px;border-radius:4px;border:1px solid transparent}
+  .nav a:hover{color:var(--cyan);border-color:rgba(0,212,255,.3)}
+  .topic{margin-bottom:28px}
+  .topic-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .topic-head .dot{width:8px;height:8px;border-radius:50%;background:var(--purple);box-shadow:0 0 10px var(--purple)}
+  .topic-head h2{font-size:18px;font-weight:700}
+  .topic-head .note-link{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--purple);text-decoration:none;border-bottom:1px dashed rgba(167,139,250,.3)}
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 22px;margin-bottom:12px}
+  .q-num{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--purple),var(--blue));padding:2px 9px;border-radius:4px;margin-bottom:10px}
+  .q-stem{font-size:15px;font-weight:600;line-height:1.7;margin-bottom:12px;white-space:pre-line}
+  .q-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+  .q-options .opt{font-size:13.5px;color:var(--text2);line-height:1.5;padding:7px 10px;border:1px solid transparent;border-radius:6px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .q-options .opt:hover{border-color:rgba(0,212,255,.35);background:rgba(0,212,255,.05);color:var(--text)}
+  .q-options .opt b{color:var(--cyan);font-family:var(--mono)}
+  .q-options .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)}
+  .q-options .opt.correct b{color:var(--green)}
+  .q-options .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)}
+  .q-options .opt.wrong b{color:var(--rose)}
+  .q-options .opt.locked{pointer-events:none}
+  .q-sub{margin-bottom:8px}
+  .q-sub-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:5px}
+  .toggle{background:none;border:1px solid rgba(0,212,255,.25);color:var(--cyan);border-radius:6px;padding:6px 16px;font-size:13px;cursor:pointer;margin-top:14px;font-family:var(--mono)}
+  .toggle:hover{background:rgba(0,212,255,.08)}
+  .answer{display:none;margin-top:12px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13.5px;color:var(--text2);line-height:1.7}
+  .answer.show{display:block}
+  .answer .ans{color:var(--green);font-weight:700;font-family:var(--mono)}
+  .answer .trap{color:var(--rose)}
+  .footer{text-align:center;padding:20px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .footer a{color:var(--cyan);text-decoration:none}
+  @media(max-width:640px){.q-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回笔记</a>
+  <div class="hero">
+    <div class="hero-badge">EXAM BANK · 第 21 章 知识产权与标准化</div>
+    <h1>知识产权与标准化 <span class="accent">配套练习</span></h1>
+    <div class="hero-sub">四大特性 · 保护期限 · 权利归属 · 侵权判断 · 标准</div>
+  </div>
+
+  <div class="nav">
+    <a href="#特性">概述特性</a>
+    <a href="#期限">保护期限</a>
+    <a href="#归属">权利归属</a>
+    <a href="#侵权">侵权判断</a>
+  </div>
+
+  <div class="topic" id="特性">
+    <div class="topic-head"><span class="dot"></span><h2>知识产权概述与特性</h2><a class="note-link" href="index.html">笔记 →</a></div>
+
+    <div class="q-card">
+      <span class="q-num">第 1 题</span>
+      <div class="q-stem">知识产权只在授予或确认其权利的国家范围内受保护，在其他国家不受保护。这体现了知识产权的( )。</div>
+      <div class="q-options" data-ans="B">
+        <div class="opt"><b>A.</b> 无体性</div><div class="opt"><b>B.</b> 地域性</div>
+        <div class="opt"><b>C.</b> 时间性</div><div class="opt"><b>D.</b> 专有性</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：B</span><br><b>解析：</b>四大特性：<b>无体性</b>（抽象财富）、<b>专有性</b>（排他使用）、<b>地域性</b>（只在授予国保护）、<b>时间性</b>（法定期限）。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 2 题</span>
+      <div class="q-stem">知识产权在法定期限届满后，权利自行消灭，相关知识产品成为全社会共同财富。这体现( )。</div>
+      <div class="q-options" data-ans="C">
+        <div class="opt"><b>A.</b> 无体性</div><div class="opt"><b>B.</b> 专有性</div>
+        <div class="opt"><b>C.</b> 时间性</div><div class="opt"><b>D.</b> 地域性</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：C</span><br><b>解析：</b><b>时间性</b> = 仅在法律规定期限内受保护，期满权利消灭、成为公共财富。</div>
+    </div>
+  </div>
+
+  <div class="topic" id="期限">
+    <div class="topic-head"><span class="dot"></span><h2>保护期限（重点）</h2><a class="note-link" href="index.html">笔记 →</a></div>
+
+    <div class="q-card">
+      <span class="q-num">第 3 题</span>
+      <div class="q-stem">公民作品的署名权、修改权、保护作品完整权，其保护期为( )。</div>
+      <div class="q-options" data-ans="A">
+        <div class="opt"><b>A.</b> 无期限限制</div><div class="opt"><b>B.</b> 作者终生 + 死后 50 年</div>
+        <div class="opt"><b>C.</b> 50 年</div><div class="opt"><b>D.</b> 20 年</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：A</span><br><b>解析：</b>公民作品的<b>人身权</b>（署名权、修改权、保护作品完整权）<b>无期限限制</b>；发表权、使用权、获得报酬权才是终生+死后 50 年。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 4 题</span>
+      <div class="q-stem">发明专利的保护期是( )，自( )起算。</div>
+      <div class="q-options" data-ans="B">
+        <div class="opt"><b>A.</b> 20 年；授权日</div><div class="opt"><b>B.</b> 20 年；申请日</div>
+        <div class="opt"><b>C.</b> 10 年；申请日</div><div class="opt"><b>D.</b> 10 年；授权日</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：B</span><br><b>解析：</b><b>发明</b>专利 20 年、<b>实用新型/外观设计</b> 10 年，均从<b>申请日</b>起算；注册商标有效期 <b>10 年</b>。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 5 题</span>
+      <div class="q-stem">单位软件产品的著作权财产权保护期为( )。若其间未发表则( )。</div>
+      <div class="q-options" data-ans="D">
+        <div class="opt"><b>A.</b> 作者终生 + 死后 50 年；仍受保护</div><div class="opt"><b>B.</b> 无期限；不受限</div>
+        <div class="opt"><b>C.</b> 20 年；不保护</div><div class="opt"><b>D.</b> 50 年（首次发表后第 50 年 12 月 31 日）；不保护</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：D</span><br><b>解析：</b>单位软件/joint 软件：发表权及各项财产权 <b>50 年</b>（首次发表后第 50 年 12 月 31 日）；若其间<b>未发表则不保护</b>。公民软件则为作者终生+死后 50 年（以最后死亡作者为准）。</div>
+    </div>
+  </div>
+
+  <div class="topic" id="归属">
+    <div class="topic-head"><span class="dot"></span><h2>知识产权人的确定</h2><a class="note-link" href="index.html">笔记 →</a></div>
+
+    <div class="q-card">
+      <span class="q-num">第 6 题</span>
+      <div class="q-stem">公民在单位完成的职务作品，若利用单位物质技术条件创作且单位承担责任，则著作权归属( )。</div>
+      <div class="q-options" data-ans="B">
+        <div class="opt"><b>A.</b> 作者个人</div><div class="opt"><b>B.</b> 单位</div>
+        <div class="opt"><b>C.</b> 作者与单位各一半</div><div class="opt"><b>D.</b> 不享有著作权</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：B</span><br><b>解析：</b>职务作品（单位担责/合同约定归单位）→ <b>除署名权外其余归单位</b>；其他情形作者拥有著作权、单位可优先使用。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 7 题</span>
+      <div class="q-stem">委托创作软件，合同中<strong>未约定</strong>著作权归属时，著作权归( )。</div>
+      <div class="q-options" data-ans="C">
+        <div class="opt"><b>A.</b> 委托方</div><div class="opt"><b>B.</b> 双方共有</div>
+        <div class="opt"><b>C.</b> 创作方</div><div class="opt"><b>D.</b> 国家</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：C</span><br><b>解析：</b>委托创作：<b>有约定归委托方，无约定归创作方</b>。（与单位职务作品相反）</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 8 题</span>
+      <div class="q-stem">商标权与专利权在"先申请"规则外，关于"同时申请"的处理，正确的是( )。</div>
+      <div class="q-options" data-ans="A">
+        <div class="opt"><b>A.</b> 商标看先使用（需证据），无法证明协商，否则抽签</div><div class="opt"><b>B.</b> 商标直接归最先使用者</div>
+        <div class="opt"><b>C.</b> 专利同时申请则驳回双方</div><div class="opt"><b>D.</b> 专利同时申请归先完成者</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：A</span><br><b>解析：</b>商标同时申请看<b>先使用</b>（需证据），无法证明协商、无效则<b>抽签</b>；专利同时申请协商归属，但<b>不能同时驳回</b>双方申请。</div>
+    </div>
+  </div>
+
+  <div class="topic" id="侵权">
+    <div class="topic-head"><span class="dot"></span><h2>侵权与标准</h2><a class="note-link" href="index.html">笔记 →</a></div>
+
+    <div class="q-card">
+      <span class="q-num">第 9 题</span>
+      <div class="q-stem">下列关于著作权说法正确的是( )。</div>
+      <div class="q-options" data-ans="B">
+        <div class="opt"><b>A.</b> 作品发表后才享有著作权</div><div class="opt"><b>B.</b> 作品不论是否发表都享有著作权</div>
+        <div class="opt"><b>C.</b> 开发软件的思想、过程、数学概念受著作权保护</div><div class="opt"><b>D.</b> 时事新闻属于著作权法保护对象</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：B</span><br><b>解析：</b>著作权<b>自动产生，不论是否发表</b>；开发软件的<b>思想、过程、操作方法、数学概念</b>不受保护；时事新闻不受著作权法保护。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 10 题</span>
+      <div class="q-stem">下列行为中，<strong>构成侵权</strong>的是( )。</div>
+      <div class="q-options" data-ans="C">
+        <div class="opt"><b>A.</b> 个人学习、研究或欣赏</div><div class="opt"><b>B.</b> 为教学科研少量引用</div>
+        <div class="opt"><b>C.</b> 剽窃他人作品</div><div class="opt"><b>D.</b> 临摹室外公共场所艺术品</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：C</span><br><b>解析：</b>合理使用（不侵权）：个人学习、适当引用、教学科研、临摹室外艺术品等；<b>剽窃、歪曲篡改、擅自发表、署名等构成侵权</b>。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 11 题</span>
+      <div class="q-stem">我国标准的编号中，<strong>推荐性国家标准</strong>的代号是( )。</div>
+      <div class="q-options" data-ans="A">
+        <div class="opt"><b>A.</b> GB/T</div><div class="opt"><b>B.</b> GB</div>
+        <div class="opt"><b>C.</b> Q</div><div class="opt"><b>D.</b> DB</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：A</span><br><b>解析：</b><b>GB</b>=强制国标、<b>GB/T</b>=推荐性国标（/T 表示推荐）；<b>Q</b>=企业标准、<b>DB</b>=地方标准。</div>
+    </div>
+  </div>
+
+  <div class="footer"><a href="index.html">← 返回笔记</a> · 2026</div>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('.q-card').forEach(function(card){
+    var groups = card.querySelectorAll('.q-options');
+    var answerEl = card.querySelector('.answer');
+    var done = 0;
+    function markCorrect(g){
+      var ans = g.getAttribute('data-ans');
+      g.querySelectorAll('.opt').forEach(function(o){
+        var b = o.querySelector('b');
+        var l = b ? b.textContent.replace(/[^A-Z]/g,'') : '';
+        if (l === ans) o.classList.add('correct');
+      });
+    }
+    groups.forEach(function(g){
+      var ans = g.getAttribute('data-ans');
+      g.querySelectorAll('.opt').forEach(function(opt){
+        opt.addEventListener('click', function(){
+          if (g.getAttribute('data-done')) return;
+          g.setAttribute('data-done','1');
+          done++;
+          var b = opt.querySelector('b');
+          var letter = b ? b.textContent.replace(/[^A-Z]/g,'') : '';
+          var isCorrect = letter === ans;
+          opt.classList.add(isCorrect ? 'correct' : 'wrong');
+          if (!isCorrect) markCorrect(g);
+          g.querySelectorAll('.opt').forEach(function(o){ o.classList.add('locked'); });
+          if (done >= groups.length && answerEl) answerEl.classList.add('show');
+        });
+      });
+    });
+    var toggle = card.querySelector('.toggle');
+    if (toggle) toggle.addEventListener('click', function(){
+      groups.forEach(markCorrect);
+      groups.forEach(function(g){ g.querySelectorAll('.opt').forEach(function(o){ o.classList.add('locked'); }); });
+      if (answerEl) answerEl.classList.add('show');
+    });
+  });
+})();
+</script>
+</body>
+</html>

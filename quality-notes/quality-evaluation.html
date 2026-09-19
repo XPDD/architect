@@ -774,29 +774,31 @@
       <div class="card-grid">
         <div class="card">
           <div class="card-badge">1</div>
-          <div class="card-title"><span class="note-highlight">SAAM</span> — 最早的方法</div>
+          <div class="card-title"><span class="note-highlight">SAAM</span> — 软件架构分析方法</div>
           <ul class="card-list">
-            <li>最早形成文档并广泛应用</li>
+            <li>英文：<b>Software Architecture Analysis Method</b> / 最早的方法，Rick Kazman 等，约 1994</li>
             <li>主评质量属性：<span class="hl-green">可修改性</span></li>
             <li>5步：场景开发→架构描述→单个场景评估→场景交互→总体评估</li>
+            <li>何时用：<b>架构最早期</b>，方案尚不成熟时快速筛查，也可比较候选方案</li>
           </ul>
         </div>
         <div class="card">
           <div class="card-badge">2</div>
-          <div class="card-title"><span class="note-highlight">ATAM</span> — 架构权衡分析</div>
+          <div class="card-title"><span class="note-highlight">ATAM</span> — 架构权衡分析方法</div>
           <ul class="card-list">
+            <li>英文：<b>Architecture Tradeoff Analysis Method</b> / SEI 在 SAAM 基础上改进，约 1998</li>
             <li>评估<span class="hl-green">性能/可用性/安全性/可修改性</span>的折中</li>
-            <li>4阶段：描述介绍→调查分析→测试→报告</li>
-            <li>核心产出：<span class="hl-purple">质量属性效用树</span></li>
+            <li>核心产出：<span class="hl-purple">质量属性效用树</span>；识别风险/敏感点/权衡点</li>
+            <li>何时用：<b>架构中期</b>，初步成型需多属性权衡时</li>
           </ul>
         </div>
         <div class="card">
           <div class="card-badge">3</div>
-          <div class="card-title"><span class="note-highlight">CBAM</span> — 成本效益分析</div>
+          <div class="card-title"><span class="note-highlight">CBAM</span> — 成本效益分析方法</div>
           <ul class="card-list">
-            <li>对 ATAM 的<strong>补充</strong>，在质量确定后分析效益</li>
-            <li>核心依据：<span class="hl-orange">投资回报率（ROI）</span></li>
-            <li>选择 ROI 最高的架构策略</li>
+            <li>英文：<b>Cost Benefit Analysis Method</b> / Barry Boehm 等；ATAM 的<strong>经济延伸</strong></li>
+            <li>核心依据：<span class="hl-orange">投资回报率（ROI）</span>，选 ROI 最高的策略</li>
+            <li>何时用：<b>架构后期/决策期</b>，在多个可行方案中按性价比拍板</li>
           </ul>
         </div>
         <div class="card">
@@ -810,8 +812,40 @@
         </div>
       </div>
 
-      <div class="numbered-header"><span class="num">7</span>ATAM 四阶段详解</div>
+      <div class="numbered-header"><span class="num">6.1</span>演进历史 & 何时使用</div>
 
+      <table class="compare-table">
+        <thead>
+          <tr><th>方法</th><th>中文全称</th><th>关注点</th><th>适用阶段</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="note-highlight">SAAM</span></td>
+            <td>软件架构（体系结构）分析方法</td>
+            <td>单个质量属性（<b>可修改性</b>），基于场景定性分析</td>
+            <td><b>早期</b>草稿期 · 比较候选方案 · 成本低</td>
+          </tr>
+          <tr>
+            <td><span class="hl-purple">ATAM</span></td>
+            <td>架构权衡分析方法</td>
+            <td><b>多属性</b>权衡（性能/可用/安全/可修改），效用树排序，找敏感/权衡/风险点</td>
+            <td><b>中期</b>架构成型 · 需多种冲突质量目标取舍</td>
+          </tr>
+          <tr>
+            <td><span class="hl-green">CBAM</span></td>
+            <td>成本效益（成本收益）分析方法</td>
+            <td>在 ATAM 基础上<b>加经济量化（ROI）</b>，选最划算的架构策略</td>
+            <td><b>后期</b>决策 · 多个可行方案中挑性价比最高</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="feynman" style="margin-top:14px;">
+        <div class="feynman-label">&#x25C6; 怎么记住 + 什么时候用</div>
+        <p>一条线串起来：<strong>SAAM 看"好不好改"（单属性·早期）→ ATAM 看"怎么取舍"（多属性·中期）→ CBAM 看"值不值"（算 ROI·后期）</strong>。三者层层递进，不是三选一。通俗理解：最小的是问你"这房子隔断好改吗"（SAAM），中等的是"好用、好改、安全、不垮之间要东墙补西墙怎么办"（ATAM），最大的是"这么多取舍到底花钱值不值"（CBAM）。在写大量代码前做——拿具体质量场景当"考卷"，提前暴露风险和权衡点，避免地基没打好就开盖。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">7</span>ATAM 四阶段详解</div>
       <table class="compare-table">
         <thead>
           <tr><th>阶段</th><th>目标</th><th>关键活动</th></tr>
@@ -840,9 +874,103 @@
         </tbody>
       </table>
 
-      <div class="feynman">
-        <div class="feynman-label">&#x25C6; 费曼</div>
-        <p><strong>质量属性和架构评估到底在讲什么？</strong> 质量属性就是你系统"好不好"的衡量标准——跑得快不快（性能）、会不会崩（可靠性）、崩了多久能恢复（可用性）、安不安全、好不好改。架构评估就是<strong>在还没写代码的时候，先检查你的设计图能不能扛住这些要求</strong>。SAAM 是最老的检查方法（主要看"好好不好改"），ATAM 更全面——让各方坐下来，把各个质量需求摆出来权衡取舍（要性能还是要安全？），CBAM 更实际——<strong>哪个方案花钱最少回报最大就选哪个</strong>。核心思想：先想清楚、再动手，别把房子盖一半才发现地基不行。</p>
+      <div class="numbered-header"><span class="num">7.1</span>质量属性效用树（Utility Tree）</div>
+
+      <div class="note-section">
+        <p><span class="hl-red">高频考点</span>：效用树是 <b>ATAM 第二阶段（调查和分析）</b>的核心产出，用来对质量属性进行<b>分类</b>和<b>优先级排序</b>。一句话：把模糊的大目标拆成可量化、可排序的小场景。</p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">层</div>
+          <div class="card-title">树根 → 质量属性 → 属性分类 → 质量属性场景（叶子）</div>
+          <ul class="card-list">
+            <li><b>树根</b>：系统的总体"效用"/大目标</li>
+            <li><b>第2层 质量属性</b>：性能、可用性、安全性、可修改性（ATAM 只关注这 <b>4 类</b>）</li>
+            <li><b>第3层 属性分类</b>：对某个属性进一步细化（如性能→响应时间/吞吐量）</li>
+            <li><b>叶子 质量属性场景</b>：具体、可测量的场景（刺激→环境→响应）</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">例</div>
+          <div class="card-title">在线支付系统示例</div>
+          <ul class="card-list">
+            <li>根：系统效用</li>
+            <li>质量属性：安全性 → 属性分类：访问控制 → 场景：用户登录需双因素认证，未授权访问率 &lt;0.1%</li>
+            <li>质量属性：性能 → 属性分类：响应时间 → 场景：高峰用户单击支付，页面 2 秒内返回</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="note-section" style="margin-top:10px;">
+        <h4><span class="dot"></span>三个易混概念</h4>
+        <ul>
+          <li><b>效用树</b> = 结构化"组织框架"（根→属性→分类→场景），作用是<b>梳理 + 排序</b>。</li>
+          <li><b>质量属性场景</b> = 标准化"描述单元"（刺激-环境-响应），作用是<b>无歧义定义需求</b>。</li>
+          <li><b>质量属性分类</b> = 静态"知识体系"（运行期/开发期），作用是<b>提供基础清单</b>。</li>
+        </ul>
+      </div>
+
+      <div class="numbered-header"><span class="num">7.1.1</span>效用树是如何形成的（生成步骤）</div>
+
+      <div class="note-section">
+        <h4><span class="dot"></span>ATAM 第二阶段"调查和分析"的关键流程</h4>
+        <div style="margin:10px 0;">
+          <div class="flow-row" style="gap:6px;">
+            <div class="flow-box primary">① 确定树根<br><small>系统总体效用/大目标</small></div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box">② 选质量属性<br><small>性能/可用/安全/可修改</small></div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box warn">③ 属性分类<br><small>每属性再细化</small></div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box primary">④ 写场景（叶）<br><small>刺激→环境→响应</small></div>
+          </div>
+          <div class="flow-row" style="gap:6px;margin-top:6px;">
+            <div class="flow-box primary">⑤ 修剪<br><small>保留重要场景 ≤50</small></div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box">⑥ 打优先级对<br><small>重要度×难易度 H/M/L</small></div>
+            <div class="flow-arrow">&#x2192;</div>
+            <div class="flow-box warn">⑦ 指导后续<br><small>识别风险/权衡,选战术</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-section">
+        <h4><span class="dot"></span>每步做什么 —— 以"在线支付"为例</h4>
+        <table class="compare-table">
+          <thead>
+            <tr><th>步骤</th><th>动作</th><th>例</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="note-highlight">① 树根</span></td><td>确认整体目标（到底要什么"好"）</td><td>系统在高峰也能稳定、安全、快速完成支付</td></tr>
+            <tr><td><span class="hl-purple">② 质量属性</span></td><td>从经典清单挑本项目最相关的大类</td><td>性能、安全性、可用性、可修改性</td></tr>
+            <tr><td><span class="hl-orange">③ 属性分类</span></td><td>把每个属性细化成技术、可测量的维度</td><td>性能→响应时间/吞吐量；安全→访问控制/审计</td></tr>
+            <tr><td><span class="hl-green">④ 场景（叶）</span></td><td>用"刺激→环境→响应"写成具体、可量化的小目标</td><td>高峰用户点击支付，页面 2 秒内返回；登录需双因素认证、未授权率 &lt;0.1%</td></tr>
+            <tr><td><span class="hl-green">⑤ 修剪</span></td><td>砍掉不重要/过时场景，保留核心（≤50）</td><td>只留影响成败的场景</td></tr>
+            <tr><td><span class="hl-orange">⑥ 优先级对</span></td><td>每个叶子打"重要度 × 难易度"（H/M/L）</td><td>(H,L) 重要且易实现 → 最优先</td></tr>
+            <tr><td><span class="hl-purple">⑦ 用起来</span></td><td>找高风险、敏感点/权衡点，选对应质量属性<b>战术</b>解决</td><td>高并发场景 → 用优先级队列、增加资源等性能战术</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="note-section">
+        <h4><span class="dot"></span>一句话记住"怎么形成"</h4>
+        <p>先定<b>整体目标</b>（根）→ 拆成<b>几个质量属性</b> → 每个属性<b>再细化</b>成可测维度 → 落到<b>具体场景</b> → <b>剪枝</b>保留重点 → 给每个场景打<b>重要度×难易度</b>。核心就是<b>自顶向下拆 + 由下往上排</b>，把"系统要好"从一句话变成一张可执行的问题清单。</p>
+      </div>
+
+      <div class="note-section">
+        <h4><span class="dot"></span>修剪与优先级排序（考点）</h4>
+        <p>初始树很大，先<b>修剪</b>保留重要场景（通常 <b>不超过 50 个</b>），再对每个场景打两个维度（都用 H/M/L 表示）：</p>
+        <ul>
+          <li><b>重要度（Importance）</b>：该场景对系统成功的重要性（干系人判断）。</li>
+          <li><b>难易度（Difficulty）</b>：该场景实现的难易程度。</li>
+          <li>例：<span class="hl-orange">(H, L)</span> = 重要且易实现，最优先处理。</li>
+        </ul>
+      </div>
+
+      <div class="feynman" style="margin-top:14px;">
+        <div class="feynman-label">&#x25C6; 效用树怎么理解</div>
+        <p>效用树就是把"系统要好"这句话，像剥洋葱一样剥下去：第一层问<b>"好在哪些方面？"</b>（性能/安全/可用/可修改）；第二层问<b>"每个方面具体指什么？"</b>（性能分响应时间、吞吐量）；最底层落到<b>"能测量的场景"</b>（高峰 2 秒内返回）。然后给每个叶子标"重不重要 + 好不好做"（H/M/L），就能看出先解决哪个了。它就是 ATAM 的<b>"问题清单"</b>，先发现问题，再用质量属性<b>战术</b>去解决问题。</p>
       </div>
 
       <div class="diagram">

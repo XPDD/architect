@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件工程 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>软件工程 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"数据流图", q:"数据流图（DFD）分层细化过程中遵循的数据平衡原则，正确的是（　）。",
+   options:["子图内部加工的输入输出不必平衡","父图与子图之间的输入/输出数据流必须与父图对应加工保持一致","子图数据流可任意增减，不受父图限制","父图与子图的加工数量必须完全相等"],
+   answer:1, explain:"数据平衡原则：<strong>父图与子图之间</strong>——子图边界上的输入/输出数据流必须与父图对应加工的输入/输出数据流保持一致；<strong>子图内部</strong>——加工的输入和输出需要平衡。"},
+
+  {topic:"数据流图", q:"若父图中某加工的一条数据流对应于子图中的几条数据流，其平衡条件是（　）。",
+   options:["子图中这几条数据流的数据项全体正好等于父图中这条数据流","子图数据流数量与父图完全相同","子图数据流名称与父图完全相同","不存在平衡条件"],
+   answer:0, explain:"若父图中某加工的一条数据流对应子图几条数据流，而<strong>子图中组成这些数据流的数据项全体正好等于父图中的这条数据流</strong>，则它们仍然是平衡的。"},
+
+  {topic:"数据字典", q:"数据流图与数据字典在需求分析与设计阶段的作用，错误的是（　）。",
+   options:["分析阶段 DFD 用于建立系统的功能模型，完成需求分析","设计阶段 DFD 为模块划分与接口设计提供依据","数据字典是统一标准、确保数据完整一致性","数据字典只能做描述，无检索与一致性检验功能"],
+   answer:3, explain:"数据字典作用包括：<strong>按各种要求列表、相互参照、由描述内容检索名称、一致性检验、完整性检验</strong>。故「只能描述无检索检验」错误。"},
+
+  {topic:"数据字典", q:"关于数据字典，下列说法正确的是（　）。",
+   options:["它是一个可有可无的工具","它是所有人员工作的依据、统一标准，确保数据完整性和一致性","只在设计阶段使用","数据字典与 DFD 无关"],
+   answer:1, explain:"<strong>数据字典是所有人员工作的依据、统一的标准</strong>，可确保数据在系统中的完整性和一致性。"},
+
+  {topic:"序列图", q:"UML 序列图中的「同步消息」指的是（　）。",
+   options:["发送方发送后不必等待接收方处理完成","发送方发送后必须等待接收方处理完成才能继续执行","接收方处理完后返回结果给发送方","用于表示异常中断的片段"],
+   answer:1, explain:"<strong>同步消息</strong>：发送方发送后必须等待接收方处理完成才能继续执行，收到响应前会暂停；异步消息则不必等待、可并行。"},
+
+  {topic:"序列图", q:"序列图中，发送方发送消息后不必等待接收方处理完成、可继续执行其他操作的消息是（　）。",
+   options:["同步消息","返回消息","异步消息","中断消息"],
+   answer:2, explain:"<strong>异步消息</strong>：发送方发送后不必等待接收方处理完成，可继续执行其他操作，双方可以并行执行。"},
+
+  {topic:"序列图", q:"序列图中，接收方处理完同步消息后将结果返回给发送方的消息是（　）。",
+   options:["异步消息","返回消息","同步消息","循环消息"],
+   answer:1, explain:"<strong>返回消息</strong>：表示接收方处理完同步消息后，返回结果给发送方，通常用于表达方法或函数的执行结果。"},
+
+  {topic:"交互图", q:"系统分析设计过程中两种交互图（序列图与通信图）的选取原则，正确的是（　）。",
+   options:["序列图强调时间顺序，常用于设计阶段；通信图强调关联，常用于分析阶段","序列图强调时间顺序，常用于分析阶段；通信图强调对象关联，常用于设计阶段","两者都强调时间顺序","两者都强调对象关联"],
+   answer:1, explain:"<strong>序列图强调消息时间顺序</strong>并清晰展示时序与并发，常用于<strong>分析阶段</strong>；<strong>通信图强调参与交互对象及关联</strong>，常用于<strong>设计阶段</strong>。"},
+
+  {topic:"分支片段", q:"顺序图中表示「只有当特定条件满足时才执行对应消息序列」（类似 if 结构）的片段是（　）。",
+   options:["Alt 片段","Opt 片段","Loop 片段","Break 片段"],
+   answer:1, explain:"<strong>Opt 片段</strong>：特定条件满足时才执行对应消息序列，类似 if 结构；Alt 是 if-else；Loop 是循环；Break 是中断。"},
+
+  {topic:"分支片段", q:"顺序图中表示「条件满足时中断当前流程，并执行中断后的操作，用于处理异常/特殊情况」的片段是（　）。",
+   options:["Alt 片段","Loop 片段","Break（中断）片段","Opt 片段"],
+   answer:2, explain:"<strong>Break（中断）</strong>：在某个条件满足时中断当前流程，并执行中断后的操作，用于处理异常或特殊情况。"},
+
+  {topic:"分支片段", q:"顺序图中表示条件分支（可理解为 if-else 结构）的片段是（　）。",
+   options:["Alt 片段","Opt 片段","Loop 片段","Break 片段"],
+   answer:0, explain:"<strong>Alt 片段</strong>：表示条件分支，可理解成 if-else 结构；Opt 类似 if；Loop 类似 for/while；Break 是中断。"},
+];
+</script>
+<script>
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '软工概念扎实！' : pct >= 60 ? '基本掌握，建议回顾软件工程笔记。' : '还需加强，建议重读软件工程笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

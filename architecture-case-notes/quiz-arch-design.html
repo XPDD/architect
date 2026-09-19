@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统架构设计 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>系统架构设计 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"微服务", q:"微服务架构将一个应用程序拆分为一组小型、独立的服务。下列属于其优点的是（　）。",
+   options:["技术栈单一，各服务必须用同一种语言","每个服务可独立部署和扩展，系统更富弹性","不存在分布式事务等复杂问题","运维成本比单体更低"],
+   answer:1, explain:"微服务优点：<strong>灵活性和可扩展性</strong>（独立部署扩展）、<strong>技术多样性</strong>（不同栈）、<strong>易理解维护</strong>。缺点是复杂性（分布式事务）、部署测试复杂、运维成本高。"},
+
+  {topic:"微服务", q:"下列属于微服务架构缺点的是（　）。",
+   options:["运维成本低","需处理分布式事务、服务发现、服务治理等复杂问题","无法使用不同技术栈","各服务不能独立部署"],
+   answer:1, explain:"微服务缺点：<strong>复杂性</strong>（分布式事务/服务发现/治理）、<strong>部署和测试更复杂</strong>、<strong>运维成本高</strong>（监控/日志/排查）。"},
+
+  {topic:"场景六要素", q:"质量属性场景由六部分组成，其中「刺激源」指的是（　）。",
+   options:["刺激到达时需考虑的条件","生成该刺激的实体（人、计算机系统或任何刺激器）","被激励的制品","刺激到达后采取的行动"],
+   answer:1, explain:"<strong>刺激源</strong>=生成刺激的实体；刺激=到达时需考虑的条件；制品=被激励对象；响应=刺激到达后采取的行动。"},
+
+  {topic:"场景六要素", q:"质量属性场景六要素中，用于「对需求进行测试、度量响应」的是（　）。",
+   options:["环境","制品","响应度量","刺激"],
+   answer:2, explain:"<strong>响应度量</strong>＝响应发生时如何度量、以对需求进行测试。环境是刺激发生的条件，制品是被激励对象。"},
+
+  {topic:"场景六要素", q:"关于质量属性场景六要素，下列对应正确的是（　）。",
+   options:["刺激＝生成刺激的实体","环境＝被激励的制品","制品＝整个系统或系统的一部分","响应度量＝刺激到达后采取的行动"],
+   answer:2, explain:"<strong>制品</strong>是被激励的制品，可为整个系统或一部分。刺激=到达条件；响应=采取的行动；响应度量=如何度量。"},
+
+  {topic:"可修改性", q:"可修改性质量属性场景的「环境」要素，可能情况包括（　）。",
+   options:["最终用户、开发人员、系统管理员","系统设计时、编译时、构建时、运行时","希望增加、删除、修改、改变功能","系统用户界面、平台或目标系统"],
+   answer:1, explain:"可修改性场景的<strong>环境</strong>＝设计时、编译时、构建时、运行时；刺激源＝用户/开发/管理员；刺激＝增减改功能；制品＝UI 平台等。"},
+
+  {topic:"可用性场景", q:"系统需求「可连续运行时间不少于 240h，断电或故障后 10s 内应重启」，其「响应度量」是（　）。",
+   options:["系统故障或断电","10 秒内","重启","运行环境"],
+   answer:1, explain:"刺激=系统故障或断电；制品=系统；环境=运行环境；响应=重启；<strong>响应度量=10 秒内</strong>。"},
+
+  {topic:"可用性场景", q:"「网络失效后，10s 内应发起重新连接」中，「刺激源」是（　）。",
+   options:["网络失效","重新连接","10 秒内","网络环境"],
+   answer:0, explain:"刺激源=网络失效；刺激=网络失效；制品=系统；环境=网络环境；响应=重新连接；响应度量=10 秒内。"},
+
+  {topic:"心跳机制", q:"对比 ping/echo 与心跳两种故障检测策略，下列说法正确的是（　）。",
+   options:["ping/echo 是服务器单向发送状态信号","心跳是客户端主动探测服务器的双向通信","ping/echo 是客户端主动请求，需服务器响应（双向通信）","心跳无需监控端"],
+   answer:2, explain:"<strong>ping/echo</strong>＝客户端定期发请求、服务器响应，无响应则判故障（主动探测、双向通信）；<strong>心跳</strong>＝服务器定期发状态信号，监控端超时未收到判故障（单向通信、服务端主动）。"},
+
+  {topic:"心跳机制", q:"从资源利用率角度看，心跳机制比 ping/echo 更适合大规模云服务器，其原因是（　）。",
+   options:["心跳需双向交互，流量更大","心跳仅发送小数据包（如 1 个 UDP 包/次），ping/echo 需请求+响应，流量翻倍","心跳会消耗更多 CPU 和 I/O","心跳需客户端高频主动轮询"],
+   answer:1, explain:"心跳仅发小数据包，<strong>带宽更省</strong>；且服务器仅简单发包（<strong>CPU/I/O 更省</strong>），客户端仅监听（<strong>无需轮询、避免线程阻塞</strong>）。故心跳资源占用更低。"},
+
+  {topic:"目标/分类", q:"质量属性场景中，「需求进行增删改功能」这一说法属于（　）。",
+   options:["可修改性场景的「刺激」","可用性场景的「响应」","性能场景的「制品」","安全性场景的「环境」"],
+   answer:0, explain:"<strong>可修改性场景</strong>的刺激＝希望增加、删除、修改、改变功能、质量属性、容量等。"},
+];
+</script>
+<script>
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '必答第一题稳了，继续！' : pct >= 60 ? '基本掌握，建议回顾系统架构设计笔记。' : '还需加强，建议重读架构设计笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

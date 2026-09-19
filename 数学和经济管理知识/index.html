@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 20 章 数学与经济管理知识补充 · 知识笔记</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--radius-lg:12px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(251,191,36,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(255,248,113,.04)0%,transparent 50%);line-height:1.7;min-height:100vh;padding:40px 16px}
+  .wrap{max-width:920px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:13px;margin-bottom:16px}
+  .hero{text-align:center;padding:44px 20px 34px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:28px;position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--amber),var(--blue),transparent)}
+  .hero-badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--amber);letter-spacing:.22em;margin-bottom:10px}
+  .hero h1{font-size:30px;font-weight:800;letter-spacing:-.02em}.hero h1 .accent{color:var(--amber);text-shadow:0 0 24px rgba(251,191,36,.3)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:10px}
+  .hero-stats{display:flex;justify-content:center;gap:18px;margin-top:20px;flex-wrap:wrap}
+  .hero-stat{padding:7px 16px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);font-size:12px;color:var(--text2)}
+  .hero-stat strong{color:var(--amber);font-family:var(--mono);font-size:16px}
+  .section{margin-bottom:26px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+  .sec-head .s-num{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 12px;border-radius:4px;color:var(--amber);background:rgba(251,191,36,.08);border:1px solid rgba(251,191,36,.2);white-space:nowrap}
+  .sec-head h2{font-size:18px;font-weight:700}
+  .sec-head .rule{flex:1;height:1px;background:var(--border)}
+  .block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+  .block h3{font-size:14px;font-weight:700;margin-bottom:8px}.block h3 .dot{color:var(--amber)}
+  .block p,.block li{font-size:13px;color:var(--text2);line-height:1.7}
+  .block ul{margin-left:18px;list-style:none}
+  .block ul li{position:relative;padding-left:14px;margin-bottom:4px}
+  .block ul li::before{content:'\203A';position:absolute;left:0;color:var(--amber)}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+  .card .c-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .card p,.card li{font-size:12px;color:var(--text2);padding-left:12px;position:relative;line-height:1.6;margin-bottom:3px}
+  .hl{color:var(--amber);font-weight:600}.hl-cyan{color:var(--cyan);font-weight:600}.hl-green{color:var(--green);font-weight:600}
+  .formula{background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.15);border-left:3px solid var(--amber);border-radius:var(--radius);padding:10px 14px;margin:8px 0;font-size:13px;color:var(--text2)}
+  .formula .tag{font-family:var(--sans);font-size:10px;color:var(--amber);font-weight:700;display:block;margin-bottom:4px}
+  .arrowflow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin:8px 0}
+  .step{padding:5px 10px;border-radius:4px;background:rgba(77,124,255,.06);border:1px solid rgba(77,124,255,.18);color:var(--blue);font-weight:600}
+  .arrow{color:var(--muted)}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+  thead th{background:rgba(255,255,255,.03);color:var(--text2);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--mono);letter-spacing:.06em;border-bottom:1px solid rgba(251,191,36,.15)}
+  tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text2);font-size:12px;line-height:1.6}
+  tbody td:first-child{color:var(--text);font-weight:600}
+  .footer{text-align:center;padding:24px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  @media(max-width:640px){.hero h1{font-size:24px}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← 返回总索引</a>
+
+  <div class="hero">
+    <div class="hero-badge">CHAPTER 20 · MATH &amp; ECONOMICS</div>
+    <h1><span class="accent">数学与经济管理知识补充</span></h1>
+    <div class="hero-sub">软考高级系统架构设计师 · 9 大题型方法与答案速记</div>
+    <div class="hero-stats">
+      <div class="hero-stat">题型 <strong>9</strong> 类</div>
+      <div class="hero-stat">最高频 <strong>线性规划</strong></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">01</span><h2>最小生成树 / 最短路径</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 最小生成树（Prim / Kruskal）</h3>
+      <p>目标：用 <span class="hl">n−1</span> 条边连通 n 个顶点，且权和最小。<span class="hl-green">每次选权值最小的边，且不构成回路</span>，直到所有顶点连通。</p>
+      <div class="formula"><span class="tag">例题 · 9 栋楼房敷设管道（千元）</span>选权=1 的 4 条边 + 权=2 的 3 条边 + 权=3 的 1 条边 → 总成本 = <strong>13</strong> 千元 <span class="hl">(A)</span></div>
+      <p>② 海上油井 1#～8#：从海岸经 1# 连接所有油井，管道只能在油井处分叉 → 亦为最小生成树思想。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 最短路径（Dijkstra 迪杰斯特拉）</h3>
+      <p>从起点逐步扩展，每步选当前<span class="hl">未确定顶点中距离最小</span>的，并松弛其邻边；重复直至终点。</p>
+      <div class="formula"><span class="tag">例题 · A→F 最短距离</span>路径表 → 最短 = <strong>40</strong>，路径 A→B→F <span class="hl">(B)</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">02</span><h2>网络与最大流量</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 最大流（标号法 / 增广路）</h3>
+      <p>反复在残余网络中寻找<span class="hl">从源点到汇点的增广路</span>，其瓶颈容量=该路上最小剩余容量；累加到总流量，直到无增广路为止。（注意先看汇点入边容量确定上界）</p>
+      <div class="formula"><span class="tag">例题 · ①→⑥ 最大运输能力（万吨/小时）</span>增广路 ①→②→⑤→⑥(6) + ①→③→⑤→⑥(14) + ①→④→⑥(5) + ①→④→②→⑤→⑥(1) = <strong>23</strong> <span class="hl">(A)</span></div>
+      <p>② A/B/C 三厂 → 企业当天最多运来原料：求多源到汇点的最大流即可。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">03</span><h2>线性规划</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 步骤</h3>
+      <div class="arrowflow">
+        <span class="step">设变量</span><span class="arrow">→</span><span class="step">列目标函数</span><span class="arrow">→</span><span class="step">列约束方程</span><span class="arrow">→</span><span class="step">画可行域</span><span class="arrow">→</span><span class="step">求顶点并代入目标函数</span>
+      </div>
+      <p style="margin-top:8px"><strong>结论：</strong>线性规划最优解一定在<span class="hl">可行域的某个顶点</span>上取得，逐一计算各顶点并比较。</p>
+      <div class="formula"><span class="tag">例题 · 甲乙丙原料生产产品Ⅰ/Ⅱ</span>max Z = 9X + 12Y；约束 X+Y≤4、4X+3Y≤12、X+3Y≤6<br>交点 (2, 4/3)：Z = 9×2 + 12×(4/3) = <strong>34</strong> 万元 <span class="hl">(B)</span>；此时仅<b>甲</b>原料有剩余 <span class="hl">(A)</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">04</span><h2>动态规划</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 方法</h3>
+      <p>将问题划分为<span class="hl">多个阶段</span>，每个阶段做一次决策，利用<span class="hl">递推关系 / 状态转移</span>求最优；核心是「分阶段 + 状态 + 递推」。常用于投资分配、资源分配、背包类问题。</p>
+      <div class="formula"><span class="tag">例题 · 400 万元投资甲/乙/丙</span>收益表（百万元）：甲[0,40,100,130,160] 乙[0,40,80,110,130] 丙[0,50,90,140,150]，遍历投资组合求最大收益</div>
+      <div class="formula"><span class="tag">例题 · 三营业区增设 6 个销售店（每区至少 1 个）</span>方案 甲3/乙2/丙1 = 190+150+150 = <strong>490</strong> 万元 <span class="hl">(B)</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">05</span><h2>博弈论</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 方法</h3>
+      <p>站在每个参与方角度，考虑"对方采用某策略时我方最优策略"，找出<span class="hl">占优策略 / 纳什均衡</span>。若双方各自理性分析后决策相同，即为均衡结果。</p>
+      <div class="formula"><span class="tag">例题 · 甲/乙网站广告定价</span>无论对方高/低价，自身"低价"都更高 → 均衡 = <span class="hl">两家都低价，各得 700 万元</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">06</span><h2>状态转移矩阵</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 方法</h3>
+      <p>用矩阵 P 表示状态间转移概率。n 个月后状态 = 初始状态 × P<sup>n</sup>。<span class="hl-green">行=从（来），列=到（去）</span>，矩阵乘法逐月迭代。</p>
+      <div class="formula"><span class="tag">例题 · A/B 品牌市场份额（各 50%）</span>P 计算 2 个月后 → A 下降、B 上升（A 减约 10%，B 增约 10%）</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">07</span><h2>排队论</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 方法</h3>
+      <div class="arrowflow">
+        <span class="step">设 8:00 前排队 x 人</span><span class="arrow">→</span><span class="step">每分钟来 y 人</span><span class="arrow">→</span><span class="step">每口每分钟进 z 人</span><span class="arrow">→</span><span class="step">列方程求解</span>
+      </div>
+      <div class="formula"><span class="tag">例题 · 博览会检票</span>8 口 60 分：8·60·z=x+60y；10 口 40 分：10·40·z=x+40y<br>相减得 y=4z（开 4 口即可抵消新增），代入得 x=240z；求 20 分消除：n·20·z=x+20y → n=<strong>16</strong> <span class="hl">(C，16,4)</span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">08</span><h2>决策树 / 全概率</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 决策树</h3>
+      <p>按题意<span class="hl">画出决策支路</span>，计算各支路<span class="hl">期望值（加权平均）</span>，选期望成本最小 / 收益最大的支路。</p>
+      <div class="formula"><span class="tag">例题 · A→B 陆路/水路运输</span>水路费用期望 = 7000×75% + (90000×10%+7000)×25%；陆路 = 10000×75% + 10000×25%，比较两者取小</div>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 全概率 / 贝叶斯（次品归属）</h3>
+      <p>某次品由各厂贡献的<span class="hl">比例 = 供货占比 × 该厂次品率</span>，比例最高者即为最可能来源。</p>
+      <div class="formula"><span class="tag">例题 · 甲乙丙丁供货 4:3:2:1</span>甲 40%×1%=0.4%、乙 30%×2%=0.6%、丙 20%×2.5%=0.5%、丁 10%×5%=0.5% → 次品归属<span class="hl">乙</span>概率最大</div>
+    </div>
+  </div>
+
+  <div class="footer">第 20 章 · 数学与经济管理知识补充 · 软考高级架构师 · 笔记速查</div>
+</div>
+</body>
+</html>

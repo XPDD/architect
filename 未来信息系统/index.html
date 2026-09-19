@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 19 章 未来信息综合技术 · 知识笔记</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--radius-lg:12px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(52,211,153,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(0,212,255,.03)0%,transparent 50%);line-height:1.7;min-height:100vh;padding:40px 16px}
+  .wrap{max-width:920px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:13px;margin-bottom:16px}
+  .hero{text-align:center;padding:44px 20px 34px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:28px;position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--green),var(--cyan),transparent)}
+  .hero-badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--green);letter-spacing:.22em;margin-bottom:10px}
+  .hero h1{font-size:30px;font-weight:800;letter-spacing:-.02em}.hero h1 .accent{color:var(--green);text-shadow:0 0 24px rgba(52,211,153,.3)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:10px}
+  .hero-stats{display:flex;justify-content:center;gap:18px;margin-top:20px;flex-wrap:wrap}
+  .hero-stat{padding:7px 16px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);font-size:12px;color:var(--text2)}
+  .hero-stat strong{color:var(--green);font-family:var(--mono);font-size:16px}
+  .section{margin-bottom:26px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+  .sec-head .s-num{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 12px;border-radius:4px;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);white-space:nowrap}
+  .sec-head h2{font-size:18px;font-weight:700}
+  .sec-head .rule{flex:1;height:1px;background:var(--border)}
+  .block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+  .block h3{font-size:14px;font-weight:700;margin-bottom:8px}.block h3 .dot{color:var(--green)}
+  .block p,.block li{font-size:13px;color:var(--text2);line-height:1.7}
+  .block ul{margin-left:18px;list-style:none}
+  .block ul li{position:relative;padding-left:14px;margin-bottom:4px}
+  .block ul li::before{content:'\203A';position:absolute;left:0;color:var(--green)}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+  .card .c-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .card p,.card li{font-size:12px;color:var(--text2);padding-left:12px;position:relative;line-height:1.6;margin-bottom:3px}
+  .hl{color:var(--green);font-weight:600}.hl-cyan{color:var(--cyan);font-weight:600}.hl-amber{color:var(--amber);font-weight:600}.hl-purple{color:var(--purple);font-weight:600}
+  .arrowflow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin:8px 0}
+  .step{padding:5px 10px;border-radius:4px;background:rgba(52,211,153,.06);border:1px solid rgba(52,211,153,.18);color:var(--green);font-weight:600}
+  .arrow{color:var(--muted)}
+  .footer{text-align:center;padding:24px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  @media(max-width:640px){.hero h1{font-size:24px}.grid2,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← 返回总索引</a>
+
+  <div class="hero">
+    <div class="hero-badge">CHAPTER 19 · FUTURE INFO TECH</div>
+    <h1><span class="accent">未来信息综合技术</span></h1>
+    <div class="hero-sub">软考高级系统架构设计师 · 人工智能 · 数字孪生 · 云计算 · 大数据 · 区块链 · 边缘计算 · CPS · 机器人</div>
+    <div class="hero-stats">
+      <div class="hero-stat">关键技术 <strong>8</strong> 类</div>
+      <div class="hero-stat">CPS 三层次 <strong>单元/系统/SoS</strong></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">01</span><h2>人工智能 AI</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 定义与分类</h3>
+      <p>用数字计算机/机器<span class="hl">模拟、延伸、扩展人的智能</span>，感知环境、获取知识并使用知识获得最佳结果。分<span class="hl">弱人工智能</span>（模拟/延伸）和<span class="hl">强人工智能</span>（真正推理、思考、解决问题）。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 关键技术</h3>
+      <div class="grid3">
+        <div class="card"><div class="c-title">自然语言处理 NLP</div><p>机器翻译、语义理解、问答系统</p></div>
+        <div class="card"><div class="c-title">计算机视觉</div><p>车牌识别、人脸识别</p></div>
+        <div class="card"><div class="c-title">知识图谱</div><p>从"关系"角度分析问题，如谷歌知识图谱</p></div>
+        <div class="card"><div class="c-title">人机交互 HCI</div><p>触摸屏</p></div>
+        <div class="card"><div class="c-title">VR / AR</div><p>生成与真实环境视觉听觉近似数字化环境</p></div>
+        <div class="card"><div class="c-title">机器学习 ML</div><p>基于数据找规律并预测，如垃圾邮件过滤</p></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 机器学习分类</h3>
+      <p>按学习模式：<span class="hl">监督、无监督、半监督、强化</span>（强化需反馈机制）。按学习方法：<span class="hl">传统机器学习</span>（特征需人工）、<span class="hl">深度学习</span>（多层神经网络，自动特征学习，需海量数据+GPU）。</p>
+      <p>常见算法：<span class="hl">迁移学习、主动学习、演化学习</span>。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 机器学习训练算法（按模式罗列 · 考点）</h3>
+      <div class="grid3">
+        <div class="card">
+          <div class="c-title">监督学习（有标注）</div>
+          <p><b>分类</b>：决策树、随机森林、支持向量机(SVM)、KNN、朴素贝叶斯、逻辑回归、神经网络<br><b>回归</b>：线性回归、岭回归、决策树回归</p>
+        </div>
+        <div class="card">
+          <div class="c-title">无监督学习（无标注）</div>
+          <p><b>聚类</b>：K-Means、层次聚类、DBSCAN、高斯混合模型<br><b>降维</b>：主成分分析(PCA)、奇异值分解<br><b>关联</b>：Apriori、FP-Growth</p>
+        </div>
+        <div class="card">
+          <div class="c-title">强化学习（需反馈）</div>
+          <p><b>值函数</b>：Q-Learning、SARSA、DQN<br><b>策略</b>：策略梯度、Actor-Critic、DDPG、PPO</p>
+        </div>
+        <div class="card">
+          <div class="c-title">深度学习（神经网络）</div>
+          <p><b>结构</b>：CNN(图像)、RNN/LSTM(序列)、GAN(生成)、Transformer(大模型/自注意力)、自编码器</p>
+        </div>
+        <div class="card">
+          <div class="c-title">集成学习（组合模型）</div>
+          <p><b>Bagging</b>：<b>并行投票、降方差</b>→随机森林<br><b>Boosting</b>：<b>串行纠错、降偏差</b>→AdaBoost、GBDT、XGBoost、LightGBM<br>本质：把多个"弱模型"合成一个"强模型"</p>
+        </div>
+        <div class="card">
+          <div class="c-title">优化器（调参必会）</div>
+          <p><b>梯度下降</b>：批量GD、随机梯度下降 SGD、小批量<br><b>自适应</b>：Momentum、RMSProp、Adam、Adagrad</p>
+        </div>
+        <div class="card" style="grid-column:span 2">
+          <div class="c-title">Bagging vs Boosting（必辨）</div>
+          <p><b>Bagging</b>=多个模型<b>同时各自练</b>、少数服从多数/平均 → 降<b>方差</b>（求稳），代表<b>随机森林</b>。<br>
+          <b>Boosting</b>=模型<b>一个接一个</b>练、后一个<b>专门改前一个的错</b> → 降<b>偏差</b>（求准），代表<b>XGBoost/GBDT</b>。<br>
+          <span style="color:var(--muted)">记忆：并行求稳=Bagging(森林)；串行纠错=Boosting(提升)。</span></p>
+        </div>
+      </div>
+      <p style="margin-top:6px;font-size:12px;color:var(--muted)">记忆：分类(监督)+聚类(无监督)+强化(反馈)是三类主力；深度学习看架构(CNN/RNN/GAN/Transformer)；集成=随机森林(Bagging) vs XGBoost(Boosting)；优化用 SGD/Adam。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">02</span><h2>数字孪生体</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 定义与关键技术</h3>
+      <p>创建物理对象的<span class="hl">数字模型</span>并用<span class="hl">实时数据</span>更新，反映真实状态；用信息换能量，减少复杂系统不确定性。</p>
+      <p>关键技术：<span class="hl">建模</span>（三维空间=需求指标、生存期阶段、空间尺度）、<span class="hl">仿真</span>（验证模型正确性，是数字孪生与物理实体闭环的<b>核心技术</b>）。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 应用</h3>
+      <p>制造业（设计虚拟样机、生产监控、故障预测）、能源（电网运行模拟、风机故障预测）、医疗（虚拟手术、康复训练）。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">03</span><h2>云计算</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 服务方式（灵活度 S&lt;P&lt;I · 方便度相反）</h3>
+      <table>
+        <thead><tr><th>模式</th><th>含义</th><th>例</th></tr></thead>
+        <tbody>
+          <tr><td>IaaS 基础设施即服务</td><td>提供内存/IO/存储/计算等虚拟资源池、虚拟化服务器</td><td>云端不同配置服务器</td></tr>
+          <tr><td>PaaS 平台即服务</td><td>提供分布式开发环境与平台，客户在其上定制开发</td><td>在线编程、在线办公</td></tr>
+          <tr><td>SaaS 软件即服务</td><td>应用软件统一部署云平台，按数量/时长收费，浏览器使用</td><td>百度云盘</td></tr>
+          <tr><td><span class="hl-amber">FaaS / Serverless</span></td><td>把应用拆成"函数"，按事件触发自动运行，无需管理服务器，按执行次数计费</td><td>AWS Lambda、云函数</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> Serverless（无服务器 / FaaS）— 现代第四类</h3>
+      <p><span class="hl-amber">Serverless = 无服务器计算</span>，核心是让你<b>只管写好函数代码</b>，云平台负责一切（部署、伸缩、运维），按<b>事件触发</b>执行、按<b>调用/执行时间</b>计费。典型例子：AWS Lambda、阿里云函数计算、谷歌云函数。</p>
+      <p>它与三者的关系：Serverless（FaaS）位于 <span class="hl-green">PaaS 与 SaaS 之间</span>，是一层<b>更细粒度、更上层</b>的抽象——比 PaaS 连"平台环境"都不用管（只交函数），比 SaaS 又保留了"自己写逻辑"的能力。用比喻：<b>IaaS=租地自己盖、PaaS=租带厨具的房自己做饭、SaaS=下馆子、Serverless=按顿叫个能随时来的厨师</b>。</p>
+      <p style="font-size:12px;color:var(--muted)">考点提示：传统软考三大服务方式是 IaaS/PaaS/SaaS；<b>serverless（FaaS）是近年新增考点</b>，常作为"更上层/事件驱动/免运维"的第四类出现，注意它与 PaaS 的区别（更细粒度、只交函数）。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 部署模式</h3>
+      <p><span class="hl">公有云</span>（公开分配）、<span class="hl">社区云</span>（社区组织专有，公有云范畴内）、<span class="hl">私有云</span>（单组织专有）、<span class="hl">混合云</span>（公有+私有+社区组合，因安全控制原因不把全部企业信息放公有云）。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">04</span><h2>大数据与区块链</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 大数据</h3>
+      <p>大小/复杂性超出常用软件工具以合理成本与时限捕获、管理、处理。特点：<span class="hl">大规模、高速度、多样化、可变性、复杂性</span>。分析 5 阶段：获取/记录 → 信息抽取/清洗/注记 → 集成/聚集/表现 → 分析/建模 → 数据解释。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 区块链</h3>
+      <p>分布式数据库，区块按<span class="hl">时间顺序</span>链接成<span class="hl">不可篡改记录链</span>。</p>
+      <p>区块结构（图中）：<span class="hl">区块头（版本号、时间戳、上一区块哈希、Merkle 根）</span> + <span class="hl">交易信息（双方、时间、内容）</span>，用哈希函数链成链。</p>
+      <p>核心特性：<span class="hl">去中心化、不可篡改性、透明性、安全性、智能合约</span>。原理：密码学安全、共识机制、分布式存储、智能合约。应用：金融、供应链、医疗、物联网。</p>
+
+      <div class="card" style="margin-top:10px">
+        <div class="c-title">共识机制（防双重支付）对比</div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin:8px 0">
+          <thead>
+            <tr><th style="text-align:left;padding:7px 10px;border-bottom:1px solid rgba(52,211,153,.2);color:var(--text2);font-weight:600">机制</th><th style="text-align:left;padding:7px 10px;border-bottom:1px solid rgba(52,211,153,.2);color:var(--text2);font-weight:600">全称</th><th style="text-align:left;padding:7px 10px;border-bottom:1px solid rgba(52,211,153,.2);color:var(--text2);font-weight:600">靠什么</th><th style="text-align:left;padding:7px 10px;border-bottom:1px solid rgba(52,211,153,.2);color:var(--text2);font-weight:600">代表/特点</th></tr>
+          </thead>
+          <tbody>
+            <tr><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text);font-weight:600">PoW</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">工作量证明 Proof of Work</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">算力/哈希求解</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">比特币；耗能高、慢</td></tr>
+            <tr><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text);font-weight:600">PoS</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">权益证明 Proof of Stake</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">持币数量/质押</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">以太坊；省能、较快</td></tr>
+            <tr><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text);font-weight:600">PBFT</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">实用拜占庭容错 Practical Byzantine Fault Tolerance</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">节点投票(≥2/3)</td><td style="padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.05)">联盟链/许可链；容忍部分恶意节点</td></tr>
+            <tr><td style="padding:7px 10px;color:var(--text);font-weight:600">PoA</td><td style="padding:7px 10px">权威证明 Proof of Authority</td><td style="padding:7px 10px">可信/授权节点</td><td style="padding:7px 10px">企业/私有链；人多但可信度高</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px">记忆：PoW 靠"算力"、PoS 靠"股权"、PBFT 靠"投票"、PoA 靠"权威(可信节点)"。共识机制保证网络各节点对交易记录<b>一致认可</b>，防止双重支付。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">05</span><h2>边缘计算</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 概念与落地形态</h3>
+      <p>分布式计算模型，把计算/存储放<span class="hl">物理世界边缘、靠近数据源</span>，降延迟提实时性。</p>
+      <p>落地形态：<span class="hl">云边缘、边缘云、云化网关</span>；核心能力：<span class="hl">边云协同、边缘智能</span>。特点：联接性、数据第一入口、约束性、分布性。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 边云协同（六类）</h3>
+      <div class="grid3">
+        <div class="card"><div class="c-title">资源协同</div><p>边提供基础设施资源，接受云端调度</p></div>
+        <div class="card"><div class="c-title">数据协同</div><p>边采集初处理，云存储分析与价值挖掘</p></div>
+        <div class="card"><div class="c-title">智能协同</div><p>边执行推理（分布式智能），云集中训练并下发</p></div>
+        <div class="card"><div class="c-title">应用管理协同</div><p>边部署运行+生命周期，云开发测试</p></div>
+        <div class="card"><div class="c-title">业务管理协同</div><p>边提供微服务/数字孪生实例，云业务编排</p></div>
+        <div class="card"><div class="c-title">服务协同</div><p>边实现 ECSaaS，与云 SaaS 协同按需</p></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 架构层与挑战</h3>
+      <p>边云协同架构：<span class="hl">边缘层 → 雾层 → 云层</span>。挑战：异构性、延迟、安全性；解决：虚拟化、容器化、微服务、SDN、安全技术。应用：智慧园区、云游戏、视频监控、工业互联网、智慧医疗。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">06</span><h2>信息物理系统 CPS</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 定义</h3>
+      <p>控制系统、嵌入式系统的<span class="hl">扩展与延伸</span>；将<span class="hl">数字和物理系统融合</span>，实现人、机、物、环境、信息相互映射、适时交互、高效协同。融合感知、计算、通信、控制等信息技术。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 三层体系架构</h3>
+      <div class="grid3">
+        <div class="card"><div class="c-title">单元级 CPS</div><p>不可分割的最小单元，可感知/计算/交互/延展/自决策，如智能灯泡、智能机床</p></div>
+        <div class="card"><div class="c-title">系统级 CPS</div><p>多单元经工业网络（现场总线/以太网）互联互通互操作，如汽车制造线上机器人</p></div>
+        <div class="card"><div class="c-title">SoS 级 CPS</div><p>多个系统级 CPS 有机组合，如智慧城市交通+能源+环境监测</p></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 技术体系与四大核心要素</h3>
+      <p>技术体系：<span class="hl">总体技术</span>（顶层设计）、<span class="hl">支撑技术</span>（智能感知/嵌入式软件/数据库/中间件/物联网/大数据等）、<span class="hl">核心技术</span>（虚实融合控制、数字孪生、现场总线、工业以太网等）。</p>
+      <p>四大核心要素：<span class="hl">一硬</span>=感知和自动控制（硬件支撑）；<span class="hl">一软</span>=工业软件（CPS 核心）；<span class="hl">一网</span>=工业网络（网络载体）；<span class="hl">一平台</span>=工业云和智能服务平台（数据汇聚+支撑上层方案）。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 应用与建设路径</h3>
+      <p>应用：<span class="hl">智能设计、智能生产、智能服务、智能应用</span>。建设路径：CPS 体系设计 → 单元级 → 系统级 → SoS 级。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">07</span><h2>机器人</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 机器人 4.0 时代</h3>
+      <p>把<span class="hl">云端大脑分布各处</span>，充分利用边缘计算优势，强调智能协作与理解决策能力。</p>
+      <p>核心技术：<span class="hl">云-边-端无缝协同计算、持续学习与协同学习、知识图谱、场景自适应、数据安全</span>。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 分类</h3>
+      <p>按控制方式：<span class="hl">操作机器人（核电站远距操作）、程序机器人（焊接）、示教再现机器人（手术，可记录重复）、智能机器人（扫地，自主决策）、综合机器人（火星）</span>。按应用行业：工业机器人、服务机器人、特殊领域机器人。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">08</span><h2>考试要点 · 算法与核心技术清单</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 人工智能 / 机器学习 — 必背算法</h3>
+      <div class="grid3">
+        <div class="card"><div class="c-title">按学习模式</div><p><b>监督</b>(有标注)：分类/回归；<b>无监督</b>(无标注)：聚类；<b>半监督</b>(少量标注)；<b>强化</b>(需反馈/奖惩)</p></div>
+        <div class="card"><div class="c-title">按学习方法</div><p><b>传统机器学习</b>(特征手动，需领域知识)；<b>深度学习</b>(多层神经网络，自动特征，需海量数据+GPU)</p></div>
+        <div class="card"><div class="c-title">三类补充算法</div><p><b>迁移学习</b>(借用其他领域数据)；<b>主动学习</b>(挑最有用样本标注，专家标)；<b>演化学习</b>(演化算法做优化，选特征等)</p></div>
+      </div>
+      <p style="margin-top:6px;font-size:12px;color:var(--muted)">典型：垃圾邮件过滤(分类)、人脸/车牌识别(视觉)、机器翻译(NLP)、推荐(聚类)、ChatGPT(大模型/深度学习)。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 区块链 — 核心技术与共识机制</h3>
+      <div class="grid2">
+        <div class="card"><div class="c-title">底层技术</div><p><b>哈希函数</b>(链接区块、校验完整性)；<b>非对称加密</b>(签名/交易安全)；<b>Merkle 树</b>(区块头汇总交易哈希)；<b>分布式存储</b>(多节点副本)</p></div>
+        <div class="card"><div class="c-title">共识机制(防止双重支付)</div><p><b>PoW 工作量证明</b>(比特币，算力)；<b>PoS 权益证明</b>(以太坊，持币)；<b>PBFT</b>(拜占庭容错)；<b>PoA 权威证明</b>(信任节点)</p></div>
+      </div>
+      <p style="margin-top:6px;font-size:12px;color:var(--muted)">特性：去中心化、不可篡改、透明、安全、智能合约。应用：金融/供应链/医疗/物联网。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 大数据 — 分析流程</h3>
+      <div class="arrowflow">
+        <span class="step">获取/记录</span><span class="arrow">→</span><span class="step">信息抽取/清洗/注记</span><span class="arrow">→</span><span class="step">集成/聚集/表现</span><span class="arrow">→</span><span class="step">分析/建模</span><span class="arrow">→</span><span class="step">数据解释</span>
+      </div>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 云计算 — 服务方式</h3>
+      <p><span class="hl">IaaS</span>(基础设施即服务，虚拟资源池)、<span class="hl">PaaS</span>(平台即服务，开发环境)、<span class="hl">SaaS</span>(软件即服务，浏览器用)。灵活度 S&lt;P&lt;I，方便度相反。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 边缘计算 — 关键能力</h3>
+      <p>落地形态<span class="hl">云边缘/边缘云/云化网关</span>；核心 <span class="hl">边云协同(资源/数据/智能/应用/业务/服务 六类)</span>、边缘智能。解决挑战：异构、延迟、安全（虚拟化、容器化、微服务、SDN）。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> CPS — 技术体系</h3>
+      <p>总体技术 / 支撑技术 / 核心技术；四大要素 <span class="hl">一硬(感知与自动控制)、一软(工业软件)、一网(工业网络)、一平台(工业云与智能服务平台)</span>。层次：单元级→系统级→SoS级。</p>
+    </div>
+  </div>
+
+  <div class="footer">第 19 章 · 未来信息综合技术 · 软考高级架构师 · 笔记速查</div>
+</div>
+</body>
+</html>

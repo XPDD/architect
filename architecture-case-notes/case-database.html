@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案例分析题 — 数据库 · 电商订单详情缓存</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .body{padding:26px 44px 30px;position:relative;z-index:1}
+  .case-head{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+  .case-head .exam-badge{font-family:var(--font-mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:4px 12px;border-radius:4px;box-shadow:0 0 14px rgba(0,212,255,.3)}
+  .case-head .exam-title{font-size:14px;font-weight:700}
+  .case-head .exam-sub{font-family:var(--font-mono);font-size:10px;color:var(--text-muted);margin-left:auto}
+  .scenario{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-left:2px solid var(--cyan);border-radius:var(--radius);padding:16px 18px;margin-bottom:20px}
+  .scenario-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.14em;margin-bottom:8px}
+  .scenario p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.75}
+  .scenario ul{list-style:none;padding-left:0;margin-top:6px}.scenario ul li{font-size:12.5px;padding:2px 0 2px 18px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .scenario ul li::before{content:'';position:absolute;left:6px;top:9px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.5)}
+  .scenario strong{color:var(--cyan)}
+  .diagram{margin:16px 0 20px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 14px;font-size:11.5px;font-weight:500;color:rgba(255,255,255,.7);text-align:center;white-space:nowrap}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:4px 0}
+  .question{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);border-radius:var(--radius);margin-bottom:16px;overflow:hidden}
+  .question-head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.04)}
+  .question-head .q-tag{font-family:var(--font-mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--purple),var(--blue));padding:3px 10px;border-radius:4px}
+  .question-head .q-title{font-size:13px;font-weight:600}
+  .question-head .q-score{font-family:var(--font-mono);font-size:11px;color:var(--amber);margin-left:auto}
+  .question-body{padding:14px 16px}
+  .question-body p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.75}
+  .question-body ul{list-style:none;padding-left:0;margin-top:6px}.question-body ul li{font-size:12.5px;padding:2px 0 2px 18px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .question-body ul li::before{content:'';position:absolute;left:6px;top:9px;width:4px;height:4px;border-radius:50%;background:rgba(77,124,255,.5)}
+  .answer{display:none;margin:6px 16px 14px;padding:14px 16px;background:rgba(52,211,153,.05);border:1px solid rgba(52,211,153,.15);border-left:2px solid var(--green);border-radius:var(--radius);font-size:12.5px;color:rgba(255,255,255,.8);line-height:1.75}
+  .answer.show{display:block}
+  .answer b{color:var(--green)}.answer .ans-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:6px;display:block}
+  .answer ul{list-style:none;padding-left:0;margin-top:4px}.answer ul li{font-size:12.5px;padding:1px 0 1px 18px;position:relative;color:rgba(255,255,255,.8);line-height:1.6}
+  .answer ul li::before{content:'\00B7';position:absolute;left:4px;color:var(--green)}
+  .reveal{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--green);border:1px solid rgba(52,211,153,.3);background:rgba(52,211,153,.07);padding:6px 16px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .reveal:hover{background:rgba(52,211,153,.14)}
+  .reveal.open{color:var(--text-secondary);border-color:rgba(255,255,255,.1);background:rgba(255,255,255,.02)}
+  .qa-actions{margin-top:6px;padding:0 16px 16px;display:flex;gap:10px;align-items:center}
+  .btn{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)}
+  .foot{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;font-family:var(--font-mono);font-size:12px;margin-top:8px}
+  .foot a{color:var(--text-muted);text-decoration:none;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:1px}
+  .foot a:hover{color:var(--cyan);border-color:var(--cyan)}
+  .foot a.note-link{color:var(--blue);border-color:rgba(77,124,255,.3)}
+  .foot a.quiz-link{color:var(--green);border-color:rgba(52,211,153,.3);font-weight:700}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.header{padding:22px 20px}.header-meta{flex-wrap:wrap;gap:12px}.body{padding:18px 18px 24px}.case-head{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">DB</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">架构直播5 · 案例分析下 / 数据库</div>
+        <div class="header-title">案例分析题 — 电商订单详情缓存系统</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>试题三 · 案例分析（25 分）</div><div class="meta-item"><span class="meta-dot"></span>旁路缓存 · 分布式锁</div><div class="meta-item"><span class="meta-dot"></span>3 个小问 · 可展开参考答案</div></div>
+  </div>
+  <div class="body">
+    <div class="case-head">
+      <div class="exam-badge">试题三</div>
+      <div class="exam-title">阅读以下关于缓存与数据库一致性的叙述，回答问题 1 至问题 3。</div>
+      <div class="exam-sub">P3 · 数据库设计</div>
+    </div>
+
+    <div class="scenario">
+      <div class="scenario-label">【说明】</div>
+      <p>某大型电商平台为缓解订单详情页的高并发读压力，采用 <b>Redis 缓存 + MySQL</b> 的 <b>cache-aside（旁路缓存）</b>架构：应用先读缓存，未命中再读数据库并回填缓存；写操作先更新数据库，再更新/失效缓存。为应对高并发下的缓存异常，团队引入<b>布隆过滤器</b>（用于解决<b>缓存穿透</b>——大量非法/不存在数据的请求绕过缓存直达数据库）；对热点 key 失效则采用<b>互斥锁 / 逻辑过期</b>（解决<b>缓存击穿</b>）；同时为支撑秒杀抢购，使用 <b>Redis 分布式锁</b>保护关键资源。</p>
+      <ul>
+        <li>李工提出缓存与数据库的一致性方案：实时同步更新。<br>张工提出异步准实时更新。</li>
+        <li>王工使用多线程处理：线程 1 负责写入缓存，线程 2 负责读取缓存。</li>
+      </ul>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 1</span><span class="q-title">请写出 cache-aside 架构中「读取数据」「写入数据」的完整流程，并分析多线程下可能产生的一致性风险。</span><span class="q-score">9 分</span></div>
+      <div class="question-body">
+        <p>请写出旁路缓存（cache-aside）架构<b>读取数据</b>与<b>写入数据</b>的过程；并说明王工的多线程读写（写线程未更新完缓存时读线程可能读到旧数据）造成的不一致问题成因，至少给出 3 种解决办法。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a1">查看参考答案</button></div>
+      <div class="answer" id="a1">
+        <span class="ans-label">参考答案</span>
+        <ul>
+          <li><b>读流程</b>：①查询缓存是否有目标数据 →②命中则返回目标数据 →③未命中则访问数据库查询 →④将查询到的数据更新到缓存 →⑤返回目标数据。</li>
+          <li><b>写流程</b>：①更新数据库中的目标信息 →②将更新后的数据写入缓存（确保一致性）。</li>
+          <li><b>一致性风险成因</b>：读写线程并发导致缓存与数据库不一致——如写线程尚未更新完缓存时，读线程读到了旧数据。</li>
+          <li><b>解决办法</b>：①加锁同步——对缓存操作加互斥锁，确保读写互斥；②设置缓存过期时间——强制定期刷新缓存，缩小不一致时间窗口；③延迟双删——写数据库后延迟再次删除缓存，防止旧数据残留；④异步队列——将缓存更新操作串行化到队列处理，避免并发冲突。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 2</span><span class="q-title">缓存与数据库一致性：实时同步更新 vs 异步准实时更新，应如何选择？请说明选择依据。</span><span class="q-score">8 分</span></div>
+      <div class="question-body">
+        <p>李工建议实时同步更新，张工建议异步准实时更新。请分别简述两种方案的基本思路，并说明本场景（读多写少、对响应速度要求极高）应选哪种方案及原因。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a2">查看参考答案</button></div>
+      <div class="answer" id="a2">
+        <span class="ans-label">参考答案</span>
+        <ul>
+          <li><b>实时同步更新</b>：每次数据更新立即同步更新缓存与数据库，确保两者一致，适合一致性要求高的场景，但性能开销大。</li>
+          <li><b>异步准实时更新</b>：数据库更新后，稍后通过异步机制更新缓存（批量/定时同步），数据在一定时间内趋于一致，适合对实时性要求不高的场景。</li>
+          <li><b>选择</b>：本场景应选<b>异步准实时更新</b>。原因是订单详情类功能<b>读操作远多于写操作</b>、对系统响应速度要求极高，异步更新能减少实时同步的性能开销，保证系统高效与用户体验。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="question">
+      <div class="question-head"><span class="q-tag">问题 3</span><span class="q-title">请区分缓存穿透与缓存击穿，并说明布隆过滤器如何解决缓存穿透，及 Redis 分布式锁。</span><span class="q-score">8 分</span></div>
+      <div class="question-body">
+        <p>请先指出<b>缓存穿透</b>与<b>缓存击穿</b>的区别；再解释布隆过滤器的工作原理与优缺点，并说明它如何解决<b>缓存穿透</b>（而非缓存击穿）；最后说明基于 MySQL 与基于 Redis 的分布式锁各自的适用性，以及 Redis 分布式锁的一种死锁场景。</p>
+      </div>
+      <div class="qa-actions"><button class="reveal" data-target="a3">查看参考答案</button></div>
+      <div class="answer" id="a3">
+        <span class="ans-label">参考答案</span>
+        <ul>
+          <li><b>缓存穿透 vs 击穿</b>：<b>穿透</b>＝查询<b>根本不存在</b>的数据（如恶意请求不存在 ID），缓存永远不命中，每次都打数据库；<b>击穿</b>＝某个<b>热点 key 过期的瞬间</b>，大量并发请求同时打到数据库。穿透用<b>布隆过滤器</b>/缓存空值解决；击穿用<b>互斥锁</b>/逻辑过期解决。</li>
+          <li><b>布隆过滤器</b>：空间效率高的概率型数据结构，用多个哈希函数把数据映射到位数组。判断存在时检查多个哈希值对应位是否全为 1：有任一为 0 → 一定不存在；全为 1 → 可能存在（有假阳性）。优点：内存小、查询快、适合大规模；缺点：有假阳性、无法删除已添加数据。</li>
+          <li><b>解决缓存穿透</b>：把可能存在的数据 key 预先放入布隆过滤器；请求到来先查布隆过滤器，若判断「一定不存在」直接返回，避免无效/非法请求反复打数据库，从而缓解<b>缓存穿透</b>。</li>
+          <li><b>MySQL 锁缺点</b>：性能瓶颈、单点故障、锁粒度问题、数据一致性、扩展性差、容错性差；<b>Redis 锁</b>更适合高并发分布式场景，配合过期时间与续期使用。</li>
+          <li><b>死锁场景</b>：客户端 A 获锁后执行任务，执行时间超过锁有效期，锁自动过期释放，客户端 B 获得锁；A 尚未完成任务仍以为自己持锁继续执行，导致多个客户端对资源并发操作混乱。</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="foot">
+      <a href="database.html">← 数据库 · 笔记</a>
+      <a href="quiz-database.html">选择题题库</a>
+      <a href="index.html">返回索引</a>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.reveal').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    const el=document.getElementById(btn.dataset.target);
+    const open=el.classList.toggle('show');
+    btn.textContent=open?'收起参考答案':'查看参考答案';
+    btn.classList.toggle('open',open);
+  });
+});
+</script>
+</body>
+</html>

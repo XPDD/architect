@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>第 17 章 软件可靠性 · 知识笔记</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--radius-lg:12px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);line-height:1.7;min-height:100vh;padding:40px 16px}
+  .wrap{max-width:920px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:13px;margin-bottom:16px}
+  .hero{text-align:center;padding:44px 20px 34px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:28px;position:relative;overflow:hidden}
+  .hero::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .hero-badge{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--green);letter-spacing:.22em;margin-bottom:10px}
+  .hero h1{font-size:30px;font-weight:800;letter-spacing:-.02em}.hero h1 .accent{color:var(--green);text-shadow:0 0 24px rgba(52,211,153,.3)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:10px}
+  .hero-stats{display:flex;justify-content:center;gap:18px;margin-top:20px;flex-wrap:wrap}
+  .hero-stat{padding:7px 16px;border-radius:6px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);font-size:12px;color:var(--text2)}
+  .hero-stat strong{color:var(--green);font-family:var(--mono);font-size:16px}
+  .section{margin-bottom:26px}
+  .sec-head{display:flex;align-items:center;gap:12px;margin:0 0 12px}
+  .sec-head .s-num{font-family:var(--mono);font-size:12px;font-weight:700;letter-spacing:.1em;padding:4px 12px;border-radius:4px;color:var(--green);background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);white-space:nowrap}
+  .sec-head h2{font-size:18px;font-weight:700}
+  .sec-head .rule{flex:1;height:1px;background:var(--border)}
+  .block{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:10px}
+  .block h3{font-size:14px;font-weight:700;margin-bottom:8px;color:var(--text)}
+  .block h3 .dot{color:var(--green)}
+  .block p,.block li{font-size:13px;color:var(--text2);line-height:1.7}
+  .block ul,.block ol{margin-left:18px;list-style:none}
+  .block ul li{position:relative;padding-left:14px}
+  .block ul li::before{content:'\203A';position:absolute;left:0;color:var(--green)}
+  .block ol{counter-reset:li}
+  .block ol li{position:relative;padding-left:26px;counter-increment:li;margin-bottom:6px}
+  .block ol li::before{content:counter(li);position:absolute;left:0;top:0;width:18px;height:18px;border-radius:4px;background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.25);color:var(--green);font-family:var(--mono);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .card{background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px}
+  .card .c-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:6px}
+  .card ul li{font-size:12px;color:var(--text2);padding-left:12px;position:relative;line-height:1.6;margin-bottom:3px}
+  .card ul li::before{content:'\00B7';position:absolute;left:0;color:var(--green)}
+  .hl{color:var(--green);font-weight:600}
+  .hl-amber{color:var(--amber);font-weight:600}
+  .hl-cyan{color:var(--cyan);font-weight:600}
+  .hl-purple{color:var(--purple);font-weight:600}
+  .formula{background:rgba(0,212,255,.05);border:1px solid rgba(0,212,255,.15);border-left:3px solid var(--cyan);border-radius:var(--radius);padding:10px 14px;margin:8px 0;font-family:var(--mono);font-size:13px;color:var(--cyan);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .formula .tag{font-family:var(--sans);font-size:10px;color:var(--text2);margin-right:2px}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin:8px 0}
+  thead th{background:rgba(255,255,255,.03);color:var(--text2);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--mono);letter-spacing:.06em;border-bottom:1px solid rgba(52,211,153,.15)}
+  tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:var(--text2);font-size:12px;line-height:1.6}
+  tbody td:first-child{color:var(--text);font-weight:600}
+  .arrowflow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:12px;color:var(--text2);margin:8px 0}
+  .step{padding:5px 10px;border-radius:4px;background:rgba(77,124,255,.06);border:1px solid rgba(77,124,255,.18);color:var(--blue);font-weight:600}
+  .arrow{color:var(--muted)}
+  .footer{text-align:center;padding:24px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  @media(max-width:640px){.hero h1{font-size:24px}.grid2,.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../index.html">← 返回总索引</a>
+
+  <div class="hero">
+    <div class="hero-badge">CHAPTER 17 · SOFTWARE RELIABILITY</div>
+    <h1><span class="accent">软件可靠性</span></h1>
+    <div class="hero-sub">软考高级系统架构设计师 · 概念 · 建模 · 容错设计 · 测试与评价</div>
+    <div class="hero-stats">
+      <div class="hero-stat">容错技术 <strong>3</strong> 项</div>
+      <div class="hero-stat">冗余技术 <strong>4</strong> 种</div>
+      <div class="hero-stat">负载均衡 <strong>5</strong> 种</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">01</span><h2>基本概念与定量描述</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 定义</h3>
+      <p>软件可靠性是软件产品在<span class="hl">规定的条件</span>和<span class="hl">规定的时间区间</span>内<span class="hl">完成规定功能</span>的能力。</p>
+      <div class="grid2" style="margin-top:8px">
+        <div class="card">
+          <div class="c-title">可用性（Availability）—— "能不能用"</div>
+          <ul>
+            <li>正常工作时间所占<b>比例</b>（某个时刻系统在不在线）</li>
+            <li>核心指标：<b>可用度百分比</b>（如 99.9%，"几个 9"）</li>
+            <li>提升手段：<b>冗余、负载均衡、故障转移、快速恢复</b>（治"坏得快"）</li>
+            <li>像<b>随时待命的服务生</b>——中间离开过没关系，你需要时"在场"就行</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="c-title">可靠性（Reliability）—— "做得好不好"</div>
+          <ul>
+            <li>持续<b>无故障运行</b>的能力（一段时间内正确、稳定）</li>
+            <li>核心指标：<b>MTBF / MTTF</b>（平均无故障时间、失效前时间）</li>
+            <li>提升手段：<b>代码质量、充分测试、容错设计、失效预防</b>（治"老出错"）</li>
+            <li>像<b>从不出错的马拉松选手</b>——任务从头到尾一次做对、不中断</li>
+          </ul>
+        </div>
+      </div>
+      <div class="formula"><span class="tag">关系与易混</span>可用性 = MTTF / (MTTF + MTTR)。可用性看"能用的时间占比"，可靠性看"少出错、不出错"。</div>
+      <div class="block" style="margin-top:6px">
+        <h3><span class="dot">▸</span> 一句话记忆 + 两个反例（考点）</h3>
+        <p class="hl-green">口诀：卖门票的看"能用"（可用性），管账本的看"别算错"（可靠性）。</p>
+        <ul>
+          <li><b>高可用、低可靠</b>：网页随时打得开（可用），但一提交表单就报错（可靠低）。</li>
+          <li><b>高可靠、低可用</b>：系统运行极稳定（可靠），但一升级维护就停机半天（可用低）。</li>
+        </ul>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px">→ 金融/支付/航天/工业：重可靠；在线电商/社交/视频：重可用。</p>
+      </div>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 软件 vs 硬件可靠性（4 点差异，考点）</h3>
+      <ul>
+        <li><span class="hl">复杂性</span>：软件复杂性比硬件高，大部分失效来自软件失效。</li>
+        <li><span class="hl">物理退化</span>：硬件失效主要是物理退化所致，<span class="hl-amber">软件不存在物理退化</span>。</li>
+        <li><span class="hl">唯一性</span>：软件是唯一的（同版本每个 copy 相同），两个硬件不可能完全一样。</li>
+        <li><span class="hl">版本更新周期</span>：硬件较慢，软件较快。</li>
+      </ul>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 定量描述指标</h3>
+      <div class="arrowflow">
+        <span class="step">规定时间</span><span class="arrow">→</span><span class="step">自然/运行/执行时间（占CPU）</span>
+      </div>
+      <div class="formula"><span class="tag">可靠度</span>R = 1 − 失效概率<span class="arrow">→</span>初始为 0，随运行时间单调递增，趋向 1</div>
+      <table>
+        <thead><tr><th>指标</th><th>英文全称</th><th>含义</th></tr></thead>
+        <tbody>
+          <tr><td>失效强度</td><td>Failure Intensity</td><td>单位时间内软件系统出现失效的概率</td></tr>
+          <tr><td>MTTF</td><td>Mean Time To Failure</td><td>平均失效前时间（发生故障前正常运行的时间）</td></tr>
+          <tr><td>MTTR</td><td>Mean Time To Repair</td><td>平均恢复前时间（故障后的修复时间）</td></tr>
+          <tr><td>MTBF</td><td>Mean Time Between Failures</td><td>平均故障间隔时间 = <span class="hl-cyan">MTTF + MTTR</span></td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:12px;color:var(--muted);margin-top:6px">记忆：MTTF 看"首次坏之前"，MTTR 看"坏了多久修好"，MTBF 看"两次故障之间"，MTBF = MTTF + MTTR。失效强度即失效率。</p>
+      <div class="formula"><span class="tag">全系统可用性</span>= MTTF / (MTTF + MTTR) × 100%</div>
+      <div class="formula"><span class="tag">等价写法</span>= MTBF / (MTBF + MTTR) = 1 − MTTR / (MTTF + MTTR)</div>
+      <div class="block" style="margin-top:6px">
+        <h3><span class="dot">▸</span> 这个公式是怎么来的？</h3>
+        <ul>
+          <li><b>一个周期</b>：正常运转 MTTF → 故障停机 MTTR → 再运转 MTTF → 再停机 MTTR… 一个"运转-修复"循环总时间 = <b>MTTF + MTTR = MTBF</b>。</li>
+          <li><b>能用的占比</b>：总时间里只有 <b>MTTF</b> 这段真正"能用"，其余 MTTR 在修。</li>
+          <li><b>推出</b>：可用性 = 能用的时间 ÷ 总时间 = <b>MTTF / (MTTF + MTTR)</b>。</li>
+        </ul>
+        <p style="font-size:12px;color:var(--muted);margin-top:6px">为什么"可用 ≠ 可靠"：A 系统 MTTF=900、MTTR=100 → 可用 90%（少坏但修得慢）；B 系统 MTTF=99、MTTR=1 → 可用 99%（老坏但秒修）。只要 MTTR 足够短，可用性就能很高。</p>
+      </div>
+      <svg viewBox="0 0 760 230" style="width:100%;max-width:760px;display:block;margin:14px auto 4px" role="img" aria-label="可用性公式推导示意图">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4d7cff"/></marker>
+        </defs>
+        <!-- timeline baseline -->
+        <line x1="30" y1="120" x2="730" y2="120" stroke="rgba(255,255,255,.2)" stroke-width="2"/>
+        <!-- cycle 1 -->
+        <rect x="40" y="90" width="420" height="60" rx="6" fill="rgba(52,211,153,.10)" stroke="#34d399" stroke-width="2"/>
+        <rect x="460" y="90" width="120" height="60" rx="6" fill="rgba(248,113,113,.12)" stroke="#f87171" stroke-width="2"/>
+        <!-- cycle 2 (tail) -->
+        <rect x="580" y="90" width="120" height="60" rx="6" fill="rgba(52,211,153,.10)" stroke="#34d399" stroke-width="2" opacity=".6"/>
+        <!-- cycle 1 brackets -->
+        <path d="M40,175 L40,165 L580,165 L580,175" stroke="#fbbf24" stroke-width="2" fill="none"/>
+        <text x="90" y="200" fill="#fbbf24" font-size="13" font-weight="700">MTTF</text>
+        <path d="M40,205 L40," fill="none"/>
+        <path d="M460,205 L460,195 L460,205" stroke="#f87171" stroke-width="2" fill="none"/>
+        <text x="474" y="200" fill="#f87171" font-size="13" font-weight="700">MTTR</text>
+        <!-- labels -->
+        <text x="250" y="80" fill="#34d399" font-size="14" font-weight="700" text-anchor="middle">正常运转 MTTF（能用）</text>
+        <text x="520" y="80" fill="#f87171" font-size="14" font-weight="700" text-anchor="middle">停机 MTTR（在修）</text>
+        <text x="640" y="80" fill="#34d399" font-size="13" text-anchor="middle" opacity=".8">再运转…</text>
+        <!-- availability formula -->
+        <g>
+          <rect x="140" y="150" width="480" height="30" rx="6" fill="rgba(0,212,255,.08)" stroke="rgba(0,212,255,.3)" stroke-width="1"/>
+          <text x="380" y="170" fill="#00d4ff" font-size="14" font-weight="700" text-anchor="middle">可用性 = 能用的时间 ÷ 总时间 = MTTF ÷ (MTTF + MTTR)</text>
+        </g>
+      </svg>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 串并联系统可靠性（图中公式）</h3>
+      <div class="grid2">
+        <div class="card">
+          <div class="c-title">串联系统（一坏全坏）</div>
+          <div class="formula">R = R<sub>1</sub> · R<sub>2</sub> · … · R<sub>n</sub></div>
+        </div>
+        <div class="card">
+          <div class="c-title">并联系统（全坏才坏）</div>
+          <div class="formula">R = 1 − (1−R<sub>1</sub>)(1−R<sub>2</sub>)…(1−R<sub>n</sub>)</div>
+        </div>
+      </div>
+      <p>图为串联「输入→R1→R2→…→Rn→输出」；并联「输入→(R1/R2/…/Rn 平行)→输出」。</p>
+      <div class="block" style="margin-top:8px">
+        <h3><span class="dot">▸</span> 为什么这样算（概率的"与"）</h3>
+        <ul>
+          <li><b>串联 = 求"都对"</b>：系统正常 ⇔ 所有部件都正常（独立事件同时发生，概率<b>相乘</b>）。例 R1=0.9、R2=0.8 → R=0.9×0.8=<b>0.72</b>（越串越不可靠）。</li>
+          <li><b>并联 = 求"别全坏"</b>：系统失效 ⇔ 所有部件都坏。先算全坏概率 F=(1−R<sub>1</sub>)(1−R<sub>2</sub>)…，再用 <span class="hl-cyan">1 − F</span>。例 F=0.1×0.2=0.02 → R=1−0.02=<b>0.98</b>（越并越可靠）。</li>
+          <li>一句话：<b>串联相乘（要全部好，变低）；并联"1 减全坏"（一个顶住，变高）</b>。</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">02</span><h2>可靠性建模</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 定义与影响因素</h3>
+      <p>可靠性模型 = 为预计或估算软件可靠性所建立的<span class="hl">可靠性框图</span>和<span class="hl">数学模型</span>。</p>
+      <p>影响因素：<span class="hl">运行环境、软件规模、软件内部结构、开发方法和环境、可靠性投入</span>。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 模型的组成</h3>
+      <ul>
+        <li><span class="hl">模型假设</span>：模型是对实际情况的简化/规范化（如测试代表实际运行剖面）。</li>
+        <li><span class="hl">性能度量</span>：模型输出量（失效强度、残留缺陷数）。</li>
+        <li><span class="hl">参数估计方法</span>：无法直接获取的度量（如残留缺陷数）通过参数估计间接确定。</li>
+        <li><span class="hl">数据要求</span>：模型要求一定的输入数据（可靠性数据）。</li>
+      </ul>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 三大共同假设（考点）</h3>
+      <div class="grid3">
+        <div class="card"><div class="c-title">代表性假设</div><ul><li>可用测试产生的可靠性数据预测运行阶段行为</li></ul></div>
+        <div class="card"><div class="c-title">独立性假设</div><ul><li>失效独立发生于不同时刻，互不影响</li></ul></div>
+        <div class="card"><div class="c-title">相同性假设</div><ul><li>所有失效后果（等级）相同，只考虑发生时刻</li></ul></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 可靠性模型分类（了解概念）</h3>
+      <p>种子法、失效率类、曲线拟合类、可靠性增长模型、程序结构分析、输入域分类、执行路径分析、非齐次泊松过程（NHPP）、马尔可夫过程、贝叶斯模型。</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">03</span><h2>可靠性设计（重点 · 容错）</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 设计手段：避错 vs 容错</h3>
+      <div class="grid2">
+        <div class="card">
+          <div class="c-title">避错（排错）</div>
+          <ul><li>通过<strong>技术评审、系统测试、正确性证明</strong>，在系统正式运行前发现并改正错误</li></ul>
+        </div>
+        <div class="card">
+          <div class="c-title">容错</div>
+          <ul><li>系统运行中发生一定<strong>硬件故障/软件错误</strong>时仍能正常工作的性能/措施，<strong>主要采用冗余</strong>消除故障影响</li></ul>
+        </div>
+      </div>
+      <p style="margin-top:8px">实践：<span class="hl-amber">设计阶段采取可靠性控制最有效、最经济、最重要</span>。原则：在总体设计框架内、不与其他设计原则冲突；排在功能度、用户需求、开发费用之后考虑。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 冗余技术（容错的基础）</h3>
+      <p>在正常系统运行所需基础上增加一定数量资源（信息、时间、硬件、软件）。四种：</p>
+      <div class="grid2">
+        <div class="card"><div class="c-title">结构冗余</div><ul><li>静态、动态、混合</li></ul></div>
+        <div class="card"><div class="c-title">信息冗余</div><ul><li>如校验码、纠错码</li></ul></div>
+        <div class="card"><div class="c-title">时间冗余</div><ul><li>重试、重复执行</li></ul></div>
+        <div class="card"><div class="c-title">冗余附加</div><ul><li>用于冗余检测和维护</li></ul></div>
+      </div>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 三大软件容错技术（高频考点）</h3>
+      <table>
+        <thead><tr><th>技术</th><th>思想</th></tr></thead>
+        <tbody>
+          <tr><td>N 版本程序设计</td><td>用 <span class="hl">N 个功能相同程序同时执行</span>，结果通过<span class="hl">多数表决</span>选出；N 个版本必须<span class="hl">由不同人独立设计</span>、用不同方法/语言/环境/工具，降低表决点相关错误概率</td></tr>
+          <tr><td>恢复块设计</td><td>动态冗余（主动冗余）：<span class="hl">故障检测→定位→恢复</span>，用备用模块替换重跑；备用模块待机时并行工作=热备份，不工作=冷备份</td></tr>
+          <tr><td>防卫式程序设计</td><td>不含传统容错，在程序中加<strong>错误检查代码 + 错误恢复代码</strong>，出错时撤销错误状态回到已知正确状态；策略=错误检测、破坏估计、错误恢复</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 双机容错</h3>
+      <p>软硬结合方案（两台服务器 + 外接共享磁盘阵列 + 双机软件）。用<span class="hl">心跳</span>保持主备系统联系；心跳信号表明主系统故障或备机收不到主机心跳 → 高可用管理软件立即转移资源，备机替代工作。</p>
+      <p>工作模式：<span class="hl">双机热备、双机互备、双机双工</span>。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 集群技术与负载均衡</h3>
+      <p>集群：多台计算机协同工作，提高可用性与可靠性；特点=<span class="hl">可伸缩、高可用、可管理、高性价比、高透明</span>；分类=高性能计算集群、负载均衡集群、高可用性集群。</p>
+      <p>负载均衡常用技术：</p>
+      <ol>
+        <li>基于特定软件（应用层，如 HTTP 重定向）</li>
+        <li>基于 DNS（传输层，主机名配多地址轮询）</li>
+        <li>基于 NAT（一个外网 IP 映射多个内网 IP）</li>
+        <li>反向代理（转发到内网多节点）</li>
+        <li>混合型</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-head"><span class="s-num">04</span><h2>可靠性测试与评价</h2><span class="rule"></span></div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 测试步骤</h3>
+      <div class="arrowflow">
+        <span class="step">定义软件运行剖面</span><span class="arrow">→</span><span class="step">设计可靠性测试用例</span><span class="arrow">→</span><span class="step">实施可靠性测试</span>
+      </div>
+      <p style="margin-top:6px">广义：为评价可靠性而运用建模、统计、试验、分析、评价等手段；狭义：为获取可靠性数据，按预先确定的测试用例在预期使用环境中测试（<span class="hl">面向缺陷，以用户方式测试</span>）。</p>
+    </div>
+    <div class="block">
+      <h3><span class="dot">▸</span> 可靠性评价三过程</h3>
+      <div class="arrowflow">
+        <span class="step">选择可靠性模型</span><span class="arrow">→</span><span class="step">收集可靠性数据</span><span class="arrow">→</span><span class="step">可靠性评估与预测</span>
+      </div>
+      <p style="margin-top:6px">选模型考虑：模型假设适用性、预测能力与质量、输出值能否满足评价需求、使用的简便性。数据是可靠性评价基础，主要在测试/实施阶段收集。辅助方法：失效数据图形分析、试探性数据分析技术。</p>
+    </div>
+  </div>
+
+  <div class="footer">第 17 章 · 软件可靠性 · 软考高级架构师 · 笔记速查</div>
+</div>
+</body>
+</html>

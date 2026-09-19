@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数据库设计 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>数据库设计 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"考试特点", q:"关于数据库设计考题特点，正确的是（　）。",
+   options:["必考关系型数据库的纯理论","一定会给出数据库选型或应用场景，且必考 NoSQL（Redis 概率最高）","完全不考 NoSQL","不会考 Redis 相关操作"],
+   answer:1, explain:"数据库题<strong>一定会给出选型/应用场景</strong>；<strong>必考 NoSQL</strong>，其中 Redis 被考概率最高（缓存三剑客、分布式锁、持久化）；且趋势是有一问「操作类选择题」。"},
+
+  {topic:"缓存一致性", q:"某系统「读操作远多于写操作、对响应速度要求极高」，缓存与数据库一致性方案应选（　）。",
+   options:["实时同步更新","异步准实时更新","关闭缓存","删除数据库"],
+   answer:1, explain:"<strong>读多写少</strong>且要求响应快，应选<strong>异步准实时更新</strong>——数据库更新后通过异步机制/批量定时同步缓存，减少实时同步性能开销、保证高效与体验。"},
+
+  {topic:"缓存一致性", q:"关于缓存与数据库「实时同步更新」方案，正确的是（　）。",
+   options:["数据更新时立即同步更新缓存和数据库，保证一致","数据更新后稍后通过异步机制更新缓存","只能支持异步","会牺牲数据一致性"],
+   answer:0, explain:"<strong>实时同步更新</strong>＝每次更新立即同步缓存和数据库，保证两者一致、数据始终最新，适合一致性要求高的场景；异步准实时则稍后再同步、趋于一致。"},
+
+  {topic:"一致性哈希", q:"相比普通哈希算法，一致性哈希算法的核心优势是（　）。",
+   options:["实现更简单，无需映射环空间","增/减节点时只需重新分配一小部分数据，避免缓存抖动","总是把数据放到第一个节点","不需要哈希函数"],
+   answer:1, explain:"<strong>一致性哈希</strong>把节点和数据映射到虚拟环形空间，增/减节点时<strong>仅一小部分数据需重新分配</strong>，有效避免传统哈希在节点变化时需重分配大量数据的「缓存抖动」问题。"},
+
+  {topic:"一致性哈希", q:"传统哈希算法在缓存节点的缺点是（　）。",
+   options:["节点扩展或减少时需要重新分配大量数据","永远不需要重新分配数据","只能用于单节点","无法做数据分片"],
+   answer:0, explain:"<strong>传统哈希</strong>节点扩展/减少时<strong>需重新分配大量数据</strong>，存在缓存抖动问题；一致性哈希则只需挪少量数据。"},
+
+  {topic:"布隆过滤器", q:"关于布隆过滤器，下列说法正确的是（　）。",
+   options:["用单个哈希函数映射到位数组","有任一哈希位为 0 说明数据一定不存在","一定不存在误判","支持删除已添加的数据"],
+   answer:1, explain:"布隆过滤器用<strong>多个哈希函数</strong>映射到<strong>一个位数组</strong>：任一哈希位为 0 → <strong>一定不存在</strong>；全为 1 → 可能存在。<strong>可能有假阳性、无法删除已添加数据</strong>。"},
+
+  {topic:"布隆过滤器", q:"布隆过滤器的缺点是（　）。",
+   options:["占用内存大、查询慢","存在假阳性（可能误判）且无法删除已添加数据","无法处理大规模数据","只能精确判断存在性"],
+   answer:1, explain:"布隆过滤器<strong>优点</strong>：内存小、查询快、适合大规模；<strong>缺点</strong>：<strong>可能有假阳性</strong>、<strong>无法删除已添加数据</strong>。"},
+
+  {topic:"布隆过滤器", q:"缓存穿透指的是（　）。",
+   options:["查询根本不存在的数据（如恶意请求不存在 ID），缓存永不命中、每次都打数据库","缓存服务器宕机","热点 key 过期的瞬间大量请求涌向数据库","大量 key 同时失效导致数据库压力激增"],
+   answer:0, explain:"<strong>缓存穿透</strong>＝查询<strong>根本不存在</strong>的数据，缓存永不命中、每次都打数据库。解决用<strong>布隆过滤器</strong>（先判断 key 是否可能存在，不存在直接返回）或缓存空值。这是布隆过滤器真正解决的场景。"},
+
+  {topic:"布隆过滤器", q:"缓存击穿指的是（　）。",
+   options:["缓存中存储的特定热点数据失效的瞬间，大量并发请求同时涌向数据库","查询不存在的数据导致缓存永不命中","大量 key 同一时间失效导致数据库压力激增","缓存服务器宕机"],
+   answer:0, explain:"<strong>缓存击穿</strong>＝某个<strong>热点 key 过期的瞬间</strong>，大量并发请求同时打到数据库。解决用<strong>互斥锁 / 逻辑过期</strong>。<strong>注意与缓存穿透区分</strong>：穿透是「数据根本不存在」，用布隆过滤器；雪崩是「大量 key 同时失效」，用随机 TTL/多级缓存/集群。"},
+
+  {topic:"分布式锁", q:"基于 MySQL 实现分布式锁的缺点，不包括（　）。",
+   options:["单点故障，数据库故障则锁失效","高并发下大量锁请求导致性能下降","扩展性差，单库难以满足性能容量需求","锁一定能跨网络分区可靠工作"],
+   answer:3, explain:"MySQL 分布式锁缺点：<strong>性能瓶颈、单点故障、锁粒度问题、数据一致性、扩展性差、容错性差</strong>（网络分区时不如 ZooKeeper/Redis 可靠）。「一定跨分区可靠」恰恰是它的缺点，而不是不存在的优点。"},
+
+  {topic:"分布式锁", q:"典型的 Redis 分布式锁「死锁场景」是（　）。",
+   options:["客户端 A 执行时间超过锁有效期，锁自动过期，客户端 B 获得锁，A 仍继续执行导致并发混乱","客户端获取锁后立即释放","两个客户端串行持锁","客户端从不请求锁"],
+   answer:0, explain:"<strong>死锁场景</strong>：A 获锁后执行任务，执行时间超过锁有效期 → 锁自动过期释放 → B 获得锁；A 未完成任务仍以为自己持锁继续执行 → 多个客户端对资源并发操作混乱。"},
+
+  {topic:"ZSet 命令", q:"基于 Redis ZSet 实现秒杀分数时，「获取分数范围」对应的命令是（　）。",
+   options:["ZADD","ZRANGE","ZSCORE","ZREM"],
+   answer:1, explain:"存入秒杀分数用 <strong>ZADD</strong>；获取分数范围用 <strong>ZRANGE</strong>；获取分数用 <strong>ZSCORE</strong>。"},
+
+  {topic:"cache-aside", q:"cache-aside（旁路缓存）架构的读取流程，正确顺序是（　）。",
+   options:["直接读数据库→返回","查询缓存→命中返回；未命中则访问数据库→将数据更新到缓存→返回","先写数据库再删缓存","每次必读数据库"],
+   answer:1, explain:"cache-aside 读：<strong>①查缓存是否有目标数据 → ②命中则返回 → ③未命中访问数据库查询 → ④把查询到的数据更新到缓存 → ⑤返回目标数据</strong>。"},
+
+  {topic:"cache-aside", q:"cache-aside 架构中，解决「读多线程」导致的缓存与数据库不一致问题，正确的解决办法是（　）。",
+   options:["加互斥锁同步、设置缓存过期时间、延迟双删、异步队列","删除数据库记录","永远不写缓存","只用一个线程处理所有请求"],
+   answer:0, explain:"一致性解决办法：<strong>①加锁同步（读写互斥）②设置缓存过期时间（缩小不一致窗口）③延迟双删（写库后延迟再删缓存防旧数据残留）④异步队列（串行化缓存更新避免并发冲突）</strong>。"},
+
+  {topic:"应用场景", q:"大数据分析预测各地仓储中心货物配置数量、订单反馈送达时间要求响应小于 1 秒，采用缓存策略时，综合考虑最合适的做法是（　）。",
+   options:["实时同步更新缓存","读多写少场景采用异步准实时更新","完全不用缓存","所有数据只放缓存不放数据库"],
+   answer:1, explain:"订单反馈送达时间的功能<strong>读操作远多于写操作、响应速度要求极高</strong>，应采用<strong>异步准实时更新</strong>，既保证数据趋一致又减少性能开销。"},
+];
+</script>
+<script>
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '数据库稳分题这把稳了！' : pct >= 60 ? '基本掌握，建议回顾数据库笔记。' : '还需加强，建议重读数据库笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

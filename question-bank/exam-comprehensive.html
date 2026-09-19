@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模拟综合卷 · 系统架构设计师</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(167,139,250,.04)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:32px 16px}
+  .wrap{max-width:900px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+  .hero{text-align:center;padding:34px 20px 26px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:20px}
+  .hero-badge{font-family:var(--mono);font-size:11px;color:var(--purple);letter-spacing:.2em;margin-bottom:8px}
+  .hero h1{font-size:26px;font-weight:800}.hero h1 .accent{color:var(--purple)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:8px}
+  .toolbar{position:sticky;top:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:rgba(17,22,32,.92);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:20px;z-index:10}
+  .timer{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--cyan);text-shadow:0 0 10px rgba(0,212,255,.4)}
+  .toolbar .spacer{flex:1}
+  .btn{background:none;border:1px solid rgba(0,212,255,.35);color:var(--cyan);border-radius:6px;padding:7px 16px;font-size:13px;cursor:pointer;font-family:var(--mono);transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.08)}
+  .btn.warn{border-color:rgba(251,191,36,.4);color:var(--amber)}
+  .btn.warn:hover{background:rgba(251,191,36,.08)}
+  .btn.ok{border-color:rgba(52,211,153,.4);color:var(--green)}
+  .btn.ok:hover{background:rgba(52,211,153,.08)}
+  .progress{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px}
+  .progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .2s}
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 22px;margin-bottom:14px}
+  .q-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .q-num{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--purple),var(--blue));padding:2px 9px;border-radius:4px}
+  .q-tag{font-size:10px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+  .q-stem{font-size:15px;font-weight:600;line-height:1.7;margin-bottom:12px;white-space:pre-line}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+  .opt{font-size:13.5px;color:var(--text2);line-height:1.5;padding:8px 12px;border:1px solid transparent;border-radius:6px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .opt:hover{border-color:rgba(0,212,255,.35);background:rgba(0,212,255,.05);color:var(--text)}
+  .opt b{color:var(--cyan);font-family:var(--mono)}
+  .opt.picked{border-color:rgba(77,124,255,.6);background:rgba(77,124,255,.1);color:var(--text)}
+  .q-card .correct .opt.correct{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1);color:var(--text)}.q-card .correct .opt.correct b{color:var(--green)}
+  .q-card .wrong .opt.correct{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1)}.q-card .wrong .opt.correct b{color:var(--green)}
+  .q-card .wrong .opt.wrong{border-color:rgba(248,113,113,.6);background:rgba(248,113,113,.1)}.q-card .wrong .opt.wrong b{color:var(--rose)}
+  .review{display:none;margin-top:12px;padding:12px 14px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .review.show{display:block}
+  .review .ans{color:var(--green);font-weight:700;font-family:var(--mono)}
+  .score-panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;text-align:center;margin-bottom:20px;display:none}
+  .score-panel.show{display:block}
+  .score-num{font-family:var(--mono);font-size:46px;font-weight:800;color:var(--purple);text-shadow:0 0 24px rgba(167,139,250,.4)}
+  .score-sub{font-size:13px;color:var(--text2);margin-top:6px}
+  .score-detail{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:14px}
+  .score-detail .d{text-align:center}.score-detail .d strong{font-size:20px;font-family:var(--mono)}.score-detail .d.ok strong{color:var(--green)}.score-detail .d.bad strong{color:var(--rose)}.score-detail .d .lbl{font-size:10px;color:var(--muted)}
+  .footer{text-align:center;padding:20px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  @media(max-width:640px){.opts{grid-template-columns:1fr}}.locked{pointer-events:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回题库索引</a>
+  <div class="hero">
+    <div class="hero-badge">MOCK EXAM · 跨章节综合</div>
+    <h1>系统架构设计师 <span class="accent">模拟综合卷</span></h1>
+    <div class="hero-sub">25 题 · 限时 30 分钟 · 覆盖第 15–23 章核心 · 自动计时判分</div>
+  </div>
+
+  <div class="toolbar">
+    <span class="timer" id="timer">30:00</span>
+    <span class="spacer"></span>
+    <span id="answered" style="font-family:var(--mono);font-size:12px;color:var(--text2)">已答 0 / 25</span>
+    <button class="btn ok" id="gradeBtn">提交判分</button>
+    <button class="btn warn" id="resetBtn">重新开始</button>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="score-panel" id="scorePanel">
+    <div class="score-num" id="scoreNum">0</div>
+    <div class="score-sub" id="scoreSub"></div>
+    <div class="score-detail">
+      <div class="d ok"><strong id="scRight">0</strong><div class="lbl">答对</div></div>
+      <div class="d bad"><strong id="scWrong">0</strong><div class="lbl">答错</div></div>
+      <div class="d"><strong id="scBlank">0</strong><div class="lbl">未答</div></div>
+    </div>
+  </div>
+
+  <div id="questions"></div>
+
+  <div class="footer">模拟综合卷 · 2026</div>
+</div>
+<script>
+var QUESTIONS = [
+ {ch:'第17章',q:'某系统平均失效前时间(MTTF)=200h，平均故障修复时间(MTTR)=50h，则平均故障间隔时间(MTBF)与全系统可用性分别为（ ）。',opts:['250h；80%','200h；75%','250h；75%','150h；80%'],ans:'A',why:'MTBF = MTTF + MTTR = 250；可用性 = MTTF/(MTTF+MTTR) = 200/250 = 80%。'},
+ {ch:'第17章',q:'软件与硬件可靠性的主要区别，下列说法错误的是（ ）。',opts:['软件无物理退化','软件存在老化磨损','软件各版本具有唯一性','软件版本更新比硬件快'],ans:'B',why:'硬件失效主要来自物理退化；软件不存在物理退化（老化）。'},
+ {ch:'第17章',q:'用 N 个不同人、不同方法/语言/环境独立开发的相同功能程序同时执行，结果多数表决，属于（ ）。',opts:['恢复块设计','N版本程序设计','防卫式程序设计','双机容错'],ans:'B',why:'N 版本程序设计 = 多数表决；需独立设计降低表决点相关错误。'},
+ {ch:'第17章',q:'基于 DNS 在应答中轮询返回多个 IP 的负载均衡技术属于（ ）层。',opts:['应用层','传输层','网络层','会话层'],ans:'B',why:'DNS 负载均衡属于传输层；HTTP 重定向=应用层；NAT=网络层。'},
+ {ch:'第17章',q:'双机容错系统靠（ ）信号维持主备联系。',opts:['多数表决','心跳','校验码','同步时钟'],ans:'B',why:'双机容错用“心跳”；工作模式：热备、互备、双工。'},
+ {ch:'第18章',q:'软件架构定义包含三大要素，演化针对它们的增/改/删。这三大要素是（ ）。',opts:['组件、连接件、约束','模块、接口、数据','对象、消息、片段','视图、风格、策略'],ans:'A',why:'架构 = 组件 + 连接件 + 约束。'},
+ {ch:'第18章',q:'消息演化中，“反转消息的发送对象与接收对象”是（ ）。',opts:['AM','DM','SMO','OM'],ans:'D',why:'OM(Overturn)反转收发对象；SMO换顺序；CMM改变收发对象。'},
+ {ch:'第18章',q:'软件架构静态演化的正确步骤是（ ）。',opts:['理解→需求变更→计划→重构→测试','需求→测试→重构→理解','计划→重构→理解→测试','测试→重构→需求→计划'],ans:'A',why:'静态演化：软件理解→需求变更分析→演化计划→系统重构→系统测试。'},
+ {ch:'第18章',q:'大型网站架构演化第⑤阶段是（ ）。',opts:['服务集群','数据库读写分离','业务拆分','分布式服务'],ans:'B',why:'①单体②垂直③缓存④服务集群⑤库读写分离⑥反代+CDN⑦分布式文件/库⑧NOSQL+搜索引擎⑨业务拆分⑩分布式服务。'},
+ {ch:'第18章',q:'实现软件架构动态演化的两种主要技术是（ ）。',opts:['DSA 与 ADL','DSA 与 DR','静态演化与重构','MDA 与 RUP'],ans:'B',why:'DSA（动态软件架构）与 DR（动态重配置）。'},
+ {ch:'第19章',q:'机器学习按学习模式划分，需要“反馈机制”的是（ ）。',opts:['监督学习','无监督学习','半监督学习','强化学习'],ans:'D',why:'强化学习需反馈机制；深度/传统学习是按“学习方法”分类。'},
+ {ch:'第19章',q:'云计算三服务方式灵活度由弱到强为（ ）。',opts:['SaaS&lt;IaaS&lt;PaaS','IaaS&lt;PaaS&lt;SaaS','SaaS&lt;PaaS&lt;IaaS','PaaS&lt;SaaS&lt;IaaS'],ans:'C',why:'灵活度 SaaS&lt;PaaS&lt;IaaS；方便度相反。'},
+ {ch:'第19章',q:'数字孪生体实现与物理实体有效闭环的核心技术是（ ）。',opts:['建模','仿真','传感器','区块链'],ans:'B',why:'建模=理解；仿真=验证确认，是实现闭环的核心。'},
+ {ch:'第19章',q:'区块链“不可篡改性”的基础是（ ）。',opts:['中心化存储','每个区块含前一区块哈希形成不可逆链','智能合约','冗余备份'],ans:'B',why:'哈希链接形成不可逆链，篡改会被检测。区块头含版本号、时间戳、上一区块哈希、Merkle 根。'},
+ {ch:'第19章',q:'边缘计算的三种落地形态是（ ）。',opts:['公有/私有/混合云','IaaS/PaaS/SaaS','云边缘/边缘云/云化网关','边缘层/雾层/云层'],ans:'C',why:'落地形态=云边缘、边缘云、云化网关；层次结构=边缘/雾/云。'},
+ {ch:'第19章',q:'CPS 四大核心要素“一硬一软一网一平台”中，“一软”指（ ）。',opts:['感知和自动控制','工业软件','工业网络','工业云与智能服务平台'],ans:'B',why:'一硬=感知与自动控制；一软=工业软件（核心）；一网=工业网络；一平台=工业云与智能服务平台。'},
+ {ch:'第19章',q:'CPS 体系架构中，“多个系统级 CPS 有机组合（如智慧城市）”属于（ ）。',opts:['单元级','系统级','SoS 级','云级'],ans:'C',why:'单元级→系统级→SoS 级。'},
+ {ch:'第20章',q:'最小生成树应包含（ ）条边，选边原则是（ ）。',opts:['n 条；权值最大','n−1 条；每步选权值最小且不构成回路','n 条；路径最长','n−1 条；每步选权值最大'],ans:'B',why:'n 个顶点最小生成树含 n−1 条边；克鲁斯卡尔/普里姆每步选权值最小且不成环。'},
+ {ch:'第20章',q:'线性规划问题的最优解一定在（ ）取得。',opts:['可行域内部','可行域的某个顶点','可行域边界中点','原点'],ans:'B',why:'最优解必在可行域的某个顶点上，逐一比较顶点即可。'},
+ {ch:'第20章',q:'用增广路求最大流，其瓶颈容量是（ ）。',opts:['路上最小剩余容量','路上最大容量','源点出边容量','汇点入边之和'],ans:'A',why:'增广路瓶颈=路上最小的剩余容量；反复寻找直至无增广路。'},
+ {ch:'第20章',q:'甲乙网站博弈（均高1000/一方降1500另一方200/都降700），理性结果是（ ）。',opts:['都高价各得1000','都降价各得700','甲降乙高','甲高乙降'],ans:'B',why:'占优策略都是降价 → 纳什均衡=都降价，各得700。'},
+ {ch:'第21章',q:'知识产权只在授予国受保护，体现其（ ）。',opts:['无体性','专有性','地域性','时间性'],ans:'C',why:'地域性=只在授予/确认国受保护；时间性=法定期限；专有性=排他。'},
+ {ch:'第21章',q:'公民作者作品的“署名权”保护期为（ ）。',opts:['无期限限制','作者终生+死后50年','保护期50年','25年'],ans:'A',why:'人身权（署名、修改、保护作品完整）无期限；发表权、使用权才为终生+死后50年。'},
+ {ch:'第21章',q:'发明专利保护期 20 年、实用新型/外观 10 年的起算点是（ ）。',opts:['授权日','申请日','公开日','登记日'],ans:'B',why:'专利均从申请日（优先权日）起算；商标有效期 10 年并可续展。'},
+ {ch:'第15章',q:'架构评估中，改变加密级别同时影响安全性与性能，该设计决策是一个（ ）。',opts:['敏感点','风险点','权衡点','非风险点'],ans:'C',why:'影响多个质量属性=权衡点；敏感点只影响单个属性。'},
+];
+
+var idx; var timerInt; var elapsed=0; var TOTAL=QUESTIONS.length; var SUBTIME=1800; var graded=false;
+function rpad(n){return (n<10?'0':'')+n;}
+function fmt(t){var m=Math.floor(t/60),s=t%60;return rpad(m)+':'+rpad(s);}
+function renderAll(){
+  var host=document.getElementById('questions'); var h='';
+  QUESTIONS.forEach(function(q,i){
+    h+='<div class="q-card" data-i="'+i+'"><div class="q-head"><span class="q-num">第 '+(i+1)+' 题</span><span class="q-tag">'+q.ch+'</span></div><div class="q-stem">'+q.q+'</div>';
+    h+='<div class="opts">';
+    q.opts.forEach(function(o,oi){var L='ABCD'[oi]; h+='<div class="opt" data-l="'+L+'"><b>'+L+'.</b> '+o+'</div>';});
+    h+='</div><div class="review" id="rv'+i+'"></div></div>';
+  });
+  host.innerHTML=h;
+  host.querySelectorAll('.opt').forEach(function(o){
+    o.addEventListener('click',function(){
+      if(graded)return;
+      var card=o.closest('.q-card'); var L=o.getAttribute('data-l');
+      card.querySelectorAll('.opt').forEach(function(x){x.classList.remove('picked');});
+      o.classList.add('picked'); updateAnswered();
+    });
+  });
+}
+function updateAnswered(){
+  var n=0; document.querySelectorAll('.q-card').forEach(function(c){ if(c.querySelector('.opt.picked'))n++; });
+  document.getElementById('answered').textContent='已答 '+n+' / '+TOTAL;
+  document.getElementById('bar').style.width=(n/TOTAL*100)+'%';
+}
+function grade(){
+  graded=true; var right=0,wrong=0,blank=0;
+  document.querySelectorAll('.q-card').forEach(function(c){
+    var i=+c.getAttribute('data-i'); var q=QUESTIONS[i];
+    var picked=c.querySelector('.opt.picked'); var L=picked?picked.getAttribute('data-l'):null;
+    var rv=c.getElementById?null:document.getElementById('rv'+i);
+    c.querySelectorAll('.opt').forEach(function(x){x.classList.add('locked');});
+    var review=document.getElementById('rv'+i);
+    if(L===q.ans){right++; c.classList.add('correct'); review.innerHTML='<span class="ans">✓ 正确</span> — '+q.why;}
+    else if(L){wrong++; c.classList.add('wrong'); review.innerHTML='<span class="ans">✗ 你的答案：'+L+' · 正确答案：'+q.ans+'</span> — '+q.why;}
+    else {blank++; c.classList.add('wrong'); review.innerHTML='<span class="ans">未答 · 正确答案：'+q.ans+'</span> — '+q.why;}
+    review.classList.add('show');
+  });
+  clearInterval(timerInt);
+  var score=Math.round(right/TOTAL*100);
+  document.getElementById('scoreNum').textContent=score;
+  document.getElementById('scoreSub').textContent='答对 '+right+' / '+TOTAL+' 题 · 用时 '+fmt(elapsed);
+  document.getElementById('scRight').textContent=right; document.getElementById('scWrong').textContent=wrong; document.getElementById('scBlank').textContent=blank;
+  document.getElementById('scorePanel').classList.add('show');
+  document.getElementById('scorePanel').scrollIntoView({behavior:'smooth'});
+}
+function reset(){
+  graded=false; elapsed=0; renderAll(); updateAnswered();
+  document.getElementById('scorePanel').classList.remove('show');
+  document.getElementById('bar').style.width='0';
+  clearInterval(timerInt); startTimer();
+}
+function startTimer(){
+  clearInterval(timerInt);
+  timerInt=setInterval(function(){ elapsed++; var t=SUBTIME-elapsed; if(t<0)t=0; document.getElementById('timer').textContent=fmt(t); if(t<=0){grade();} },1000);
+}
+document.getElementById('gradeBtn').onclick=grade;
+document.getElementById('resetBtn').onclick=reset;
+renderAll(); updateAnswered(); startTimer();
+</script>
+</body>
+</html>

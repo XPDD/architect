@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案例答题技巧 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>案例答题技巧 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"说明理由", q:"「请说明选择某方案的理由」属于案例中的高频题型，其答题要点不包括（　）。",
+   options:["结合案例背景的业务需求","对比其他方案优缺点，突出所选方案优势","只罗列方案优点，不需提业务背景","强调技术可行性与成本效益"],
+   answer:2, explain:"说明理由要<strong>结合业务需求</strong>、对比其他方案、强调可行性与成本，并引用架构设计原则（高内聚低耦合、康威定律）；不能只罗列优点。"},
+
+  {topic:"说明理由", q:"「说明理由」题型的万能答题模板中，属于「满足业务需求」逻辑的是（　）。",
+   options:["技术成熟、团队掌握度高、成本合理","符合题干中业务场景的高并发、高可用、可扩展、易维护等核心需求","遵循高内聚低耦合、分层架构、关注点分离原则","避免单点故障、性能瓶颈、数据不一致"],
+   answer:1, explain:"<strong>满足业务需求</strong>＝符合题干高并发/高可用/可扩展/易维护核心需求；可行性对应「技术成熟团队掌握」；架构原则对应「高内聚低耦合」；规避风险对应「单点故障/瓶颈/不一致」。"},
+
+  {topic:"优缺点", q:"「分析单体架构与微服务架构的差异」时，以下说法正确的是（　）。",
+   options:["单体架构低耦合高内聚，微服务架构耦合度高","微服务可按服务独立扩容，单体只能整体扩容","微服务架构复杂度更低，无分布式事务问题","单体维护成本低，微服务难分工维护"],
+   answer:1, explain:"<strong>微服务低耦合高内聚</strong>、可按服务独立扩容、便于分工维护，但复杂度更高、存在分布式事务问题；单体与之相反。"},
+
+  {topic:"优缺点", q:"「对比缓存互斥锁方案与逻辑过期方案」时，正确的结论是（　）。",
+   options:["互斥锁并发性能高、响应快","逻辑过期数据一致性强、实现简单","互斥锁侧重强一致性，逻辑过期侧重高性能","两种方案侧重点完全相同"],
+   answer:2, explain:"<strong>互斥锁</strong>：数据一致性强、实现简单，但会造成线程阻塞、并发性能差；<strong>逻辑过期</strong>：并发性能高、响应快，但会短暂返回旧数据、一致性较弱、实现复杂。故互斥锁强一致、逻辑过期高性能。"},
+
+  {topic:"举例", q:"「对比差异万能句」的正确表述是（　）。",
+   options:["XX 方案完全优于 YY 方案","XX 方案侧重强一致性/高可用，适用于 XX 场景；YY 侧重高性能/低延迟，适用于 YY 场景","所有方案一视同仁，无适用差异","只谈性能，不谈场景"],
+   answer:1, explain:"<strong>对比差异万能句</strong>：XX 侧重强一致性/高可用，适用 XX 场景；YY 侧重高性能/低延迟，适用 YY 场景。强调「哪种方案适合哪种场景」而非绝对优劣。"},
+
+  {topic:"解决方案", q:"解决「网络故障对端云数据同步的影响」时，错误的是（　）。",
+   options:["终端采用本地持久化存储，支持离线业务","采用断点续传与增量同步","引入消息队列实现异步解耦","关闭所有终端，等待网络恢复再同步"],
+   answer:3, explain:"正确的四个抓手是：①本地持久化（离线存储）②断点续传+增量同步③消息队列异步解耦④幂等接口避免冲突。<strong>关闭终端等待</strong>显然不是有效方案。"},
+
+  {topic:"解决方案", q:"针对数据库查询性能瓶颈提出的优化中，最不恰当的是（　）。",
+   options:["建立合理索引，优化慢查询 SQL","引入分布式缓存减轻数据库压力","采用读写分离，主库写、从库读","删除所有索引以加快写入"],
+   answer:3, explain:"优化应从<strong>索引+SQL优化、分布式缓存、读写分离、分库分表</strong>入手。<strong>删除所有索引</strong>会大幅恶化查询性能，不可取。"},
+
+  {topic:"解决方案", q:"「提出解决方案」的五大万能抓手不包括（　）。",
+   options:["冗余与高可用（集群、主备、多副本）","异步解耦（消息队列削峰填谷）","缓存优化（多级缓存）","强制要求员工加班保证上线"],
+   answer:3, explain:"五大抓手是<strong>冗余高可用、异步解耦、缓存优化、数据可靠机制、容错与监控告警</strong>。「加班保证上线」是管理动作，非技术解决方案。"},
+
+  {topic:"概念定义", q:"「简述某概念定义」时，四步答题模板依次是（　）。",
+   options:["定义→目的→要素→应用","优点→缺点→成本→风险","背景→案例→结论","只要一句话定义即可"],
+   answer:0, explain:"定义类题目按<strong>①核心定义 ②核心目的 ③核心特征/要素 ④典型应用</strong>四步作答，控制在 300 字以内，突出核心要点。"},
+
+  {topic:"概念定义", q:"「请简述 CAP 理论的含义」，用四步模板答题，属于第②步（核心目的）的是（　）。",
+   options:["CAP 指分布式系统三大特性：一致性、可用性、分区容错性","三者无法同时满足，最多满足其中两个","核心目的是在分布式场景下权衡一致性与可用性","用于指导分布式系统架构设计时的取舍决策"],
+   answer:2, explain:"定义=列出三特性；结论（特征）=最多满足两个；<strong>核心目的=权衡一致性与可用性</strong>；典型应用=指导架构取舍决策。故选「权衡一致性与可用性」。"},
+];
+</script>
+<script>
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '模板已内化，考场直接套用！' : pct >= 60 ? '基本掌握，建议回顾答题技巧笔记。' : '还需加强，建议重读答题技巧笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

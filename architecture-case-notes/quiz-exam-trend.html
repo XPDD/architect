@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>真题考情分析 · 练习题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  .back{text-align:center;margin-top:16px}
+  .back a{font-family:var(--mono);font-size:12px;color:var(--muted);text-decoration:none}
+  .back a:hover{color:var(--cyan)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>真题考情分析 · 练习题库</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+  <div class="back"><a href="index.html">&#x2190; 返回索引</a></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  {topic:"考试安排", q:"关于系统架构设计师高级考试，下列说法正确的是（　）。",
+   options:["每科及格线为 30 分","一科不过，只需重考该科","每科 45 分及格，一科不过则全部重考","三科必须一次性同时通过，无补考机会"],
+   answer:2, explain:"高级架构师<strong>每科 45 分及格</strong>，<strong>一科不过则全部重考</strong>。从 2024 年起一年考 2 次。"},
+
+  {topic:"考试安排", q:"高级架构师考试的总计考试时长与科目安排是（　）。",
+   options:["上午综合知识 + 案例分析（总计 240 分钟），下午论文 120 分钟","上午 3 科共 180 分钟","只有上午一场考试","下午考综合知识与案例分析"],
+   answer:0, explain:"上午考<strong>综合知识 + 案例分析</strong>（总计 240 分钟），下午考<strong>论文</strong>（120 分钟，不得提前交卷）。"},
+
+  {topic:"七大模块", q:"案例分析真题被规整为七大核心模块，其中属于「唯一必答题」、每年必考 1 道的是（　）。",
+   options:["数据库","系统架构设计","新兴前沿技术","分布式与高并发"],
+   answer:1, explain:"<strong>系统架构设计</strong>是案例中唯一必答题，每年必考 1 道，近三年均围绕【质量属性+场景+效用树+架构评估】出题。"},
+
+  {topic:"七大模块", q:"近三年考频极高、几乎年年出现，且预判会持续绑定 Redis、缓存三剑客等考点的高频选做题是（　）。",
+   options:["软件工程","嵌入式","数据库","Web 应用开发"],
+   answer:2, explain:"<strong>数据库</strong>是高频主流选做题，考点紧贴实战：主从复制、读写分离、分库分表、缓存容错等，预判 Redis 持续绑定。"},
+
+  {topic:"七大模块", q:"从 2025 年起正式升级为案例核心选做题、单批次甚至考查两道、彻底取代软件工程和嵌入式旧题型的模块是（　）。",
+   options:["新兴前沿技术","嵌入式系统","软件工程","Web 应用"],
+   answer:0, explain:"<strong>新兴前沿技术</strong>是命题大势，2025 起固定设置 1–2 道选做题，方向含云原生、Serverless、大模型、隐私计算、区块链等。"},
+
+  {topic:"七大模块", q:"近年逐步降温、边缘化冷门出题，且老师建议「考场遇到没接触过的技术直接放弃」的模块是（　）。",
+   options:["系统架构设计","数据库","嵌入式系统","分布式与高并发"],
+   answer:2, explain:"<strong>嵌入式系统</strong>考频持续走低，偏好小众专有技术，跨领域难度大、备考性价比极低，建议直接放弃。"},
+
+  {topic:"七大模块", q:"近年独立为选做题、聚焦「分布式服务调度、流量管控、集群容错、高并发架构」的模块是（　）。",
+   options:["分布式与高并发架构","软件工程","嵌入式","Web 应用开发"],
+   answer:0, explain:"<strong>分布式与高并发</strong>聚焦服务层与流量层：CAP/BASE、服务治理、负载均衡、限流熔断降级、秒杀削峰、异步解耦、集群弹性扩容。"},
+
+  {topic:"七大模块", q:"早年几乎每年必考，但 2025 年 5 月、11 月两次考试彻底取消独立命题、属命题方向重大调整的模块是（　）。",
+   options:["数据库","软件工程","新兴前沿","系统架构设计"],
+   answer:1, explain:"<strong>软件工程</strong>近两年出题灵活、超纲概率高（SysML、UML 序列图细节、风险驱动），2025 年彻底取消独立命题，单纯考软工概率越来越低。"},
+
+  {topic:"选题策略", q:"后端考生选题时，最合理的策略是（　）。",
+   options:["优先选嵌入式，因为简单","第一题必拿高分，首选分布式与高并发/数据库，次选新兴前沿","专挑冷门前沿如区块链","所有题目平均分配时间"],
+   answer:1, explain:"后端选题：<strong>第一题（系统架构设计）必拿高分</strong> → 首选<strong>分布式高并发、数据库</strong> → 次选<strong>云原生/微服务/大模型</strong>；避开区块链、隐私计算等偏陌生方向。"},
+
+  {topic:"选题策略", q:"以下哪个方向属于新兴前沿技术中「偏陌生、更建议规避」的类别？（　）",
+   options:["云原生","微服务治理","大模型后端部署","区块链与隐私计算"],
+   answer:3, explain:"老师在预判中建议：新兴前沿优先选<strong>云原生、微服务治理、大模型部署</strong>这类贴合后端的方向，<strong>避开区块链、隐私计算</strong>等偏陌生方向。"},
+
+  {topic:"第一题", q:"关于「系统架构设计」第一题的命题特征，描述错误的是（　）。",
+   options:["它是全卷唯一必答题","核心围绕质量属性+场景+效用树+架构评估","几乎每道都超纲、素材来自课外","是全场最容易拿高分的保底分题型"],
+   answer:2, explain:"第一题是<strong>唯一紧贴教材、极少超纲</strong>的题目，素材大多源自课本核心章节（仅 2024 下、2026 上零星出现教材外架构常识），并非每道都超纲。"},
+];
+</script>
+<script>
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好，选题策略清晰！' : pct >= 60 ? '基本掌握，建议回顾考情分析笔记。' : '还需加强，建议重读考情分析笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 前沿技术 AI 大模型与 RAG</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25);flex-shrink:0}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);text-align:center;white-space:nowrap}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-arrow{display:flex;align-items:center;justify-content:center;width:22px;color:rgba(255,255,255,.15);font-size:14px;flex-shrink:0}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:4px 0}
+  .vs-block{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:10px 0}
+  .vs-col{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:12px 14px}
+  .vs-col.vs-old{border-color:rgba(251,191,36,.2)}.vs-col.vs-new{border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.04)}
+  .vs-title{font-size:12px;font-weight:700;margin-bottom:8px}.vs-old .vs-title{color:var(--amber)}.vs-new .vs-title{color:var(--cyan)}
+  .vs-col ul{list-style:none}.vs-col ul li{font-size:11.5px;color:rgba(255,255,255,.7);line-height:1.6;padding-left:14px;position:relative}
+  .vs-col ul li::before{content:'\00B7';position:absolute;left:2px;color:var(--text-muted)}
+  .vs-arrow{display:flex;align-items:center;color:var(--cyan);font-size:18px}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table thead th:first-child{border-radius:var(--radius) 0 0 0}.compare-table thead th:last-child{border-radius:0 var(--radius) 0 0}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:last-child td:first-child{border-radius:0 0 0 var(--radius)}.compare-table tbody tr:last-child td:last-child{border-radius:0 0 var(--radius) 0}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:rgba(77,124,255,.15);border:1px solid rgba(77,124,255,.25);color:var(--blue);font-family:var(--font-mono);font-size:10px;font-weight:700;margin-bottom:4px}
+  .card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.card-grid{grid-template-columns:1fr}.vs-block{grid-template-columns:1fr;gap:8px}.vs-arrow{justify-content:center;transform:rotate(90deg)}.compare-table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">AI</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">架构直播5 · 案例分析下 / 前沿技术</div>
+        <div class="header-title">AI 大模型与 RAG · 基础与架构</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-08</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · 案例分析</div><div class="meta-item"><span class="meta-dot"></span>命题大势 · 必考重点</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>大模型定义与特点？</div>
+      <div class="cue-item"><span class="q-mark">?</span>大模型按输入分为哪三类？</div>
+      <div class="cue-item"><span class="q-mark">?</span>大模型有哪些挑战？</div>
+      <div class="cue-item"><span class="q-mark">?</span>基础架构图 5 层是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>完整架构图的 6 层是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>RAG 原理与工作流程？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>大模型定义与特点</div>
+      <div class="note-section"><p><span class="note-highlight">大模型</span>是具有大规模参数和复杂计算结构的机器学习模型，通常由深度神经网络构建，拥有数十亿甚至数千亿参数，旨在提升表达能力和预测性能，处理复杂任务。通过训练海量数据学习复杂模式，具有更强泛化能力。</p>
+      <ul>
+        <li><span class="hl-green">巨大规模</span>：数十亿参数，模型可达数百 GB 甚至更大，表达与学习能力强。</li>
+        <li><span class="hl-green">更好性能与泛化</span>：在 NLP、图像、语音等任务上表现出色。</li>
+        <li><span class="hl-green">大数据训练</span>：需 TB 以上甚至 PB 级数据集。</li>
+        <li><span class="hl-green">强大算力</span>：训练通常需数百上千 GPU、几周到数月。</li>
+        <li><span class="hl-green">迁移学习与预训练</span>：预训练后微调，提升新任务性能。</li>
+        <li><span class="hl-green">自监督学习</span>：少依赖标记数据，提升效能。</li>
+        <li><span class="hl-green">领域知识融合</span>：从多领域数据学习并跨领域应用，促进创新。</li>
+        <li><span class="hl-green">自动化与效率</span>：自动编程、翻译、摘要等。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">2</span>大模型分类（按输入数据类型）</div>
+      <table class="compare-table">
+        <thead><tr><th>类别</th><th>说明</th><th>代表</th></tr></thead>
+        <tbody>
+          <tr><td><span class="note-highlight">语言大模型（NLP）</span></td><td>处理文本、理解自然语言，在大规模语料上训练</td><td>GPT、BERT 类</td></tr>
+          <tr><td><span class="hl-purple">视觉大模型（CV）</span></td><td>图像处理分析：分类、检测、分割、姿态估计、人脸识别</td><td>VIT（Google）、文心 UFO、华为盘古 CV、INTERN（商汤）</td></tr>
+          <tr><td><span class="hl-green">多模态大模型</span></td><td>处理文本、图像、音频等多模态，结合 NLP 与 CV 能力</td><td>DingoDB（九章云极）、DALL-E（OpenAI）、悟空画画（华为）、Midjourney</td></tr>
+        </tbody>
+      </table>
+
+      <div class="numbered-header"><span class="num">3</span>大模型的挑战</div>
+      <div class="card-grid">
+        <div class="card"><div class="card-badge">1</div><div class="card-title">数据安全隐患</div><div class="card-list"><li>训练需海量数据，常涉机密与隐私，需防泄露与滥用</li></div></div>
+        <div class="card"><div class="card-badge">2</div><div class="card-title">成本高昂</div><div class="card-list"><li>训练部署需大量算力与人力资源，中小企业难承担</li></div></div>
+        <div class="card"><div class="card-badge">3</div><div class="card-title">无法保障内容可信</div><div class="card-list"><li>大模型会编造词句，内容不真实可信、无权威性</li></div></div>
+        <div class="card"><div class="card-badge">4</div><div class="card-title">成本难控</div><div class="card-list"><li>千亿参数训练过贵，企业应用应用百亿级基础模型+垂直训练</li></div></div>
+      </div>
+
+      <div class="numbered-header"><span class="num">4</span>基础架构图 · 5 层</div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 大模型基础架构图（高层 5 层）</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">表现层（应用层）<br><small>用户实际看到的地方</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">平台层<br><small>模型与应用间：评测体系、LangChain 平台</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">模型层<br><small>LLM（GPT）/ 多模态模型（文生图图生图）</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">数据层<br><small>企业垂域数据：静态知识库 + 动态三方数据集</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box primary">基础层<br><small>硬件支撑（A100、数据服务器等）</small></div></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">5</span>完整架构图 · 6 层</div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; AI 大模型完整架构（6 层）</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">6 模型服务层<br><small>封装/调度/增强能力，保障安全（权限与安全控制、工具与数据支撑、大模型交互与任务处理）</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box accent">5 能力层<br><small>文本/音频/图像/视频/文档/策略/数字人/混合生成</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">4 模型层<br><small>(数据准备/模型训练/多模态/CV/NLP/推理部署/评测管理)</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">3 框架层<br><small>PyTorch / TensorFlow</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">2 云原生层<br><small>私有云/政务云/算力中心</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box primary">1 基础设施层<br><small>GPU / NPU / CPU</small></div></div>
+        </div>
+      </div>
+      <div class="note-section"><p>模型层含：<strong>数据准备</strong>（采集/存储/清洗/标注）、<strong>模型训练</strong>（训练/微调/量化/蒸馏）、<strong>多模态大模型</strong>（视觉-语言、语言-视觉、文档解析）、<strong>CV 大模型</strong>（图像/视频生成、分类检测分割、图像/视频表征）、<strong>NLP 大模型</strong>（多语言、开放域对话、代码生成、数字解答）、<strong>推理部署层</strong>（VLLM、TensorRT-LLM、SGLang、Ollama 等）、<strong>评测与数据集管理</strong>（模型评测、客观/主观评测、评测数据集管理）。</p></div>
+      <div class="note-section"><p><span class="hl-green">模型服务层</span>是连接底层能力与上层应用的核心枢纽：上层（大模型知识问答：Embedding/Prompt/CoT/召回路由/MCP/RAG）；中层（工具与数据支撑）；下层（权限与安全控制）。</p></div>
+
+      <div class="numbered-header"><span class="num">6</span>RAG · 原理与架构</div>
+      <div class="note-section"><p><span class="note-highlight">RAG（Retrieval-Augmented Generation）</span>＝结合检索与生成的 NLP 模型。通过引入外部知识库，用<strong>检索模块（Retriever）</strong>从文档中提取相关信息，交给<strong>生成模块（Generator）</strong>生成更准确有用的回答。核心思想：弥补生成模型在知识密集型任务上的不足（传统生成模型缺知识易答错），RAG 检索背景信息使回答更具可信度与准确性。</p>
+      <ul>
+        <li><span class="hl-green">检索阶段</span>：接收查询，从预定义知识库查相关文档/段落，多用向量搜索（BERT 向量化，映射到同一向量空间算相似度），返回若干最相关文档。</li>
+        <li><span class="hl-purple">生成阶段</span>：将检索到的文档与原始查询一起输入生成模型，生成最终回答。</li>
+      </ul></div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; RAG 工作流程</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box">用户发起查询（query）</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">转发到检索模块（Retrieval）</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box primary">从知识库检索相关内容 → 返回检索结果</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">生成增强上下文（Enhanced context）</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box">构建 Prompt：Prompt + Query + 增强上下文</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box accent">交给 LLM → 生成回答 → 回传交互层 → 返回用户</div></div>
+        </div>
+      </div>
+      <div class="note-section"><p>检索模块：用<strong>预训练双塔模型（dual-encoder）</strong>高效向量化检索。生成模块：用<strong>T5 或 BART</strong>等强生成模型处理输入，输出连贯准确的信息。</p></div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>前沿技术说人话：</strong><b>大模型</b>就是「参数巨大的深度学习模型」，按输入分<b>语言（NLP）、视觉（CV）、多模态</b>三大类；麻烦的是<b>数据安全、成本贵、会编造内容、成本难控</b>。架构图记得两版：<b>基础版 5 层</b>（基础→数据→模型→平台→表现），<b>完整版 6 层</b>（基础设施→云原生→框架→模型→能力→模型服务）。<b>RAG</b> 就是「<b>先检索再生成</b>」——拿用户问题先去知识库搜相关文档，拼成增强上下文喂给 LLM，这样回答更准、不会瞎编。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">前沿技术是<strong>命题大势</strong>：大模型定义（大规模参数/深度网络/强泛化）、特点（规模大/大数据/强算力/预训练迁移/自监督/多域融合/自动化）、分类（<strong>语言/视觉/多模态</strong>）、四大挑战（数据安全/成本高/内容不可信/成本难控）；架构图记 <strong>基础 5 层</strong>与<strong>完整 6 层</strong>；<strong>RAG</strong>＝检索（双塔向量化）＋生成（T5/BART），流程「query→检索→增强上下文→Prompt→LLM→回答」，能提升知识密集任务的回答准确性。</div>
+      <div class="summary-tags"><span class="tag primary">前沿技术</span><span class="tag">AI大模型</span><span class="tag">语言/视觉/多模态</span><span class="tag">架构图</span><span class="tag">RAG</span><span class="tag">检索增强</span><span class="tag">命题大势</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="quiz-frontier-ai.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 前沿技术练习（选择题）</a>
+</div>
+</body>
+</html>

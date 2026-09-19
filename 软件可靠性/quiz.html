@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件可靠性 · 配套题库</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(52,211,153,.04)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:32px 16px}
+  .wrap{max-width:860px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+  .hero{text-align:center;padding:34px 20px 26px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:20px}
+  .hero-badge{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.2em;margin-bottom:8px}
+  .hero h1{font-size:24px;font-weight:800}.hero h1 .accent{color:var(--green)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:8px}
+  .nav{position:sticky;top:12px;display:flex;flex-wrap:wrap;gap:6px;background:rgba(17,22,32,.9);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:24px;z-index:10}
+  .nav a{font-size:12px;color:var(--text2);text-decoration:none;padding:4px 11px;border-radius:4px;border:1px solid transparent}
+  .nav a:hover{color:var(--cyan);border-color:rgba(0,212,255,.3)}
+  .topic{margin-bottom:28px}
+  .topic-head{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .topic-head .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+  .topic-head h2{font-size:18px;font-weight:700}
+  .topic-head .note-link{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--green);text-decoration:none;border-bottom:1px dashed rgba(52,211,153,.3)}
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 22px;margin-bottom:12px}
+  .q-num{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--green),var(--blue));padding:2px 9px;border-radius:4px;margin-bottom:10px}
+  .q-stem{font-size:15px;font-weight:600;line-height:1.7;margin-bottom:12px;white-space:pre-line}
+  .q-options{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+  .q-options .opt{font-size:13.5px;color:var(--text2);line-height:1.5;padding:7px 10px;border:1px solid transparent;border-radius:6px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .q-options .opt:hover{border-color:rgba(0,212,255,.35);background:rgba(0,212,255,.05);color:var(--text)}
+  .q-options .opt b{color:var(--cyan);font-family:var(--mono)}
+  .q-options .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)}
+  .q-options .opt.correct b{color:var(--green)}
+  .q-options .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)}
+  .q-options .opt.wrong b{color:var(--rose)}
+  .q-options .opt.locked{pointer-events:none}
+  .q-sub{margin-bottom:8px}
+  .q-sub-label{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:5px}
+  .toggle{background:none;border:1px solid rgba(0,212,255,.25);color:var(--cyan);border-radius:6px;padding:6px 16px;font-size:13px;cursor:pointer;margin-top:14px;font-family:var(--mono)}
+  .toggle:hover{background:rgba(0,212,255,.08)}
+  .answer{display:none;margin-top:12px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13.5px;color:var(--text2);line-height:1.7}
+  .answer.show{display:block}
+  .answer .ans{color:var(--green);font-weight:700;font-family:var(--mono)}
+  .answer .trap{color:var(--rose)}
+  .footer{text-align:center;padding:20px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .footer a{color:var(--cyan);text-decoration:none}
+  @media(max-width:640px){.q-options{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回笔记</a>
+  <div class="hero">
+    <div class="hero-badge">EXAM BANK · 第 17 章 软件可靠性</div>
+    <h1>软件可靠性 <span class="accent">配套练习</span></h1>
+    <div class="hero-sub">可靠性概念 · 指标 · 串并联 · 建模 · 容错设计 · 集群 · 负载均衡 · 测试与评价</div>
+  </div>
+
+  <div class="nav">
+    <a href="#概念">概念指标</a>
+    <a href="#容错">容错设计</a>
+    <a href="#集群">集群均衡</a>
+  </div>
+
+  <div class="topic" id="概念">
+    <div class="topic-head"><span class="dot"></span><h2>概念与指标</h2><a class="note-link" href="index.html">笔记 →</a></div>
+
+    <div class="q-card">
+      <span class="q-num">第 1 题</span>
+      <div class="q-stem">软件可靠性是软件产品在( )内完成规定功能的能力。</div>
+      <div class="q-options" data-ans="C">
+        <div class="opt"><b>A.</b> 规定条件与任意时间</div><div class="opt"><b>B.</b> 任意条件与规定时间</div>
+        <div class="opt"><b>C.</b> 规定的条件与规定的时间区间</div><div class="opt"><b>D.</b> 任何条件与任何时间</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：C</span><br><b>解析：</b>可靠性 = 在<b>规定条件</b>和<b>规定时间区间</b>内完成规定功能的能力。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 2 题</span>
+      <div class="q-stem">关于软件可靠性与硬件可靠性的区别，说法错误的是( )。</div>
+      <div class="q-options" data-ans="B">
+        <div class="opt"><b>A.</b> 软件没有物理退化（老化）</div><div class="opt"><b>B.</b> 硬件失效主要来自设计缺陷</div>
+        <div class="opt"><b>C.</b> 软件具有唯一性，各版本相同</div><div class="opt"><b>D.</b> 软件版本更新比硬件快</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：B</span><br><b>解析：</b>硬件失效主要来自<b>物理退化</b>，而非设计缺陷；软件无物理退化。<span class="trap">软件失效多来自软件本身的缺陷。</span></div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 3 题</span>
+      <div class="q-stem">某系统 MTTF=200 小时，MTTR=50 小时，则平均故障间隔时间(MTBF)与全系统可用性分别为( )。</div>
+      <div class="q-options" data-ans="A">
+        <div class="opt"><b>A.</b> 250 小时；80%</div><div class="opt"><b>B.</b> 200 小时；80%</div>
+        <div class="opt"><b>C.</b> 250 小时；75%</div><div class="opt"><b>D.</b> 150 小时；80%</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：A</span><br><b>解析：</b>MTBF = MTTF + MTTR = 200 + 50 = <b>250</b>；可用性 = MTTF/(MTTF+MTTR) = 200/250 = <b>80%</b>。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 4 题</span>
+      <div class="q-stem">两个可靠性分别为 0.9、0.8 的部件<strong>串联</strong>组成系统，系统可靠性约为( )；若<strong>并联</strong>则约为( )。</div>
+      <div class="q-options" data-ans="D">
+        <div class="opt"><b>A.</b> 0.98；0.72</div><div class="opt"><b>B.</b> 0.72；0.98</div>
+        <div class="opt"><b>C.</b> 0.90；0.95</div><div class="opt"><b>D.</b> 0.72；0.72</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：B</span><br><b>解析：</b><b>串联</b>=求"都对"，独立事件概率<b>相乘</b>：R=0.9×0.8=<b>0.72</b>（越串越不可靠）。<b>并联</b>=求"别全坏"，先算全坏再<b>1 减</b>：F=0.1×0.2=0.02 → R=1−0.02=<b>0.98</b>（越并越可靠）。<span class="trap">串联要全部部件都好 → 概率变小；并联只要一个顶住 → "1 − 全坏概率"，可靠性反而更高。</span></div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 5 题</span>
+      <div class="q-stem">关于"可靠性与可用性"，下列说法<strong>正确</strong>的是( )。</div>
+      <div class="q-options" data-ans="C">
+        <div class="opt"><b>A.</b> 可靠性强调"能用的时间占比"，可用性强调"少出错"</div><div class="opt"><b>B.</b> 冗余/负载均衡主要提升可靠性</div>
+        <div class="opt"><b>C.</b> 可用性 = MTTF / (MTTF + MTTR)，但系统偶发故障时只要 MTTR 短、可用性仍可高</div><div class="opt"><b>D.</b> 可靠性与可用性是同一概念的两种叫法</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：C</span><br><b>解析：</b><b>可用性</b>=能用的时间占比（MTTF/(MTTF+MTTR)）；<b>可靠性</b>=持续无故障运行（少出错）。<span class="trap">冗余/负载均衡/故障转移提升的是<b>可用性</b>；通过代码质量/测试/容错来提升<b>可靠性</b>。口诀：卖门票的看"能用"，管账本的看"别算错"。</span></div>
+    </div>
+  </div>
+
+  <div class="topic" id="容错">
+    <div class="topic-head"><span class="dot"></span><h2>可靠性建模与容错设计</h2><a class="note-link" href="index.html">笔记 →</a></div>
+
+    <div class="q-card">
+      <span class="q-num">第 6 题</span>
+      <div class="q-stem">软件可靠性模型通常包含三个共同假设，其中"可用测试产生的可靠性数据预测运行阶段的可靠性行为"属于( )。</div>
+      <div class="q-options" data-ans="A">
+        <div class="opt"><b>A.</b> 代表性假设</div><div class="opt"><b>B.</b> 独立性假设</div>
+        <div class="opt"><b>C.</b> 相同性假设</div><div class="opt"><b>D.</b> 可维护性假设</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：A</span><br><b>解析：</b>三大假设：<b>代表性</b>（测试数据可预测运行行为）、<b>独立性</b>（失效互不影响）、<b>相同性</b>（失效后果等级相同）。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 7 题</span>
+      <div class="q-stem">用 N 个由不同人、不同方法/语言/环境独立开发的相同功能程序同时执行，结果通过多数表决选出，这种提高可靠性的方法是( )。</div>
+      <div class="q-options" data-ans="B">
+        <div class="opt"><b>A.</b> 恢复块设计</div><div class="opt"><b>B.</b> N 版本程序设计</div>
+        <div class="opt"><b>C.</b> 防卫式程序设计</div><div class="opt"><b>D.</b> 双机容错</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：B</span><br><b>解析：</b>N 版本程序设计 = <b>多数表决</b>，且须由不同人、不同方法独立设计，降低表决点相关错误概率。容错三大技术：N 版本、恢复块、防卫式。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 8 题</span>
+      <div class="q-stem">恢复块设计属于( )冗余方式。备用模块待机时与主模块并行工作称为( )备份。</div>
+      <div class="q-options" data-ans="C">
+        <div class="opt"><b>A.</b> 静态冗余；冷备份</div><div class="opt"><b>B.</b> 信息冗余；热备份</div>
+        <div class="opt"><b>C.</b> 动态冗余（主动冗余）；热备份</div><div class="opt"><b>D.</b> 时间冗余；冷备份</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：C</span><br><b>解析：</b>恢复块 = <b>动态冗余/主动冗余</b>（检测→定位→替换重跑）。备用并行工作=热备份，待机不工作=冷备份。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 9 题</span>
+      <div class="q-stem">双机容错系统采用( )方法保持主备系统联系，一旦主机故障即切换至备用系统。</div>
+      <div class="q-options" data-ans="D">
+        <div class="opt"><b>A.</b> 多数表决</div><div class="opt"><b>B.</b> 冗余校验</div>
+        <div class="opt"><b>C.</b> 负载均衡</div><div class="opt"><b>D.</b> 心跳</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：D</span><br><b>解析：</b>双机容错通过<b>心跳</b>信号判断主机是否故障，故障后自动把资源转移到备用系统。工作模式：热备、互备、双工。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 10 题</span>
+      <div class="q-stem">在程序中包含错误检查代码和错误恢复代码，出错时撤销错误状态回到已知正确状态，这种<strong>不采用传统容错</strong>技术的软件容错方法是( )。</div>
+      <div class="q-options" data-ans="A">
+        <div class="opt"><b>A.</b> 防卫式程序设计</div><div class="opt"><b>B.</b> N 版本程序设计</div>
+        <div class="opt"><b>C.</b> 恢复块设计</div><div class="opt"><b>D.</b> 冗余码设计</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：A</span><br><b>解析：</b>防卫式程序设计不采用传统容错，靠<b>错误检查代码</b>和<b>错误恢复代码</b>实现；策略：错误检测、破坏估计、错误恢复。</div>
+    </div>
+  </div>
+
+  <div class="topic" id="集群">
+    <div class="topic-head"><span class="dot"></span><h2>集群与负载均衡</h2><a class="note-link" href="index.html">笔记 →</a></div>
+
+    <div class="q-card">
+      <span class="q-num">第 11 题</span>
+      <div class="q-stem">在 DNS 服务器中为同一主机名配置多个 IP，应答查询时按顺序返回不同解析结果，将访问引导到不同节点。这种负载均衡属于( )。</div>
+      <div class="q-options" data-ans="B">
+        <div class="opt"><b>A.</b> 应用层（HTTP 重定向）</div><div class="opt"><b>B.</b> 传输层（DNS）</div>
+        <div class="opt"><b>C.</b> 网络层（NAT）</div><div class="opt"><b>D.</b> 反向代理</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：B</span><br><b>解析：</b>基于 <b>DNS</b> 的负载均衡属于<b>传输层</b>；HTTP 重定向=应用层；NAT=一个外网 IP 映射多内网 IP；反向代理=转发到内网多节点。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 12 题</span>
+      <div class="q-stem">集群系统提高可用性与可靠性的特点不包括( )。</div>
+      <div class="q-options" data-ans="D">
+        <div class="opt"><b>A.</b> 可伸缩性</div><div class="opt"><b>B.</b> 可管理性</div>
+        <div class="opt"><b>C.</b> 高性价比</div><div class="opt"><b>D.</b> 物理退化性</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：D</span><br><b>解析：</b>集群特点：<b>可伸缩、高可用、可管理、高性价比、高透明</b>。"物理退化"是硬件概念，与集群特点无关。</div>
+    </div>
+
+    <div class="q-card">
+      <span class="q-num">第 13 题</span>
+      <div class="q-stem">可靠性测试的步骤正确顺序是( )。</div>
+      <div class="q-options" data-ans="C">
+        <div class="opt"><b>A.</b> 设计用例→实施测试→定义运行剖面</div><div class="opt"><b>B.</b> 实施测试→定义剖面→设计用例</div>
+        <div class="opt"><b>C.</b> 定义运行剖面→设计用例→实施测试</div><div class="opt"><b>D.</b> 设计用例→定义剖面→实施测试</div>
+      </div>
+      <button class="toggle">查看答案</button>
+      <div class="answer"><span class="ans">答案：C</span><br><b>解析：</b>可靠性测试 = <b>定义运行剖面 → 设计可靠性测试用例 → 实施可靠性测试</b>。</div>
+    </div>
+  </div>
+
+  <div class="footer"><a href="index.html">← 返回笔记</a> · 2026</div>
+</div>
+<script>
+(function(){
+  document.querySelectorAll('.q-card').forEach(function(card){
+    var groups = card.querySelectorAll('.q-options');
+    var answerEl = card.querySelector('.answer');
+    var done = 0;
+    function markCorrect(g){
+      var ans = g.getAttribute('data-ans');
+      g.querySelectorAll('.opt').forEach(function(o){
+        var b = o.querySelector('b');
+        var l = b ? b.textContent.replace(/[^A-Z]/g,'') : '';
+        if (l === ans) o.classList.add('correct');
+      });
+    }
+    groups.forEach(function(g){
+      var ans = g.getAttribute('data-ans');
+      g.querySelectorAll('.opt').forEach(function(opt){
+        opt.addEventListener('click', function(){
+          if (g.getAttribute('data-done')) return;
+          g.setAttribute('data-done','1');
+          done++;
+          var b = opt.querySelector('b');
+          var letter = b ? b.textContent.replace(/[^A-Z]/g,'') : '';
+          var isCorrect = letter === ans;
+          opt.classList.add(isCorrect ? 'correct' : 'wrong');
+          if (!isCorrect) markCorrect(g);
+          g.querySelectorAll('.opt').forEach(function(o){ o.classList.add('locked'); });
+          if (done >= groups.length && answerEl) answerEl.classList.add('show');
+        });
+      });
+    });
+    var toggle = card.querySelector('.toggle');
+    if (toggle) toggle.addEventListener('click', function(){
+      groups.forEach(markCorrect);
+      groups.forEach(function(g){ g.querySelectorAll('.opt').forEach(function(o){ o.classList.add('locked'); }); });
+      if (answerEl) answerEl.classList.add('show');
+    });
+  });
+})();
+</script>
+</body>
+</html>
