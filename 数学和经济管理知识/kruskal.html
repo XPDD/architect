@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — Kruskal 最小生成树与并查集</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(251,191,36,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(0,212,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(251,191,36,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(251,191,36,.15),transparent 30%,transparent 70%,rgba(0,212,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(251,191,36,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--amber),var(--cyan),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:36px;height:36px;background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(0,212,255,.1));border:1px solid rgba(251,191,36,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(251,191,36,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:15px;font-weight:700;color:var(--amber);text-shadow:0 0 12px rgba(251,191,36,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--amber);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;flex-wrap:wrap}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--amber);border-radius:50%;box-shadow:0 0 6px rgba(251,191,36,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(251,191,36,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(251,191,36,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--amber);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(251,191,36,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.15);color:var(--amber);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--amber);box-shadow:0 0 8px rgba(251,191,36,.25);flex-shrink:0}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.75}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.65}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(251,191,36,.45)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.14)58%);padding:0 2px;font-weight:600;color:var(--amber)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.75}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 13px;font-size:12px;font-weight:500;color:rgba(255,255,255,.72);text-align:center;white-space:nowrap}
+  .flow-box.accent{border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.06);color:var(--amber);font-weight:700}
+  .flow-box.ok{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06);color:var(--green);font-weight:700}
+  .flow-box.no{border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.06);color:var(--rose);font-weight:700;text-decoration:line-through;text-decoration-color:rgba(248,113,113,.6)}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-arrow{display:flex;align-items:center;justify-content:center;width:20px;color:rgba(255,255,255,.18);font-size:13px;flex-shrink:0}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:3px 0}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(251,191,36,.1)}
+  .compare-table thead th:first-child{border-radius:var(--radius) 0 0 0}.compare-table thead th:last-child{border-radius:0 var(--radius) 0 0}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.55}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-badge{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:4px;background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.25);color:var(--amber);font-family:var(--font-mono);font-size:10px;font-weight:700;margin-bottom:4px}
+  .card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.65);line-height:1.55;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--amber)}
+  .code{margin:8px 0;padding:11px 13px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.07);border-radius:var(--radius);font-family:var(--font-mono);font-size:11.5px;line-height:1.65;color:rgba(255,255,255,.82);overflow-x:auto;white-space:pre}
+  .code .c{color:rgba(255,255,255,.4)}.code .k{color:var(--purple)}.code .f{color:var(--cyan)}
+  .hl-red{color:var(--rose);background:linear-gradient(180deg,transparent 58%,rgba(248,113,113,.15)58%);padding:0 2px;font-weight:600}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--amber),var(--cyan));color:#08131a;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(251,191,36,.14),var(--amber),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--amber);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--amber);box-shadow:-4px 0 12px rgba(251,191,36,.06)}
+  .cornell-summary .summary-text strong{color:var(--amber)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.15);color:var(--amber);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(251,191,36,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.card-grid{grid-template-columns:1fr}.compare-table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">KR</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">第 20 章 · 数学与经济管理 / 图论算法</div>
+        <div class="header-title">Kruskal 最小生成树 · 并查集(DSU)</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-09</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · 综合知识</div><div class="meta-item"><span class="meta-dot"></span>贪心 + 割性质 · 含代码模板</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>权值 / 生成树 / 最小生成树是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>Kruskal 第二步「初始化」到底做什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>为什么需要并查集？三个核心函数？</div>
+      <div class="cue-item"><span class="q-mark">?</span>为什么「避环」是对的？</div>
+      <div class="cue-item"><span class="q-mark">?</span>为什么贪心地选最小边一定最优？</div>
+      <div class="cue-item"><span class="q-mark">?</span>为什么必须先排序？</div>
+      <div class="cue-item"><span class="q-mark">?</span>Kruskal 与 Prim 区别、复杂度？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>三个基本概念</div>
+      <div class="note-section"><ul>
+        <li><span class="note-highlight">权值</span>：每条边上标的数字，代表这条边的「代价」（如修路费用）。例 AE=9 表示 A 村到 E 村修路花 9。</li>
+        <li><span class="hl-green">生成树</span>：从原图中挑出包含「全部顶点」且「连通、无环」的子图。<strong>n 个顶点的树恰好 n−1 条边</strong>。</li>
+        <li><span class="hl-purple">最小生成树（MST）</span>：所有生成树中，权值之和最小的那一棵。</li>
+        <li>题眼翻译：「最小生成树的权值之和」＝ 用 n−1 条边连通所有顶点且不绕圈，最省钱的方案花多少。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">2</span>Kruskal 算法思想</div>
+      <div class="note-section"><p><span class="note-highlight">一句话</span>：不断用<strong>当前最便宜的边</strong>，把两个<strong>还不连通</strong>的连通块连起来。</p>
+      <ul>
+        <li>全程维护的不是一棵树，而是一片<span class="hl-green">森林</span>（若干连通块）：初始 n 个孤立点 = n 个块。</li>
+        <li>每成功选一条边 → 连通块数 <strong>−1</strong>；选满 <span class="hl-orange">n−1</span> 条边 → 只剩 1 块 = 一棵树。</li>
+        <li>决策只有一句：两端<strong>不连通</strong> → 选边 + 合并；两端<strong>已连通</strong> → 成环 → 跳过。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">3</span>为什么需要并查集（DSU）</div>
+      <div class="note-section"><p>每一步都要回答：<strong>这条边的两个端点，是不是已经连通了？</strong>并查集就是「记账本」，记录<strong>谁和谁已经在同一个连通块里</strong>，把「判断是否成环」和「合并两个集合」都做到近乎 O(1)。</p></div>
+
+      <div class="numbered-header"><span class="num">4</span>「初始化」到底做什么（易卡点）</div>
+      <div class="note-section"><p>初始时还没选任何边，<strong>任何两个顶点都不连通</strong>。所以规定：每个顶点各自成一个集合 —— 用「父节点指针」表示就是<strong>每个节点的父亲是它自己</strong>：</p>
+        <div class="code">pa[A]=A  pa[B]=B  pa[C]=C  pa[D]=D  pa[E]=E  pa[F]=F
+<span class="c"># Python</span>
+self.pa = <span class="f">list</span>(<span class="f">range</span>(size))   <span class="c"># pa[i] = i</span>
+<span class="c">// C++ 等价写法</span>
+vector&lt;<span class="k">int</span>&gt; pa(size);
+<span class="f">iota</span>(pa.begin(), pa.end(), 0);</div>
+        <p><code>pa[x] == x</code> 说明 x 是根，一个根代表一个集合。初始 6 个顶点 = 6 个集合，就这一步。</p></div>
+
+      <div class="numbered-header"><span class="num">5</span>三个核心函数 + 完整模板</div>
+      <div class="note-section"><ul>
+        <li><span class="note-highlight">init</span>：各自为集合（pa[i]=i）。</li>
+        <li><span class="hl-purple">find</span>：查根，配<strong>路径压缩</strong> <code>fa[x]=x?x:fa[x]=find(fa[x])</code>。</li>
+        <li><span class="hl-green">union</span>：<code>fa[find(u)] = find(v)</code>，把两棵树挂到一起。</li>
+      </ul>
+      <div class="code"><span class="k">int</span> fa[N];
+<span class="k">void</span> <span class="f">init</span>(<span class="k">int</span> n){ <span class="k">for</span>(<span class="k">int</span> i=0;i&lt;n;i++) fa[i]=i; }          <span class="c">// 初始化：各自为集合</span>
+<span class="k">int</span> <span class="f">find</span>(<span class="k">int</span> x){ <span class="k">return</span> fa[x]==x ? x : fa[x]=find(fa[x]); } <span class="c">// 查根（路径压缩）</span>
+
+<span class="k">int</span> <span class="f">kruskal</span>(){
+    <span class="f">init</span>(n);
+    <span class="f">sort</span>(edges.begin(), edges.end());          <span class="c">// 按边权升序</span>
+    <span class="k">int</span> cnt=0, sum=0;
+    <span class="k">for</span>(<span class="k">auto</span> &amp;e : edges){
+        <span class="k">if</span>(<span class="f">find</span>(e.u)==<span class="f">find</span>(e.v)) <span class="k">continue</span>;     <span class="c">// 同集合 → 成环 → 跳过</span>
+        fa[<span class="f">find</span>(e.u)] = <span class="f">find</span>(e.v);             <span class="c">// 不同 → 选边 + 合并</span>
+        sum += e.w;
+        <span class="k">if</span>(++cnt == n-1) <span class="k">break</span>;               <span class="c">// 凑够 n-1 条边就停</span>
+    }
+    <span class="k">return</span> sum;
+}</div></div>
+
+      <div class="numbered-header"><span class="num">6</span>例题完整走一遍</div>
+      <div class="note-section"><p>边权：AE=9，AF=7，EF=10，ED=12，FD=14，BC=5，BD=6，BF=11，CD=8，AB=18。<strong>排序后</strong>：BC 5 → BD 6 → AF 7 → CD 8 → AE 9 → EF 10 → BF 11 → ED 12 → FD 14 → AB 18。</p></div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 选边流程（6 顶点，选满 5 条即成树）</div>
+        <div class="flow-row">
+          <div class="flow-box ok">BC=5 选<br><small>{B,C}</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box ok">BD=6 选<br><small>{B,C,D}</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box ok">AF=7 选<br><small>{A,F}</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box no">CD=8 成环<br><small>B-C-D-B</small></div>
+        </div>
+        <div class="flow-v-arrow">↓</div>
+        <div class="flow-row">
+          <div class="flow-box ok">AE=9 选<br><small>{A,E,F}</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box no">EF=10 成环<br><small>A-F-E-A</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box accent">BF=11 选<br><small>合并两分量</small></div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box primary">5+6+7+9+11 = 38</div>
+        </div>
+      </div>
+      <div class="note-section" style="margin-top:8px"><p>权值和 = <span class="hl-green">5+6+7+9+11 = 38</span>，此时 6 顶点已有 5 条边，恰好构成生成树。</p></div>
+
+      <div class="numbered-header"><span class="num">7</span>正确性①：为什么「避环」是对的</div>
+      <div class="note-section"><p>若 u、v 已连通，说明已选的边里已存在一条 u→v 的路径，再加 (u,v) 就形成<strong>环</strong>；而树的定义是「连通且无环」——环上随便删哪条边图仍连通，所以这条边在任何生成树里都是<span class="hl-red">冗余</span>的。跳过它绝不会漏掉最优解。</p></div>
+
+      <div class="numbered-header"><span class="num">8</span>正确性②：割性质（贪心为何最优）</div>
+      <div class="note-section">
+        <p><span class="note-highlight">割性质</span>：把顶点任意劈成两半（S ｜ 其余），若某个连通块完全落在 S 内，则<strong>横跨这个割的最小权边，一定可以安全地选入某棵 MST</strong>。</p>
+        <p><strong>交换证明</strong>：设 MST 里没选跨割最小边 e。把 e 硬加进去 → 树里恰好出现一个环；e 一端在 S、一端在 T，原来那条 u→v 路径必须至少再跨割一次，设该跨割边为 f，则 <span class="hl-orange">w(e) ≤ w(f)</span>。把 f 换成 e，环断开，仍是一棵生成树，权值不增。所以存在一棵含 e 的 MST，选它不亏。</p>
+        <p><span class="hl-green">人话</span>：两个连通块之间迟早要架一座桥，架哪座都是架，为什么不架最便宜的？架贵的桥不会有任何额外好处。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">9</span>正确性③：归纳不变量</div>
+      <div class="note-section"><ul>
+        <li><strong>不变量</strong>：每处理完一条边，已选边集始终是「某棵 MST 的子集」。</li>
+        <li>初始：空集 ⊆ 任何 MST ✅</li>
+        <li>每步：两端同块 → 跳过，集不变 ✅；两端不同块 → 该边是当前割的最小跨割边，由割性质某棵 MST 也含它 ✅</li>
+        <li>结束：选了 n−1 条边 = 一棵生成树，且 ⊆ 某棵 MST → <strong>它就是 MST</strong> ✅</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">10</span>为什么「先排序」是必须的</div>
+      <div class="note-section"><p>按权从小到大扫描，保证「考虑一条边时，比它小的边已被尽量吸收」。这样两端<strong>首次</strong>分属不同连通块时，这条边恰好就是对应割的最小跨割边，割性质正好适用。若乱序处理，可能先选了贵桥，便宜桥反而因成环被扔掉 → 结果就错了。</p></div>
+
+      <div class="numbered-header"><span class="num">11</span>Kruskal vs Prim</div>
+      <table class="compare-table">
+        <thead><tr><th>维度</th><th>Kruskal</th><th>Prim</th></tr></thead>
+        <tbody>
+          <tr><td><span class="note-highlight">思路</span></td><td>多块同时长大，每次架最便宜的桥（选边）</td><td>从单点长出一棵树，每次接最近的顶点</td></tr>
+          <tr><td><span class="hl-purple">依赖</span></td><td>边排序 + 并查集（避环）</td><td>优先队列/数组 + 已选顶点集</td></tr>
+          <tr><td><span class="hl-green">适用</span></td><td>稀疏图</td><td>稠密图</td></tr>
+          <tr><td><span class="hl-orange">复杂度</span></td><td>O(E log E)</td><td>O(V²) 或 O(E log V)</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p>两者背后都是<span class="note-highlight">同一个割性质</span>。</p></div>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>Kruskal 说人话：</strong>把村庄修路想成「捡最便宜的边」——<strong>先问最便宜的那条能不能用，能用就用，绝不放过便宜货；会绕圈的直接扔</strong>。并查集只是个记账本，随时回答「这两个村子现在是不是已经连在一起了」。它为什么最便宜？因为每两个还没连通的块之间<strong>迟早要架一座桥</strong>，既然架哪座都是架，那就架最便宜的——架贵的不会带来任何额外好处。所以从小到大挨个问一遍，便宜的全用上、贵货只在非用不可时才用，自然就是最省钱的连法。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">Kruskal＝<strong>按边权升序选边 + 并查集避环</strong>：初始化 pa[i]=i（各自成集合），每边用 find 判断两端是否同集合——不同则选边并 union，选满 <strong>n−1</strong> 条即得最小生成树。正确性靠<strong>割性质</strong>（跨割最小边必在某棵 MST 中）+ 交换论证 + 「已选边 ⊆ 某棵 MST」的归纳不变量；「先排序」是割性质适用的前提。复杂度 <strong>O(E log E)</strong>，稀疏图优于 Prim，二者同源割性质。</div>
+      <div class="summary-tags"><span class="tag primary">Kruskal</span><span class="tag">最小生成树</span><span class="tag">并查集 DSU</span><span class="tag">割性质</span><span class="tag">贪心</span><span class="tag">图论</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;flex-wrap:wrap;">
+  <a href="index.html" style="color:var(--amber);text-decoration:none;border-bottom:1px solid rgba(251,191,36,.25);padding-bottom:1px;">&#x2190; 返回本册索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="quiz.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;">&#x25B6; 数学与经济管理练习</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="../question-bank/exam-2026-05.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 2026年5月真题（综合知识）</a>
+</div>
+</body>
+</html>

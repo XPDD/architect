@@ -1,0 +1,2951 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026年5月 系统架构设计师 · 综合知识选择题（真题+模拟）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(167,139,250,.04)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:32px 16px}
+  .wrap{max-width:900px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+  .hero{text-align:center;padding:34px 20px 26px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:20px}
+  .hero-badge{font-family:var(--mono);font-size:11px;color:var(--purple);letter-spacing:.2em;margin-bottom:8px}
+  .hero h1{font-size:26px;font-weight:800}.hero h1 .accent{color:var(--purple)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:8px}
+  .hero-stats{display:flex;justify-content:center;gap:16px;margin-top:14px;flex-wrap:wrap}
+  .hero-stat{padding:5px 14px;border-radius:4px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--text2)}
+  .hero-stat strong{color:var(--purple)}
+  .toolbar{position:sticky;top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:rgba(17,22,32,.92);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:14px;z-index:10}
+  .timer{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--cyan);text-shadow:0 0 10px rgba(0,212,255,.4)}
+  .toolbar .spacer{flex:1}
+  .seg{display:flex;gap:4px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:7px;padding:3px}
+  .seg button{background:none;border:none;color:var(--text2);font-family:var(--mono);font-size:12px;padding:4px 12px;border-radius:5px;cursor:pointer;transition:.15s}
+  .seg button.on{background:rgba(167,139,250,.16);color:var(--purple);font-weight:700}
+  .seg button:hover:not(.on){color:var(--text)}
+  .btn{background:none;border:1px solid rgba(0,212,255,.35);color:var(--cyan);border-radius:6px;padding:7px 16px;font-size:13px;cursor:pointer;font-family:var(--mono);transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.08)}
+  .btn.warn{border-color:rgba(251,191,36,.4);color:var(--amber)}
+  .btn.warn:hover{background:rgba(251,191,36,.08)}
+  .btn.ok{border-color:rgba(52,211,153,.4);color:var(--green)}
+  .btn.ok:hover{background:rgba(52,211,153,.08)}
+  .progress{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px}
+  .progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .2s}
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 22px;margin-bottom:14px}
+  .q-head{display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+  .q-num{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--purple),var(--blue));padding:2px 9px;border-radius:4px}
+  .q-sec{font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px}
+  .q-sec.real{color:var(--amber);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25)}
+  .q-sec.mock{color:var(--blue);background:rgba(77,124,255,.1);border:1px solid rgba(77,124,255,.25)}
+  .q-tag{font-size:10px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+  .q-stem{font-size:15px;font-weight:600;line-height:1.7;margin-bottom:12px;white-space:pre-line}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+  .opt{font-size:13.5px;color:var(--text2);line-height:1.5;padding:8px 12px;border:1px solid transparent;border-radius:6px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .opt:hover{border-color:rgba(0,212,255,.35);background:rgba(0,212,255,.05);color:var(--text)}
+  .opt b{color:var(--cyan);font-family:var(--mono)}
+  .opt.picked{border-color:rgba(77,124,255,.6);background:rgba(77,124,255,.1);color:var(--text)}
+  .q-card.correct .opt.correct{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1);color:var(--text)}.q-card.correct .opt.correct b{color:var(--green)}
+  .q-card.wrong .opt.correct{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1)}.q-card.wrong .opt.correct b{color:var(--green)}
+  .q-card.wrong .opt.wrong{border-color:rgba(248,113,113,.6);background:rgba(248,113,113,.1)}.q-card.wrong .opt.wrong b{color:var(--rose)}
+  .q-notes{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px;padding-top:9px;border-top:1px dashed rgba(255,255,255,.07)}
+  .q-notes .nl-cap{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.05em}
+  .q-notes a{font-size:11px;font-family:var(--mono);text-decoration:none;color:var(--cyan);background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:4px;padding:2px 8px;transition:.15s}
+  .q-notes a:hover{background:rgba(0,212,255,.14);border-color:rgba(0,212,255,.4)}
+  .review{display:none;margin-top:12px;padding:12px 14px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .review.show{display:block}
+  .review .ans{color:var(--green);font-weight:700;font-family:var(--mono)}
+  .score-panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;text-align:center;margin-bottom:20px;display:none}
+  .score-panel.show{display:block}
+  .score-num{font-family:var(--mono);font-size:46px;font-weight:800;color:var(--purple);text-shadow:0 0 24px rgba(167,139,250,.4)}
+  .score-sub{font-size:13px;color:var(--text2);margin-top:6px}
+  .score-detail{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:14px}
+  .score-detail .d{text-align:center}.score-detail .d strong{font-size:20px;font-family:var(--mono)}.score-detail .d.ok strong{color:var(--green)}.score-detail .d.bad strong{color:var(--rose)}.score-detail .d .lbl{font-size:10px;color:var(--muted)}
+  .footer{text-align:center;padding:20px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  @media(max-width:640px){.opts{grid-template-columns:1fr}}.locked{pointer-events:none}.hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回题库索引</a>
+  <div class="hero">
+    <div class="hero-badge">2026年5月 · 真题讲解 · 选择题部分</div>
+    <h1>系统架构设计师 <span class="accent">综合知识选择题</span></h1>
+    <div class="hero-sub">含答案与逐题解析 · 每题附「对应笔记」跳转 · 可切分「真题 / 模拟」练习 · 自动计时判分</div>
+    <div class="hero-stats">
+      <div class="hero-stat">合计 <strong>125</strong> 题</div>
+      <div class="hero-stat">真题 <strong>70</strong> 题</div>
+      <div class="hero-stat">模拟 <strong>55</strong> 题</div>
+      <div class="hero-stat">笔记关联 <strong>183</strong> 处</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span class="timer" id="timer">150:00</span>
+    <div class="seg" id="seg">
+      <button data-sec="all" class="on">全部</button>
+      <button data-sec="real">真题 70</button>
+      <button data-sec="mock">模拟 55</button>
+    </div>
+    <span class="spacer"></span>
+    <span id="answered" style="font-family:var(--mono);font-size:12px;color:var(--text2)">已答 0 / 0</span>
+    <button class="btn ok" id="gradeBtn">提交判分</button>
+    <button class="btn warn" id="resetBtn">重新开始</button>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="score-panel" id="scorePanel">
+    <div class="score-num" id="scoreNum">0</div>
+    <div class="score-sub" id="scoreSub"></div>
+    <div class="score-detail">
+      <div class="d ok"><strong id="scRight">0</strong><div class="lbl">答对</div></div>
+      <div class="d bad"><strong id="scWrong">0</strong><div class="lbl">答错</div></div>
+      <div class="d"><strong id="scBlank">0</strong><div class="lbl">未答</div></div>
+    </div>
+  </div>
+
+  <div id="questions"></div>
+  <div class="footer">2026年5月系统架构设计师 · 综合知识选择题 · 真题 70 + 模拟 55</div>
+</div>
+<script>
+var QUESTIONS = [
+{
+"sec": "real",
+"no": 1,
+"cat": "信息安全 · 安全体系",
+"q": "3DES 在使用 2 个密钥的 EDE 模式下，其有效密钥长度通常为（ ）位。",
+"opts": [
+"56",
+"112",
+"168",
+"224"
+],
+"ans": "B",
+"why": "3DES 采用 EDE（加密—解密—加密）模式时，若只使用 2 个密钥 K1、K2，其运算序列为 E(K1)-D(K2)-E(K1)，首尾两次都用同一个 K1，所以真正的独立密钥只有 K1、K2 两个，有效密钥长度 = 2×56 = 112 位。A项对应单 DES 的密钥长度，不是 2 密钥 3DES；B项正确，2 密钥 3DES 实际有效密钥长度通常记为 112 位；C项对应 3 个独立密钥时常见表述；D项不符合对称分组加密算法的常见密钥设置。故选 B。",
+"notes": [
+[
+"安全架构",
+"../architecture-case-notes/security.html"
+],
+[
+"信息安全基础",
+"../security-notes/security-basics.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 2,
+"cat": "软件架构设计 · 软件架构质量属性",
+"q": "下列质量属性中，全部属于运行期质量属性的是（ ）。",
+"opts": [
+"安全性、可修改性、性能",
+"安全性、可用性、性能",
+"可测试性、可用性、可维护性",
+"可扩展性、可移植性、可维护性"
+],
+"ans": "B",
+"why": "质量属性按生命周期分为三类：运行期属性（性能、可用性、安全性、可伸缩性、互操作性）、开发期属性（可修改性、可测试性、可扩展性、可移植性）和维护期属性。选项中只有 B 的三项都发生在系统运行过程中。A项中可修改性属于开发期质量属性；B项三者都在系统运行过程中体现，判断正确；C项可测试性和可维护性偏开发与维护期；D项三项都更偏设计和开发期能力。故选 B。",
+"notes": [
+[
+"软件质量属性全解",
+"../quality-notes/quality-attributes.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 3,
+"cat": "扩展：新技术 · 大模型",
+"q": "Transformer 在自然语言处理领域取得突破，核心原因之一是引入了（ ）。",
+"opts": [
+"自注意力机制",
+"卷积神经网络层",
+"递归下降分析",
+"遗传算法"
+],
+"ans": "A",
+"why": "Transformer 抛弃了 RNN 的循环结构，改用自注意力（Self-Attention）机制一次性建模序列中任意两个位置之间的关联，既能捕捉长距离依赖，又能完全并行计算，这是它在 NLP 上取得突破的根本原因。A项正确，Transformer 依靠自注意力建模长距离依赖并支持并行计算；B项是 CNN 的典型结构，不是 Transformer 核心创新；C项属于编译原理术语；D项属于优化搜索方法，与该题无关。故选 A。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 4,
+"cat": "计算机基础 · 数学与工程基础",
+"q": "甲单独完成某项工作需 20 天，乙单独完成需 30 天。若甲乙先一起做若干天，剩余工作再由甲单独做 15 天恰好完成，则甲乙先合作的时间为（ ）天。",
+"opts": [
+"2",
+"3",
+"4",
+"5"
+],
+"ans": "B",
+"why": "把总工作量设为 1，则甲效率 1/20、乙效率 1/30。甲最后单独做 15 天完成 15/20 = 3/4，剩余 1-3/4 = 1/4 由两人合作完成；合作效率为1/20+1/30 = 1/12，故合作时间 = (1/4) ÷ (1/12) = 3 天。A项代入后总工作量不足；B项正确，甲效率 1/20，乙效率 1/30，甲单做 15 天完成 3/4，剩余 1/4 由两人按 1/12 效率合作 3 天；C项会超额完成；D项更不符合工作量守恒。故选 B。",
+"notes": [
+[
+"数学与经济管理",
+"../数学和经济管理知识/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 5,
+"cat": "软件实现与测试 · 测试方法",
+"q": "若某输入项的有效取值范围规定为正整数，按照边界值分析法，其有效边界值通常有（ ）个。",
+"opts": [
+"1",
+"2",
+"3",
+"4"
+],
+"ans": "B",
+"why": "边界值分析法关注的是取值范围的两端及其邻域。对“正整数”这一有效范围，有效边界值就是最小有效值 1 和最大有效值两端，而正整数没有上界，只有下边界 1。按边界值分析，有效侧通常取：边界值：1，刚越过边界的有效值：2，而 0 虽常作为对照，但不属于正整数，是无效值；因此“有效边界值”通常为 2 个。区间中间的普通取值属于等价类内部值，不算边界值。A项少算了上边界或下边界之一；B项正确；C项把中间普通值混入边界值；D项常见于把无效边界也一并统计。故选 B。",
+"notes": [
+[
+"系统测试·测试方法",
+"../software-engineering-notes/system-testing.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 6,
+"cat": "计算机基础 · 计算机网络",
+"q": "IEEE 802.11b 标准支持的典型高速率数据传输速率为（ ）。",
+"opts": [
+"1 Mb/s 和 2 Mb/s",
+"5.5 Mb/s 和 11 Mb/s",
+"10 Mb/s 和 100 Mb/s",
+"54 Mb/s 和 108 Mb/s"
+],
+"ans": "B",
+"why": "IEEE 802.11b 工作在 2.4GHz ISM 频段，采用 CCK 调制，典型高速率为 5.5Mb/s 和 11Mb/s（同时向下兼容 1Mb/s、2Mb/s）。54Mb/s 属于 802.11a/g。A项更接近早期低速率配置，不是题干强调的典型高速率；B项正确，802.11b 工作在 2.4GHz，常考速率就是 5.5 与 11Mb/s；C项是以太网常见速率；D项更接近 802.11g 等后续标准。故选 B。",
+"notes": [
+[
+"计算机网络基础",
+"../network-notes/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 7,
+"cat": "软件架构设计 · 大数据",
+"q": "在 Lambda 架构中，负责处理最近增量数据流、以提供低延迟查询结果的是（ ）。",
+"opts": [
+"批处理层",
+"加速层",
+"服务层",
+"数据湖层"
+],
+"ans": "B",
+"why": "Lambda 架构分三层：批处理层负责全量历史数据的离线计算，延迟高但结果准确；加速层（速度层）处理最近到达的增量数据流，用于快速给出低延迟的近似结果；服务层负责合并两层结果并对外提供查询。A项负责全量历史数据的离线计算，延迟较高；B项正确，加速层也称速度层，专门处理实时增量流；C项主要对外提供查询结果，不是增量处理核心；D项并非 Lambda 的标准分层。故选 B。",
+"notes": [
+[
+"数据库精讲",
+"../database-notes/index.html"
+],
+[
+"未来信息综合技术",
+"../未来信息系统/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 8,
+"cat": "软件架构设计 · 大数据",
+"q": "Lambda 架构中的原始主数据通常采用（问题1）方式保存，并尽量保留（问题2）历史数据。就问题1而言，本题正确答案是？",
+"opts": [
+"可变存储",
+"不可变追加式存储",
+"周期覆盖式存储",
+"临时缓存式存储"
+],
+"ans": "B",
+"why": "Lambda 架构要求原始主数据以“不可变、追加式”（immutable / append-only）方式保存，即只追加、不修改、不覆盖。这样当业务规则或算法变化时，才能对历史全量数据重新计算，保证结果可重演、可追溯。A项不利于重算与追溯，不符合 Lambda 的核心思想；B项正确，Lambda 倾向以不可变、追加式方式保存全量原始数据；C项会破坏历史可重演能力；D项只适合短期缓存，不能承担主存储职责。故选 B。",
+"notes": [
+[
+"数据库精讲",
+"../database-notes/index.html"
+],
+[
+"未来信息综合技术",
+"../未来信息系统/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 9,
+"cat": "信息安全 · 安全体系",
+"q": "在访问控制矩阵 ACM 中，矩阵的行索引通常表示（ ），列索引通常表示客体。",
+"opts": [
+"主体",
+"权限类型",
+"安全级别",
+"审计日志"
+],
+"ans": "A",
+"why": "访问控制矩阵（ACM）以“行 = 主体、列 = 客体”组织，矩阵中的每个元素表示该主体对该客体拥有的访问权限（读、写、执行等），是自主访问控制 DAC 的经典模型，与之对应的是能力表和访问控制表。A项正确，ACM 的本质是主体对客体拥有哪些权限；B项是单元格可能存放的内容，不是行索引；C项可作为控制依据，但不是 ACM 行列定义；D项属于安全审计范畴。故选 A。",
+"notes": [
+[
+"安全架构",
+"../architecture-case-notes/security.html"
+],
+[
+"信息安全基础",
+"../security-notes/security-basics.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 10,
+"cat": "软件架构设计 · 软件架构风格",
+"q": "黑板架构中调用多个（ ）构件进行数据处理和计算的。",
+"opts": [
+"知识源",
+"黑板",
+"控制器",
+"数据源"
+],
+"ans": "A",
+"why": "黑板风格由三部分构成：黑板（共享数据结构，存放状态与中间结果）、知识源（各领域相对独立的求解模块）、控制（根据黑板当前状态决定何时调用哪个知识源）。真正完成数据处理与计算的是被调用的多个“知识源”构件。选项：A项正确，真正执行求解与计算的是知识源；B项黑板只存放共享数据与中间结果，本身不做计算；C项控制负责调度决策，不直接计算；D项“数据源”不是黑板风格的标准构件。故选 A。",
+"notes": [
+[
+"软件架构风格全览",
+"../architecture-notes/arch-styles.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 11,
+"cat": "软件工程 · 开发方法与模型",
+"q": "关于 V 模型的表述，正确的是（ ）。",
+"opts": [
+"测试活动只在编码完成后才开始",
+"测试阶段与开发阶段形成对应验证关系",
+"它完全以风险分析为驱动",
+"它强调原型快速迭代优先于文档"
+],
+"ans": "B",
+"why": "V 模型的左侧是开发阶段（需求分析→概要设计→详细设计→编码），右侧是对应的测试阶段（验收测试←系统测试←集成测试←单元测试），左右形成一一对应的验证关系，并强调测试活动要尽早规划而不是等编码后才开始。A项错误，测试计划应在需求/设计阶段早期开展，不是编码完成后才开始。；B项正确，需求对验收、概要设计对系统测试、详细设计对集成测试；C项是螺旋模型特征；D项更接近原型或敏捷思想。故选 B。",
+"notes": [
+[
+"软件过程模型",
+"../software-engineering-notes/se-process-models.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 12,
+"cat": "软件架构设计 · 软件架构实现",
+"q": "ABSD 方法是一种自顶向下、递归细化的方法，其主要由（ ）共同驱动。",
+"opts": [
+"架构需求、业务场景、系统用例",
+"系统功能、质量属性、业务约束",
+"业务需求、商业质量需求、技术要求",
+"构件和类"
+],
+"ans": "B",
+"why": "题解：ABSD方法的驱动因素1. 知识点背景ABSD 是一种自顶向下、递归细化的架构设计方法，由商业（业务）需求、质量需求和功能需求的组合共同驱动。2. 选项逐一解析- A. 架构需求、业务场景、系统用例这些是描述需求的方式和载体，并非驱动ABSD方法的核心要素。用例通常用来描述功能需求，而不是驱动源本身。排除。- B. 系统功能、质量属性、业务约束这三个要素与ABSD的核心驱动模型完全对应：- 系统功能 → 功能需求（系统要做什么）- 质量属性 → 质量需求（系统要达到的非功能指标，如性能、安全）- 业务约束 → 商业/业务需求（系统为何存在，受什么限制）这是最符合ABSD理论定义的选项。为正确答案。- C. 业务需求、商业质量需求、技术要求该选项存在概念混淆：- “商业质量需求”并非标准术语，标准分类是“质量需求”；- “技术要求”是架构设计的实现结果，而非驱动因素。排除。- D. 构件和类构件和类是架构设计的输出产物，是设计细化后的结果，不是驱动ABSD方法的源头。排除。",
+"notes": [
+[
+"ABSD 基于架构的软件开发",
+"../architecture-notes/absd.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 13,
+"cat": "软件架构设计 · 软件架构实现",
+"q": "ABSD 方法经过递归细化后，最终可产生（ ）。",
+"opts": [
+"用户手册和运行手册",
+"构件和类",
+"需求基线和测试用例",
+"数据仓库和数据集市"
+],
+"ans": "B",
+"why": "ABSD 从需求出发逐层递归细化，最终产出的是软件构件（Component）和类（Class）以及它们之间的连接关系——构件是架构层面的可复用单元，类是面向对象细化后的实现单元。A项属于文档交付物，不是 ABSD 递归细化结果；B项正确，教材常见表述为产生软件构件和类；C项虽重要，但不是该方法的最终落点；D项属于数据架构领域术语。故选 B。",
+"notes": [
+[
+"ABSD 基于架构的软件开发",
+"../architecture-notes/absd.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 14,
+"cat": "扩展：新技术 · 边缘计算",
+"q": "关于边缘计算与雾计算的说法，正确的是（ ）。",
+"opts": [
+"边缘计算通常更靠近数据源终端",
+"雾计算不能进行动态计算",
+"雾计算不处理实时数据",
+"两者完全等同，没有层次差异"
+],
+"ans": "A",
+"why": "边缘计算更靠近数据产生的终端侧，强调就近处理、超低时延；雾计算可以看作云与端之间的中间层，具备一定的计算、存储与调度能力（因而支持动态计算），常用于实时或近实时场景。两者是互补的分层结构而不是等同关系。A项正确，边缘计算强调就近处理、低时延；B项错误，雾计算具备一定计算与调度能力；C项错误，雾计算恰恰常用于实时或近实时场景；D项错误，雾计算通常是介于云和端之间的多层扩展。故选 A。",
+"notes": [
+[
+"未来信息综合技术",
+"../未来信息系统/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 15,
+"cat": "计算机基础 · 数学与工程基础",
+"q": "某连通无向图边权如下：AE=9，AF=7，EF=10，ED=12，FD=14，BC=5，BD=6，BF=11，CD=8，AB=18。该图最小生成树的权值之和为（ ）。",
+"opts": [
+"32",
+"38",
+"42",
+"46"
+],
+"ans": "B",
+"why": "用 Kruskal 算法按边权从小到大选边并避环：BC=5、BD=6、AF=7 依次入选；CD=8 会使 B-C-D-B 成环，跳过；AE=9 入选；EF=10 会使A-F-E-A 成环，跳过；BF=11 入选，它把 {A,E,F} 与 {B,C,D} 两个连通分量连起来，此时 6 个顶点已有 5 条边，恰好构成生成树。选项：A项32偏小，不可能连通全部6个顶点；B项38正确，由 BC(5)+BD(6)+AF(7)+AE(9)+BF(11) 构成；C项42、D项46均大于最小权值和。故选B。",
+"notes": [
+[
+"数学与经济管理",
+"../数学和经济管理知识/index.html"
+],
+[
+"Kruskal 最小生成树与并查集",
+"../数学和经济管理知识/kruskal.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 16,
+"cat": "计算机基础 · 操作系统",
+"q": "某文件系统目录项长度为 64 字节，其中文件名占 60 字节，索引结点号占 4 字节。若索引结点号为 32 位，则该文件系统理论上最多可标识（ ）个不同文件。",
+"opts": [
+"2 的 16 次方",
+"2 的 32 次方",
+"2 的 60 次方",
+"2 的 64 次方"
+],
+"ans": "B",
+"why": "在索引结点（i-node）的文件系统中：- 索引结点号（inode 号）用来唯一标识一个文件。题目说明索引结点号是 32 位。n 位二进制最多可以表示 2^n 个不同编号。32 位就可以表示2^32 个不同索引结点，也就是最多标识 2^32个不同文件。注意：目录项里的文件名只是名字，不决定文件总数；目录项长度 64 字节只是目录项的结构，是干扰信息。",
+"notes": [
+[
+"操作系统基础",
+"../os-notes/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 17,
+"cat": "软件架构设计 · 分布式系统",
+"q": "在两层 C/S 架构中，胖客户端通常负责（ ）。",
+"opts": [
+"仅数据管理",
+"仅用户界面展示",
+"用户界面交互和业务逻辑处理",
+"仅消息队列转发"
+],
+"ans": "C",
+"why": "两层 C/S 架构中，“胖客户端”把用户界面和大部分业务逻辑都放在客户端实现，服务器端主要负责数据管理与存储；“瘦客户端”则只承担界面展示，业务逻辑集中在服务器。A项更接近服务器职责；B项更像瘦客户端特征；C项正确，胖客户端承担较多界面与业务逻辑；D项不是两层 C/S 的典型职责划分。故选 C。",
+"notes": [
+[
+"层次架构",
+"../architecture-case-notes/layered-architecture.html"
+],
+[
+"软件架构风格全览",
+"../architecture-notes/arch-styles.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 18,
+"cat": "软件架构设计 · 软件产品线",
+"q": "在 DSSA 建立过程中，产生领域字典或领域术语表的阶段通常是（ ）。",
+"opts": [
+"定义领域参考架构",
+"定义领域特定元素",
+"进行领域实现编码",
+"进行系统切换部署"
+],
+"ans": "B",
+"why": "DSSA（特定领域软件架构）的建立过程为：定义领域范围 → 定义领域特定元素（抽取领域概念与术语，形成领域字典/术语表）→ 定义领域特定的设计与实现约束 → 定义领域模型和架构 → 产生并收集可复用资产。领域字典正是在“定义领域特定元素”阶段沉淀下来的。A项更偏架构设计成果，不是术语抽取起点；B项正确，定义领域特定元素时会沉淀核心概念与术语；C项属于实现阶段；D项属于运维上线活动。故选 B。",
+"notes": [
+[
+"DSSA 特定领域软件架构",
+"../architecture-notes/dssa.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 19,
+"cat": "软件架构设计 · 分布式系统",
+"q": "CQRS 将读写分离后，最常见的副作用或代价是（ ）。",
+"opts": [
+"强一致性更容易保证",
+"写入性能一定下降为零",
+"数据一致性处理更复杂",
+"数据库设计必然更简单"
+],
+"ans": "C",
+"why": "CQRS（命令查询职责分离）把写模型（命令）与读模型（查询）彻底拆开，各自独立建模、独立存储，带来的一大代价就是两个模型之间的数据同步与最终一致性处理变得复杂，而不是变简单。A项错误，读写分离往往引入最终一致性问题；B项夸张失真，写性能并非必然极差；C项正确，读模型与写模型同步会增加一致性复杂度；D项通常相反，系统复杂度会提高。故选 C。",
+"notes": [
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+],
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 20,
+"cat": "计算机基础 · 数学与工程基础",
+"q": "函数 f(x)=ln(x²-4x) 的定义域是（ ）。",
+"opts": [
+"(-,0)(4,+)",
+"(0,+)",
+"(-,-1)",
+"(4,+)"
+],
+"ans": "A",
+"why": "对数函数的真数必须大于 0，即 x²-4x = x(x-4) &gt; 0，解得 x&lt;0 或 x&gt;4，故定义域为 (-∞,0)∪ (4,+∞)。注意要写成两个区间的并集。A项正确，因为对数真数需大于 0，x²-4x=x(x-4)&gt;0，解得 x&lt;0 或 x&gt;4；B项遗漏了 x&lt;0 的可行区间；C项范围明显不足；D项仅保留右侧区间，不完整。故选 A。",
+"notes": [
+[
+"数学与经济管理",
+"../数学和经济管理知识/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 21,
+"cat": "软件工程 · 面向对象分析与设计",
+"q": "关于装饰器模式的说法，错误的是（ ）。",
+"opts": [
+"属于结构型模式",
+"可在运行期间动态添加职责",
+"只能用于具体类，不能基于抽象构件工作",
+"比静态继承更灵活"
+],
+"ans": "C",
+"why": "装饰器模式（Decorator）属于结构型模式，它通过持有一个与自身相同类型的抽象构件引用，在运行期层层包装对象、动态叠加职责，比静态继承更灵活。它恰恰是基于抽象构件（Component）接口工作的，因此 C 的说法错误。A项正确，装饰器属于结构型模式；B项正确，其价值就在于动态增强对象功能；C项错误，装饰器通常基于抽象构件接口实现包装；D项正确，它相较继承更符合开闭原则。故选 C。",
+"notes": [
+[
+"OO·UML·设计模式",
+"../software-engineering-notes/oo-uml-patterns.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 22,
+"cat": "系统设计 · 面向对象分析与设计",
+"q": "单例模式 Singleton Pattern 属于（ ）设计模式。",
+"opts": [
+"创建型",
+"结构型",
+"行为型",
+"并发型"
+],
+"ans": "A",
+"why": "GoF 的 23 种设计模式分为创建型、结构型、行为型三类。单例模式（Singleton）关注“如何创建对象并保证全局唯一实例”，属于创建型模式。A项正确，单例关注对象创建与唯一实例控制；B项关注类或对象组合结构；C项关注职责分配与交互；D项并不是 GoF 的标准分类。故选 A。",
+"notes": [
+[
+"OO·UML·设计模式",
+"../software-engineering-notes/oo-uml-patterns.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 23,
+"cat": "信息安全 · 系统可靠性分析",
+"q": "在 DO-178B 软件等级中，表示显著降低航空器或机组应对不利运行条件能力的等级通常为（ ）。",
+"opts": [
+"A级",
+"B级",
+"C级",
+"E级"
+],
+"ans": "C",
+"why": "DO-178B 按失效后果由重到轻分为 A~E 级：A 级为灾难性、B 级为危险/严重、C 级为重大（显著降低航空器或机组应对不利运行条件的能力）、D 级为较小、E 级为无安全影响。A项表示灾难性后果，最严重；B项表示危险或严重后果；C项正确，对应重大但未达灾难级的影响；D项表示无安全影响，明显不符。故选 C。",
+"notes": [
+[
+"软件可靠性",
+"../软件可靠性/index.html"
+],
+[
+"计算机可靠性",
+"../computer-system-notes/reliability.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 24,
+"cat": "软件工程 · 软件过程管理",
+"q": "关于 DO-178 与 CMMI 的比较，下列说法正确的是（ ）。",
+"opts": [
+"DO-178 的适用范围比 CMMI 更广",
+"CMMI 比 DO-178 更聚焦航空软件合规细节",
+"DO-178 比 CMMI 更具体，目标更清晰",
+"两者完全等价，只是名称不同"
+],
+"ans": "C",
+"why": "DO-178 是航空领域的软件适航标准，针对性强、对开发与验证过程的要求更具体、目标更清晰；CMMI 是通用的软件过程能力成熟度模型，适用范围广、偏重组织级过程改进。两者定位不同，不能互相替代。A项错误，CMMI 适用范围更广泛；B项错误，航空软件合规细节正是 DO-178 强项；C项正确，DO-178 对航空软件开发与验证要求更具体；D项错误，两者定位和用途并不相同。故选 C。",
+"notes": [
+[
+"软件过程模型",
+"../software-engineering-notes/se-process-models.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 25,
+"cat": "软件实现与测试 · 测试过程",
+"q": "测试左移的核心目标是（ ）。",
+"opts": [
+"把测试推迟到上线后进行",
+"尽早介入需求和设计阶段发现问题",
+"用更多回归测试替代需求评审",
+"只关注单元测试覆盖率"
+],
+"ans": "B",
+"why": "测试左移（Shift Left）的核心是把测试与质量活动尽可能前移到需求和设计阶段，越早发现缺陷修复成本越低。它并不排斥需求评审，也不是只盯单元测试覆盖率。A项与左移方向相反；B项正确，测试左移强调越早发现缺陷，修复成本越低；C项缩窄了左移范围，需求评审不能被替代；D项只覆盖一个方面，不是核心定义。故选 B。",
+"notes": [
+[
+"软件测试",
+"../software-engineering-notes/se-testing.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 26,
+"cat": "软件实现与测试 · 测试管理",
+"q": "在敏捷开发中，测试活动通常从（ ）就开始介入。",
+"opts": [
+"需求阶段",
+"概要设计阶段",
+"详细设计阶段",
+"上线验收阶段"
+],
+"ans": "A",
+"why": "敏捷开发强调持续测试与测试前移，测试人员从需求梳理阶段就介入，参与需求澄清、验收标准定义和测试用例设计，而不是等到编码或上线验收才测试。A项正确，敏捷强调测试前移，需求澄清时就应参与；B项和 C项已偏后；D项只是末端验收，违背持续测试理念。故选 A。",
+"notes": [
+[
+"软件测试",
+"../software-engineering-notes/se-testing.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 27,
+"cat": "计算机基础 · 操作系统",
+"q": "关于父进程和子进程的说法，错误的是（ ）。",
+"opts": [
+"它们具有各自独立的进程控制块",
+"它们可以并发执行",
+"它们共享同一虚拟地址空间",
+"它们对临界资源的访问仍需互斥控制"
+],
+"ans": "C",
+"why": "fork 之后子进程获得的是父进程地址空间的副本（采用写时复制 COW 技术），并非完全共享同一虚拟地址空间。父子进程各有独立的 PCB、可以并发执行，对临界资源的访问同样需要互斥与同步。A项正确，父子进程都有独立 PCB；B项正确，父子进程可并发执行；C项错误，fork 后子进程得到地址空间副本，不是完全共享同一虚拟空间；D项正确，临界资源访问仍需同步机制。故选 C。",
+"notes": [
+[
+"操作系统基础",
+"../os-notes/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 28,
+"cat": "信息安全 · 安全体系",
+"q": "关于 SSL/TLS 的表述，错误的是（ ）。",
+"opts": [
+"位于应用层与传输层之间",
+"握手阶段可结合非对称与对称机制",
+"仅使用对称加密完成全部流程",
+"可提供服务器认证与数据完整性保护"
+],
+"ans": "C",
+"why": "SSL/TLS 位于应用层与传输层之间；握手阶段用非对称加密（服务器证书、公私钥）协商出会话密钥，随后的数据传输用对称加密完成，并提供服务器认证与数据完整性保护。因此“仅使用对称加密完成全部流程”是错误的。A项正确，是教材常见定位；B项正确，协商密钥时常使用非对称机制，传输阶段使用对称加密；C项错误，SSL/TLS 不是只用对称加密；D项正确，是其核心功能。故选 C。",
+"notes": [
+[
+"安全架构",
+"../architecture-case-notes/security.html"
+],
+[
+"信息安全基础",
+"../security-notes/security-basics.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 29,
+"cat": "计算机基础 · 操作系统",
+"q": "嵌入式系统要满足强实时性要求，更适合采用的设计思路是（ ）。",
+"opts": [
+"表驱动或时间触发式设计",
+"尽量增加人工审批环节",
+"延后越界检查以换取灵活性",
+"随机调度方式减少耦合"
+],
+"ans": "A",
+"why": "强实时系统的首要要求是“时限可预测”。表驱动或时间触发式设计把系统行为编排在固定的时间表上，执行路径确定、时间抖动小，最有利于满足硬实时的截止期要求。A项正确，强实时系统强调可预测性，表驱动或时间触发更利于确定时限；B项与实时性目标冲突；C项会损害安全与可靠性；D项任务什么时候运行是随机、不确定的，无法保证任务在截止时间前完成，不满足强实时性。另外，随机调度并不能减少耦合，任务耦合是代码 / 模块依赖关系，和调度策略无关。故选 A。",
+"notes": [
+[
+"操作系统基础",
+"../os-notes/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 30,
+"cat": "计算机基础 · 计算机系统结构",
+"q": "编译程序的工作过程通常不包括（ ）。",
+"opts": [
+"语法分析",
+"中间代码生成",
+"代码优化",
+"解释执行程序"
+],
+"ans": "D",
+"why": "编译程序的完整流程是：词法分析 → 语法分析 → 语义分析 → 中间代码生成 → 代码优化 → 目标代码生成。解释执行是解释器的职责（读一句执行一句），不属于编译程序的组成步骤。A项是编译前端核心步骤；B项是连接前后续优化的重要桥梁；C项属于提升目标代码质量的典型阶段；D项属于程序运行或解释器职责，不是编译器标准处理流程。故选 D。",
+"notes": [
+[
+"计算机语言",
+"../misc-computer-notes/misc-language.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 31,
+"cat": "数据库 · 数据库模式与关系模型",
+"q": "关系模式 R(A,B,C) 中，若存在函数依赖 AB，BC，则该关系模式最高满足（ ）。",
+"opts": [
+"1NF",
+"2NF",
+"3NF",
+"BCNF"
+],
+"ans": "B",
+"why": "设主键为 A，则 A→B、A→C 都是完全函数依赖，不存在部分依赖，因此满足 2NF；但同时又存在 A→B、B→C，即 C 传递依赖于主键 A，不满足 3NF。故该关系模式最高只满足 2NF。A项过低，题目条件一般默认属性已原子化；B项正确，若主键为 A，则不存在部分依赖，但存在 BC 的传递依赖，故未达 3NF；C项与 D项都要求消除该传递依赖。故选 B。",
+"notes": [
+[
+"函数依赖与范式 1NF-BCNF",
+"../database-notes/functional-dependency-nf.html"
+],
+[
+"关系代数",
+"../database-design-notes/relational-algebra.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 32,
+"cat": "数据库 · 数据库模式与关系模型",
+"q": "关系 R(A,B) 有 5 个元组，S(B,C) 有 10 个元组，且 B 是 R 的主键，则 R 与 S 按属性 B 进行自然连接后，结果元组数的取值范围是（ ）。",
+"opts": [
+"[0,5]",
+"[0,10]",
+"[5,10]",
+"[0,50]"
+],
+"ans": "B",
+"why": "自然连接按公共属性 B 做等值匹配。下界：若 R 与 S 的 B 值没有交集，结果可为 0 个元组；上界：B 是 R 的主键，R 中每个 B 值唯一，所以 S 的 10 个元组各自最多只能匹配到 1 个 R 元组，最多 10 个。故取值范围是 [0,10]。A项上界偏小，S 中 10 个元组都可能各自匹配到 R 中不同 B；B项正确，下界可为 0，上界因 R 的 B 为主键，每个 S 元组最多匹配一个 R 元组，故最多 10；C项下界不一定至少为 5；D项是笛卡尔积上界。故选 B。",
+"notes": [
+[
+"函数依赖与范式 1NF-BCNF",
+"../database-notes/functional-dependency-nf.html"
+],
+[
+"关系代数",
+"../database-design-notes/relational-algebra.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 33,
+"cat": "扩展：新技术 · 大模型",
+"q": "在多模态大模型中，实现文本、图像、语音等不同模态之间语义互通的关键技术通常是（ ）。",
+"opts": [
+"模态对齐",
+"模态裁剪",
+"关系规范化",
+"事务隔离"
+],
+"ans": "A",
+"why": "多模态大模型要让文本、图像、语音等不同模态在同一个语义空间里可比，关键技术是“模态对齐”，例如 CLIP 通过图文对比学习把图像与文本编码到统一的向量空间，从而实现跨模态语义互通。A项正确，模态对齐让不同模态映射到可比较的统一语义空间；B项不是主流核心术语；C项属于数据库理论；D项属于事务管理，与多模态语义互通无关。故选 A。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 34,
+"cat": "扩展：新技术 · 人工智能",
+"q": "世界模型 World Model 的核心能力通常不包括（ ）。",
+"opts": [
+"表征学习",
+"动态预测",
+"决策规划",
+"关系数据库规范化"
+],
+"ans": "D",
+"why": "世界模型（World Model）要让智能体在内部建立对环境的表征并预测未来状态，核心能力包括表征学习、动态预测和基于预测的决策规划；关系数据库规范化属于数据库设计理论，与它无关。A项是世界模型建立环境内部表示的重要能力；B项用于预测未来状态变化；C项用于基于预测结果规划行动；D项是数据库设计方法，不属于世界模型的核心能力。故选 D。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 35,
+"cat": "软件实现与测试 · 测试类型",
+"q": "新功能上线后，为快速确认系统主流程是否可用，再继续开展回归测试，首先应执行（ ）。",
+"opts": [
+"冒烟测试",
+"回归测试",
+"单元测试",
+"验收测试"
+],
+"ans": "A",
+"why": "1. 题干分析题目场景是新功能上线后，需要先快速确认系统主流程是否可用，再开展后续回归测试。核心关键词是“快速确认主流程可用”，这是典型的冒烟测试场景。2. 选项逐一解析✅-    A. 冒烟测试（正确答案）冒烟测试是一种快速的、轻量级的验证测试，目的是确认系统的核心主流程是否能正常运行。它就像电路通电前的“冒烟测试”：如果通电就冒烟（主流程直接报错），就没必要再做后续的详细测试了。在上线后先执行冒烟测试，可以快速判断系统是否“可用”，避免后续回归测试做无用功。❌-    B. 回归测试回归测试的目的是验证新修改是否破坏了原有功能，是在确认系统基本可用之后，才需要开展的详细测试，不是“快速确认主流程”的首选。题干明确说“再继续开展回归测试”，说明它不是第一步要做的。❌-    C. 单元测试单元测试是在开发阶段对代码模块进行的测试，由开发人员执行，不是上线后对整个系统主流程的验证。❌-    D. 验收测试验收测试是用户或产品方对系统整体功能、性能进行的最终确认测试，是测试流程的最后一步，不是上线后的快速验证环节。3. 结论新功能上线后，为快速确认系统主流程是否可用，应先执行冒烟测试，再开展回归测试。对应选项为 A。测试类型             核心目的            执行时机             特点冒烟测试             验证主流程是否可用       上线后/构建后          快速、轻量级、只测核心流程回归测试             验证修改不影响原有功能     冒烟测试通过后          全面、重复执行历史用例单元测试             验证代码模块逻辑        开发阶段             粒度细、由开发执行验收测试             验证系统是否符合需求      测试后期             面向用户、整体确认",
+"notes": [
+[
+"系统测试·测试方法",
+"../software-engineering-notes/system-testing.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 36,
+"cat": "软件实现与测试 · 测试方法",
+"q": "黑盒测试中，特别适合分析多个输入条件组合及其因果关系的方法是（ ）。",
+"opts": [
+"因果图法",
+"边界值分析法",
+"等价类划分法",
+"错误推测法"
+],
+"ans": "A",
+"why": "因果图法专门用于分析多个输入条件之间的组合关系及其因果约束（与、或、非、互斥等），再转换为判定表来设计测试用例，最擅长处理输入条件组合爆炸的场景。A项正确，因果图法擅长处理条件组合和逻辑约束；B项主要关注边界附近输入；C项用于把输入划分为若干代表性集合；D项依赖经验，不擅长系统化表达组合关系。故选 A。",
+"notes": [
+[
+"系统测试·测试方法",
+"../software-engineering-notes/system-testing.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 37,
+"cat": "企业信息化 · 相关法律法规",
+"q": "关于专利制度的说法，正确的是（ ）。",
+"opts": [
+"申请权和专利权可以依法转让",
+"科学发现可以直接获得发明专利",
+"专利侵权诉讼时效固定从授权公告日起算",
+"实用新型仅适用于文学艺术作品"
+],
+"ans": "A",
+"why": "申请权与专利权均可依法转让（A 正确）；科学发现本身不授予专利权（B 错）；侵权诉讼时效应自权利人知道或应当知道权利被侵害之日起计算，而非授权公告日（C 错）；实用新型保护产品的形状、构造等技术方案，不适用于文学艺术作品（D 错）。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 38,
+"cat": "企业信息化 · 相关法律法规",
+"q": "我国发明专利和实用新型专利要求优先权的期限通常为自首次申请之日起（ ）个月。",
+"opts": [
+"6",
+"12",
+"18",
+"24"
+],
+"ans": "B",
+"why": "《专利法》规定：申请人自发明或实用新型在外国第一次提出专利申请之日起 12 个月内、外观设计 6 个月内，又在中国就相同主题提出申请的，可以享有优先权。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 39,
+"cat": "数据库 · 数据库设计与优化",
+"q": "某业务规则规定一个学生必须且只能属于一个班级；每个班级至少 10 人，至多 50 人。则学生实体参与该联系的基数应表示为（ ）。",
+"opts": [
+"(10,50)",
+"(0,10)",
+"(0,50)",
+"(1,1)"
+],
+"ans": "D",
+"why": "题目问的是“学生”这一侧参与联系的基数。一名学生必须且只能属于一个班级，因此取值为 (1,1)。选项中的 (10,50) 是“班级”一侧对班级内学生人数的约束。A项描述的是班级一侧可能人数范围；B项允许学生不属于任何班级，错误；C项同样不满足必须且只能；D项正确，学生必须且仅能关联一个班级。故选 D。",
+"notes": [
+[
+"数据模型与 E-R 图",
+"../database-design-notes/db-model-er.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 40,
+"cat": "数据库 · 数据库设计与优化",
+"q": "在 E-R 建模中，同一实体集中的一个实体实例与该实体集中的多个实例发生联系，这种联系通常称为（ ）。",
+"opts": [
+"递归联系",
+"弱实体联系",
+"复合实体联系",
+"联系实体"
+],
+"ans": "A",
+"why": "同一实体集内部的实例之间发生联系，称为递归联系（也称自反联系或一元联系），例如“员工作为管理者管理其他员工”“零件由其他零件组装而成”。A项正确，也称自反联系或递归联系；B项强调实体依赖性，不是联系类型本质；C项不是 E-R 图中的标准术语答案；D项是把联系转成实体后的建模对象，不是此处原始联系名称。故选 A。",
+"notes": [
+[
+"数据模型与 E-R 图",
+"../database-design-notes/db-model-er.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 41,
+"cat": "软件架构设计 · 软件架构质量属性",
+"q": "最早形成文档并得到广泛应用的软件架构评估方法是（ ）。",
+"opts": [
+"SAAM",
+"ATAM",
+"CBAM",
+"ARID"
+],
+"ans": "A",
+"why": "SAAM（软件架构分析方法）是最早形成文档并得到广泛应用的软件架构评估方法；此后才陆续出现 ATAM（面向多质量属性的权衡分析）、CBAM（成本收益分析）、ARID（面向评审与交互设计）等方法。A项正确，SAAM 常被认为是最早文档化且广泛应用的方法；B项是在 SAAM 基础上扩展多质量属性权衡；C项偏成本收益分析；D项面向评审与交互设计。故选 A。",
+"notes": [
+[
+"软件质量属性全解",
+"../quality-notes/quality-attributes.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 42,
+"cat": "系统规划与分析 · 可行性分析",
+"q": "由 Thomas L. Saaty 提出的将定性问题与定量分析结合起来的决策方法是（ ）。",
+"opts": [
+"SAAM",
+"ATAM",
+"AHP",
+"CBAM"
+],
+"ans": "C",
+"why": "AHP（层次分析法）由 Thomas L. Saaty 提出，通过构造判断矩阵把定性判断转化为定量计算，用于多准则决策；SAAM、ATAM、CBAM都是软件架构评估方法。A项和 B项都是架构评估方法；C项正确，AHP 即层次分析法，由 Saaty 提出；D项是成本收益分析法，不是该学者提出的通用决策模型。故选 C。",
+"notes": [
+[
+"数学与经济管理",
+"../数学和经济管理知识/index.html"
+],
+[
+"需求分析·结构化分析",
+"../software-engineering-notes/requirements-analysis.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 43,
+"cat": "软件架构设计 · 软件架构风格",
+"q": "在软件架构风格中，强调数据按顺序流经一系列处理构件、每个构件完成一类转换处理的是（ ）。",
+"opts": [
+"分层风格",
+"管道-过滤器风格",
+"事件驱动风格",
+"仓库风格"
+],
+"ans": "B",
+"why": "管道-过滤器风格把系统分解为一组过滤器（处理构件），每个过滤器完成一类数据转换，数据通过管道顺序流经各个过滤器，非常适合数据流式处理，也便于单独替换某个过滤器。A项强调层级职责划分，不突出数据流串行处理；B项正确，过滤器处理数据流，管道负责连接；C项基于事件触发而非连续流转换；D项强调共享数据中心。故选 B。",
+"notes": [
+[
+"软件架构风格全览",
+"../architecture-notes/arch-styles.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 44,
+"cat": "系统设计 · 面向对象分析与设计",
+"q": "在 UML 用例图中，若 A 用例在 B 用例执行的特定扩展点插入附加行为，且 B 本身可独立存在，则 A 与 B 的关系是（ ）。",
+"opts": [
+"包含",
+"扩展",
+"泛化",
+"依赖"
+],
+"ans": "B",
+"why": "在 UML 用例图中，扩展（Extend）关系指用例 A 在用例 B 的特定扩展点插入附加行为，且 B 本身可以独立存在；包含（Include）是被包含用例作为必需的公共子功能被调用；泛化表示父子继承关系。A项表示被包含用例是必需公共子功能；B项正确，扩展关系强调在扩展点增加可选行为；C项表示父子继承；D项过于宽泛，不是该题标准语义。故选 B。",
+"notes": [
+[
+"OO·UML·设计模式",
+"../software-engineering-notes/oo-uml-patterns.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 45,
+"cat": "扩展：新技术 · 机器学习",
+"q": "下列场景中，最符合无监督学习特点的是（ ）。",
+"opts": [
+"使用带标签样本训练垃圾邮件分类器",
+"根据用户历史购买数据自动聚类分群",
+"根据奖励函数训练机器人走迷宫",
+"根据已知房价数据预测新房价格"
+],
+"ans": "B",
+"why": "无监督学习的训练样本不带人工标签，由算法自行发现数据内在结构。根据用户历史购买数据自动聚类分群就属于典型的无监督学习；带标签分类和房价回归属于监督学习，按奖励函数训练机器人属于强化学习。A项属于监督学习中的分类；B项正确，聚类通常不依赖人工标签，属于无监督学习；C项是强化学习；D项是监督学习中的回归。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 46,
+"cat": "扩展：新技术 · 人工智能",
+"q": "以下属于典型规则系统的是（ ）。",
+"opts": [
+"专家系统",
+"编译系统",
+"操作系统",
+"数据库缓冲池"
+],
+"ans": "A",
+"why": "专家系统以知识库 + 推理机为核心，通过 IF-THEN 产生式规则进行推理，是典型的规则系统；编译系统负责语言翻译，操作系统负责资源管理，数据库缓冲池是性能机制，都不是以规则推理为核心。A项正确，专家系统常通过 IF-THEN 规则进行推理；B项主要进行语言翻译；C项负责资源管理；D项是数据库性能机制，都不是以规则推理为核心。故选 A。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 47,
+"cat": "信息安全 · 安全体系",
+"q": "数字签名技术通常综合使用（ ）。",
+"opts": [
+"对称加密和流量整形",
+"非对称加密和数字摘要",
+"对称加密和消息队列",
+"防火墙和访问控制列表"
+],
+"ans": "B",
+"why": "数字签名先用哈希算法对原文生成数字摘要，再用发送方私钥对摘要加密形成签名；接收方用发送方公钥解密并比对摘要，从而同时实现身份认证、完整性校验和不可否认性。因此它是“非对称加密 + 数字摘要”的组合。A项缺少签名验证所需的公私钥机制；B项正确，先做摘要再用私钥签名是经典流程；C项与签名原理无关；D项属于网络安全防护手段，不是数字签名算法组成。故选 B。",
+"notes": [
+[
+"安全架构",
+"../architecture-case-notes/security.html"
+],
+[
+"信息安全基础",
+"../security-notes/security-basics.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 48,
+"cat": "信息安全 · 安全体系",
+"q": "DDoS 攻击主要破坏信息系统的（ ）。",
+"opts": [
+"机密性",
+"可用性",
+"完整性",
+"不可否认性"
+],
+"ans": "B",
+"why": "DDoS 攻击通过海量请求耗尽目标系统的带宽、连接数或计算资源，使正常用户无法访问服务，破坏的是可用性。机密性对应窃密类攻击，完整性对应篡改，不可否认性对应签名与审计。A项通常对应窃密类攻击；B项正确，DDoS 通过耗尽资源使服务无法正常提供；C项强调数据未被篡改；D项是签名与审计场景关注点。故选 B。",
+"notes": [
+[
+"安全架构",
+"../architecture-case-notes/security.html"
+],
+[
+"信息安全基础",
+"../security-notes/security-basics.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 49,
+"cat": "软件工程 · 软件产品线",
+"q": "DSSA 的建立过程通常具有并发、递归和反复特征，因此更接近（ ）式过程。",
+"opts": [
+"瀑布",
+"螺旋",
+"V 模型",
+"喷泉"
+],
+"ans": "B",
+"why": "DSSA 的建立过程具有并发、递归和反复的特征，需要多轮迭代逐步收敛，因此更接近螺旋式过程，而不是线性的瀑布模型或强调开发—测试对应关系的 V 模型。A项线性顺序过强，不符合并发递归特征；B项正确，DSSA 常被描述为螺旋式反复推进；C项强调开发测试对应关系；D项更多用于面向对象开发过程。故选 B。",
+"notes": [
+[
+"DSSA 特定领域软件架构",
+"../architecture-notes/dssa.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 50,
+"cat": "计算机基础 · 操作系统",
+"q": "在中断处理过程中，下列通常不属于操作系统完成的工作是（ ）。",
+"opts": [
+"保存现场",
+"恢复现场",
+"中断响应与转入入口地址",
+"执行中断服务的调度控制"
+],
+"ans": "C",
+"why": "中断响应和转入中断入口地址（取得中断向量、跳转）是由 CPU 的硬件中断机制完成的，不属于操作系统的中断处理程序职责。保存现场、恢复现场以及中断服务中的调度控制才由操作系统完成。A项与 B项通常由操作系统中断处理程序参与完成；C项正确，中断响应和跳转入口主要由 CPU 硬件机制完成；D项属于系统软件在中断服务中的控制职责。故选 C。",
+"notes": [
+[
+"操作系统基础",
+"../os-notes/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 51,
+"cat": "软件架构设计 · 软件架构风格",
+"q": "在子程序-返回架构风格中，最典型的连接机制是（ ）。",
+"opts": [
+"过程调用",
+"事件广播",
+"发布订阅",
+"共享黑板"
+],
+"ans": "A",
+"why": "子程序-返回风格的构件是子程序，连接件是显式的过程调用/返回机制，强调分层调用与返回；事件广播、发布-订阅属于事件驱动风格，共享黑板属于仓库（黑板）风格。A项正确，子程序体系结构的核心就是调用与返回；B项和 C项属于事件驱动范式；D项属于黑板风格的数据共享机制。故选 A。",
+"notes": [
+[
+"软件架构风格全览",
+"../architecture-notes/arch-styles.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 52,
+"cat": "扩展：新技术 · 人工智能",
+"q": "在知识图谱中，本体 Ontology 的核心作用是（ ）。",
+"opts": [
+"存储全部实例数据",
+"定义领域概念、关系与约束",
+"直接承担数据库备份功能",
+"自动生成全部查询结果"
+],
+"ans": "B",
+"why": "本体（Ontology）是知识图谱的“模式层”，用于形式化地定义领域内的概念、属性、关系与约束，为上层的实例数据提供统一语义规范。存储实例数据、数据库备份、自动生成查询结果都不是本体的核心作用。A项实例数据通常存于知识库，不是本体唯一职责；B项正确，本体用于统一定义概念体系、属性和约束；C项属于运维能力；D项夸大了本体作用，本体提供语义基础而非直接生成全部查询结果。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 53,
+"cat": "系统设计 · 结构化分析与设计",
+"q": "在结构化分析方法中，用于描述系统行为模型的工具是（ ）。",
+"opts": [
+"数据流图",
+"E-R 图",
+"状态转换图",
+"甘特图"
+],
+"ans": "C",
+"why": "结构化分析方法用数据流图（DFD）描述功能与数据流动，用数据字典描述数据，用状态转换图（STD）描述系统的行为模型（状态及状态迁移）；E-R 图是数据建模工具，甘特图是项目进度工具。A项主要描述数据流与处理过程；B项主要描述数据实体及联系；C项正确，状态转换图反映状态及其迁移行为；D项是项目进度工具，不是结构化分析模型。故选 C。",
+"notes": [
+[
+"结构化分析与项目管理",
+"../traditional-case-notes/se-structured.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 54,
+"cat": "数据库 · 数据库模式与关系模型",
+"q": "在关系数据库中，实体与实体之间的联系通常通过表与表之间的（ ）来体现。",
+"opts": [
+"公共属性",
+"顺序号",
+"页号",
+"聚簇索引名"
+],
+"ans": "A",
+"why": "在关系数据库中，实体与实体之间的联系通过表与表之间的公共属性（主键与外键）来体现——关系模型用“值”表达“联系”，顺序号、页号、索引名都不能表达逻辑联系。A项正确，关系之间常依赖主外键等公共属性建立联系；B项只是记录编号，不必然表达联系；C项是物理存储概念；D项是索引机制，不能替代逻辑联系表达。故选 A。",
+"notes": [
+[
+"函数依赖与范式 1NF-BCNF",
+"../database-notes/functional-dependency-nf.html"
+],
+[
+"关系代数",
+"../database-design-notes/relational-algebra.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 55,
+"cat": "软件架构设计 · 软件架构风格",
+"q": "在进程通信架构风格中，构件通常是独立进程，连接件通常是（ ）。",
+"opts": [
+"过程调用、消息传递或远程调用机制",
+"类继承和对象实例化",
+"表单与报表模板",
+"黑板与控制器"
+],
+"ans": "A",
+"why": "进程通信风格的构件是独立进程，连接件是进程之间的通信机制，如过程调用、消息传递、远程调用等，核心在于进程间的同步/异步消息协调。A项正确，进程通信风格的关键在于进程间的同步、异步消息和调用机制；B项属于面向对象实现关系；C项属于应用界面元素；D项属于黑板风格的核心要素。故选 A。",
+"notes": [
+[
+"软件架构风格全览",
+"../architecture-notes/arch-styles.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 56,
+"cat": "软件工程 · 软件重用和再工程",
+"q": "在软件复用方式中，开发之前就有计划地进行复用规划，属于（ ）。",
+"opts": [
+"机会复用",
+"系统复用",
+"临时复用",
+"被动复用"
+],
+"ans": "B",
+"why": "软件复用按计划性可分为系统复用（也称计划复用，开发之前就进行复用规划）和机会复用（开发过程中偶然发现可复用资产再进行复用）。题干描述的是开发前有计划地规划复用，属于系统复用。A项强调开发过程中偶然发现可复用资产；B项正确，也称计划复用，开发前就进行总体安排；C项与 D项都不是教材中的标准分类术语。故选 B。",
+"notes": [
+[
+"基于构件的软件工程 CBSE",
+"../software-engineering-notes/cbse-component-based.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 57,
+"cat": "软件架构设计 · 软件架构质量属性",
+"q": "系统的学习曲线和用户操作效率，主要体现的软件质量属性是（ ）。",
+"opts": [
+"可用性",
+"易用性",
+"可靠性",
+"可维护性"
+],
+"ans": "B",
+"why": "易用性关注用户使用系统的难易程度与效率，典型度量包括学习曲线、操作效率、错误率、用户满意度等。可用性关注系统是否正常可服务，可靠性关注无故障运行能力，可维护性关注修改成本。A项更关注系统是否正常可服务；B项正确，学习成本和操作效率都属于易用性评价内容；C项关注无故障运行能力；D项关注修改和维护难度。故选 B。",
+"notes": [
+[
+"软件质量属性全解",
+"../quality-notes/quality-attributes.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 58,
+"cat": "软件架构设计 · 软件架构质量属性",
+"q": "关于软件架构评估的说法，错误的是（ ）。",
+"opts": [
+"最终用户或其代表应该参与主流架构评估活动",
+"敏感点一定只影响一个构件的特性",
+"系统购买者不一定需要参与架构评估",
+"架构评估关注质量属性场景与权衡分析"
+],
+"ans": "B",
+"why": "主流架构评估方法（如 ATAM、SAAM）需要各类干系人共同参与评估。敏感点指会影响系统质量属性的构件特性，敏感点可影响一个或多个构件。题干 B 选项描述 “一定只影响一个构件的特性” 表述错误。A 项正确，最终用户或其代表作为关键干系人，应该参与主流架构评估活动；C项正确，系统购买者属于干系人，但并非强制参与；D 项正确，架构评估围绕质量属性场景开展，并进行权衡分析。故选 B。",
+"notes": [
+[
+"软件质量属性全解",
+"../quality-notes/quality-attributes.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 59,
+"cat": "扩展：新技术 · 人工智能",
+"q": "AI的数据投毒用的是（ ）方式",
+"opts": [
+"提示词投毒 和 检索增强生成投毒",
+"标签注入或数据注入",
+"提示词投毒 和 仿冒界面",
+"检索增强生成投毒 和 界面假冒"
+],
+"ans": "B",
+"why": "AI 数据投毒是在模型训练阶段向训练数据集里掺入恶意样本，常用手段为标签注入或者数据注入，污染训练数据从而造成模型异常。A 项提示词投毒、检索增强生成投毒属于推理阶段攻击；C 项、D 项中的仿冒界面、界面假冒属于钓鱼类攻击，不属于数据投毒。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 60,
+"cat": "企业信息化 · 相关法律法规",
+"q": "以有线或无线方式向公众提供作品，使公众可以在其个人选定的时间和地点获得该作品，这属于著作权中的（ ）。",
+"opts": [
+"发表权",
+"发行权",
+"信息网络传播权",
+"署名权"
+],
+"ans": "C",
+"why": "信息网络传播权是指以有线或无线方式向公众提供作品，使公众可以在其个人选定的时间和地点获得该作品。发表权是决定是否将作品公之于众，发行权是向公众提供原件或复制件，署名权是表明作者身份。A项是决定是否公之于众的权利；B项强调向公众提供原件或复制件的实体交付；C项正确，关键词就是有线或无线选定时间和地点获得；D项是表明作者身份的权利。故选 C。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 61,
+"cat": "软件架构设计 · 软件架构风格",
+"q": "关于隐式调用或事件驱动风格的表述，错误的是（ ）。",
+"opts": [
+"事件触发者通常不知道会由谁处理",
+"一个构件既可能触发事件，也可能处理事件",
+"事件触发后一定能预先确定完整处理流程",
+"该风格有利于松耦合扩展"
+],
+"ans": "C",
+"why": "隐式调用/事件驱动风格中，事件发布者不知道也不需要知道谁会处理事件，一个构件既可以发布事件也可以处理事件，处理链在运行时才确定，因而无法预先固定完整处理流程——C 的说法错误。A项正确，发布者与订阅者通常解耦；B项正确，构件可兼具两类角色；C项错误，隐式调用的特点正是不必预先固定完整处理链；D项正确，事件机制常用于提高扩展性。故选 C。",
+"notes": [
+[
+"软件架构风格全览",
+"../architecture-notes/arch-styles.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 62,
+"cat": "信息安全 · 安全体系",
+"q": "验证访问资源的实体是否就是其声称的身份，这一安全机制属于（ ）。",
+"opts": [
+"审计",
+"身份认证",
+"访问控制",
+"日志归档"
+],
+"ans": "B",
+"why": "身份认证解决“你是谁”，即验证访问者身份是否与其声称的一致；访问控制解决“你能做什么”，在认证通过后按策略进行授权；审计与日志归档属于事后的记录与追溯。A项关注事后追踪与记录；B项正确，认证回答你是谁；C项是在认证之后决定你能做什么；D项是运维存档活动，不解决身份真伪问题。故选 B。",
+"notes": [
+[
+"安全架构",
+"../architecture-case-notes/security.html"
+],
+[
+"信息安全基础",
+"../security-notes/security-basics.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 63,
+"cat": "扩展：数据库 · ES",
+"q": "倒排索引最主要的作用是（ ）。",
+"opts": [
+"加速文档内容搜索",
+"优化数据的存储结构，降低存储开销",
+"加快数据新增与修改的执行速度",
+"梳理数据关联，简化多表查询逻辑"
+],
+"ans": "A",
+"why": "倒排索引是搜索引擎的核心索引结构，以词项为关键字，记录词对应的文档列表，最主要作用是加速文档内容检索。B 项倒排索引会额外保存索引信息，会增加存储开销；C 项新增、修改文档时需要更新索引，会降低增改速度；D 项倒排索引多用于全文检索，不是用来简化多表关联查询。故选 A。",
+"notes": [
+[
+"分布式数据库与 NoSQL",
+"../database-notes/distributed-nosql.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 64,
+"cat": "软件架构设计 · 分布式系统",
+"q": "A 微服务调用 B 微服务时，若 B 的接口只是偶尔出现响应延迟，为避免调用线程长时间阻塞，最直接合适的措施是（ ）。",
+"opts": [
+"熔断",
+"限流",
+"服务降级",
+"设置超时时间"
+],
+"ans": "D",
+"why": "B 微服务只是“偶尔”出现响应延迟，并非持续失败，用熔断、限流、服务降级都过重。最直接合适的做法是给调用设置合理的超时时间，超时即快速失败并释放线程，避免调用线程被长期阻塞。A项更适合持续失败或大面积异常场景；B项用于控制请求速率，不直接解决单次等待过久；C项属于兜底策略，通常在超时或熔断后触发；D项正确，可直接限制等待时间，避免资源被长期占用。故选 D。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 65,
+"cat": "计算机基础 · 操作系统",
+"q": "文件存储空间分配方式中，既支持可变长度文件，又支持随机访问的是（ ）。",
+"opts": [
+"连续分配",
+"链接分配",
+"索引分配",
+"哈希分配"
+],
+"ans": "C",
+"why": "连续分配随机访问方便，但不适应文件长度频繁变化；链接分配支持可变长度文件，却只能顺序访问、不利于随机定位；索引分配用索引表记录各数据块的地址，既支持可变长度文件，又能实现随机访问。A项随机访问方便，但不适合文件长度频繁变化；B项支持可变长度，却不利于高效随机访问；C项正确，索引表能同时支持可变长度与随机定位；D项不是文件分配的标准教材分类。故选 C。",
+"notes": [
+[
+"操作系统基础",
+"../os-notes/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 66,
+"cat": "扩展：新技术 · 人工智能",
+"q": "在知识库或知识表示方法中，下列通常不属于经典知识表示方式的是（ ）。",
+"opts": [
+"产生式规则",
+"语义网络",
+"数据流图",
+"框架表示法"
+],
+"ans": "C",
+"why": "经典知识表示方法包括产生式规则、语义网络、框架表示法、谓词逻辑等。数据流图是结构化分析中用于功能建模的工具，用于描述数据流与处理过程，而不是知识库中存储知识的方法。A项是典型规则型知识表示方法，常见于专家系统；B项用图结构描述概念及关系，也属于知识表示；C项正确，数据流图用于结构化分析中的功能建模，不是知识库存储知识的经典表示法；D项通过槽和值描述对象属性，同样属于常见知识表示。故选 C。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 67,
+"cat": "信息安全 · 系统可靠性指标",
+"q": "某攸关系统的危险失效率 λ 为 10^-6 次每小时，则其连续运行 1000 小时的期望失效次数约为（ ）。",
+"opts": [
+"10^-9",
+"10^-6",
+"10^-3",
+"1"
+],
+"ans": "C",
+"why": "期望失效次数 = 危险失效率 × 运行时间 = 10^-6 × 1000 = 10^-3 次，即连续运行 1000 小时的期望失效次数约为千分之一。A项过小，少乘了运行时间；B项只是单位时间失效率本身，不是 1000 小时期望值；C项正确，期望失效次数约为 λ×t=10^-6×1000=10^-3；D项过大，明显不符合极低危险失效率的数量级。故选 C。",
+"notes": [
+[
+"计算机可靠性",
+"../computer-system-notes/reliability.html"
+],
+[
+"软件可靠性",
+"../软件可靠性/index.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 68,
+"cat": "软件架构设计 · 软件架构质量属性",
+"q": "在软件质量属性评估中，下列通常不属于可用性度量指标的是（ ）。",
+"opts": [
+"MTBF",
+"MTTR",
+"可用率",
+"故障发生的概率"
+],
+"ans": "D",
+"why": "可用性的常用度量有 MTBF（平均无故障时间）、MTTR（平均修复时间）、可用率 = MTBF/(MTBF+MTTR) 等。而“故障发生的概率”更偏可靠性或风险概率的表述，不属于教材中可用性的核心度量指标。A项平均无故障时间可用于衡量系统可用性基础；B项平均修复时间同样是可用性经典指标；C项直接反映系统可服务时间占比，显然属于可用性度量；D项更偏可靠性或风险概率表述，不是教材中可用性常见核心度量。故选 D。",
+"notes": [
+[
+"软件质量属性全解",
+"../quality-notes/quality-attributes.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 69,
+"cat": "软件架构设计 · 软件架构质量属性",
+"q": "在运行中的系统上人为关闭一台节点或服务器，观察业务是否仍可继续提供服务，这种测试场景主要是在验证系统的（ ）。",
+"opts": [
+"容错性",
+"易用性",
+"可测试性",
+"可修改性"
+],
+"ans": "A",
+"why": "在系统运行中人为关闭一个节点或服务器，观察业务是否仍能继续提供服务，验证的是系统在部分组件发生故障时仍能维持服务的能力，即容错性（可用性的重要支撑）。A项正确，关闭节点后系统若仍能保持主要服务能力，体现的是故障条件下继续运行的容错能力；B项关注用户是否易学易用；C项关注测试实施难易；D项关注修改系统所需成本。故选 A。",
+"notes": [
+[
+"软件质量属性全解",
+"../quality-notes/quality-attributes.html"
+]
+]
+},
+{
+"sec": "real",
+"no": 70,
+"cat": "软件架构设计 · 软件架构质量属性",
+"q": "统一支付系统，要求增加支付宝的方式，且在5人/天之内完成 ，体现的软件质量属性是（ ）。",
+"opts": [
+"可修改性",
+"可靠性",
+"兼容性",
+"性能"
+],
+"ans": "A",
+"why": "题目要求在“5 人/天之内完成支付宝方式接入”，衡量的是新增功能所需的开发工作量与变更代价。对变更的适应能力越强、变更成本越低，可修改性越好；性能关注响应时间与吞吐量，可靠性关注无故障运行。选项：A项正确，“5人/天内完成新增接入”正是变更代价，属可修改性；B项可靠性关注无故障持续运行能力；C项兼容性关注与既有系统共存；D项性能关注响应时间与吞吐量。故选 A。",
+"notes": [
+[
+"软件质量属性全解",
+"../quality-notes/quality-attributes.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 1,
+"cat": "扩展：新技术 · 大模型",
+"q": "RAG系统中，查询改写（Query Rewriting）的目的是（ ）。",
+"opts": [
+"对粗召回的候选文档重新打分排序，提升片段质量",
+"把用户口语化提问改写成更利于检索的形式",
+"约束模型只依据检索片段作答并标注来源以降低幻觉",
+"把知识库文档切成合适粒度的片段并向量化建索引"
+],
+"ans": "B",
+"why": "查询改写是检索前的预处理环节：用户口语化、模糊或复合的原始提问直接做向量检索往往召回不准，需要先改写成更利于检索的形式（同义扩展、拆分子，再进入向量检索，从而提升召回质量。A 项描述的是召回之后的 Rerank（重排序）；C 项描述的是生成阶段的引用溯源与约束生成；D 项描述的是文档分块与向量化建索引，都属于 RAG的其他环节。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 2,
+"cat": "扩展：新技术 · 大模型",
+"q": "向量嵌入（Embedding）将文本映射为高维向量后，衡量语义相似度通常采用（ ）。",
+"opts": [
+"余弦相似度，即两个向量夹角的余弦值",
+"编辑距离，即两个字符串互相转换的最少操作次数",
+"最长公共子序列，即两段文本共有的最长子序列",
+"TF-IDF 权重，即词频与逆文档频率的乘积"
+],
+"ans": "A",
+"why": "向量嵌入把文本映射到高维向量空间后，语义相近的文本其向量方向更接近，最常用的度量是余弦相似度（两向量夹角的余弦，取值约 [−1,1]，越接近 1 越相似）。B 项编辑距离、C 项最长公共子序列都是在原始字符串层面做字面比对，无法用于高维向量；D 项 TF-IDF 是检索中的词权重方案，衡量的是词对文档的重要不是向量间的相似度。故选 A。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 3,
+"cat": "扩展：新技术 · 大模型",
+"q": "大模型应用中，Function Calling 使得模型能够（ ）。",
+"opts": [
+"在推理过程中直接更新训练集与模型的参数",
+"把用户输入的问题改写成更利于检索的查询语句",
+"按函数说明输出结构化参数以调用外部工具/API",
+"为生成的答案附上引用来源片段，降低幻觉"
+],
+"ans": "C",
+"why": "Function Calling（函数调用）让大模型按预定义函数的说明，输出符合要求的结构化参数（如 JSON），由程序据此调用外部工具/API 完成真实动作，是模型连接外部世界的核心能力。A 项模型在推理时并不更新参数，更不会修改训练集；B 项是 RAG 的查询改写；D 项是引用溯源（Grounding），都属于其他环节的能力。故选 C。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 4,
+"cat": "扩展：新技术 · 人工智能",
+"q": "Multi-Agent（多智能体）架构中，规划者-执行者（Planner-Executor）模式的核心是（ ）。",
+"opts": [
+"由单个全能智能体独立完成全部规划与执行工作",
+"多个完全同构的智能体并行重复执行同一子任务",
+"各智能体共享上下文按需接管任务，不设专职规划者",
+"规划智能体拆解任务、执行智能体按分工落实并汇总"
+],
+"ans": "D",
+"why": "Planner-Executor 模式的核心是显式分工协作：规划 Agent 把复杂任务拆解为若干子任务并确定执行次序，执行 Agent 按各自能力分工落实，再由规划Agent 汇总结果。A 项与传统单体调用无异；B 项同构并行只增加冗余度，不解决任务分解问题；C 项共享上下文不等于显式分工，缺少专职规划环节。故选 D。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 5,
+"cat": "扩展：新技术 · 大模型",
+"q": "RAG 中重排序（Rerank）环节的作用是（ ）。",
+"opts": [
+"扩大粗召回的候选集规模，为后续排序提供更多素材",
+"对粗召回结果做精细打分并重排，提升 Top-K 质量",
+"把长文档切分为更小片段，提升检索的命中粒度",
+"对检索结果做去重与敏感内容过滤，保证输出合规"
+],
+"ans": "B",
+"why": "Rerank（重排序）在向量粗召回之后，用更精细的排序模型对候选文档做二次相关度打分与重排，把最相关的文档排到前面，从而提升最终送入大模型的 Top-K 片段质量。A 项扩大候选集属于召回阶段；C 项是文档分块策略；D 项属于内容安全过滤，三者都不是重排序的作用。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 6,
+"cat": "扩展：新技术 · 大模型",
+"q": "大模型微调中，LoRA 技术的核心思想是（ ）。",
+"opts": [
+"用少量标注样本对全部参数做一次小步长微调",
+"通过减少权重位宽来压缩模型体积与显存占用",
+"冻结原模型权重，注入低秩矩阵近似权重增量",
+"用小模型学习教师模型的输出分布以实现能力迁移"
+],
+"ans": "C",
+"why": "LoRA（Low-Rank Adaptation，低秩适配）冻结预训练模型的原始权重不更新，通过向指定层注入可训练的低秩分解矩阵来近似权重增量，只训练极少参数从而大幅降低可训练参数量并节省显存与存储。A 项仍是全参数微调；B 项是量化压缩；D 项是知识蒸馏，都不是 LoRA 的核心思想。故选 C。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 7,
+"cat": "扩展：新技术 · 人工智能",
+"q": "AI Agent 运行循环“感知-决策-行动”中，“决策”环节通常由（ ）完成。",
+"opts": [
+"由预设规则引擎按固定优先级匹配并触发动作",
+"由数据库触发器根据数据变更事件驱动操作",
+"由工作流引擎按预先编排的流程节点顺序推进",
+"由大模型结合当前状态与目标推理选择动作"
+],
+"ans": "D",
+"why": "AI Agent 的运行循环中，感知环节获取环境信息，决策环节由大语言模型（LLM）结合当前状态、目标与可调用工具进行推理，选择下一步要执行的动作，行动环节再落地执行并观察反馈。A 项规则引擎、B 项数据库触发器、C 项工作流编排都是确定性的预定义流程，不具备基于当前状态与目标进行推理的能力。故选 D。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 8,
+"cat": "扩展：新技术 · 人工智能",
+"q": "“可信AI”建设中，为保障大模型输出可追溯，通常采用（ ）。",
+"opts": [
+"输出附带引用溯源与审计日志，可核验可追责",
+"缩短模型上下文长度，减少不确定信息进入输出",
+"提高采样温度以覆盖更多可能输出，便于人工比对",
+"对训练数据做去重清洗，从源头消除偏见与错误"
+],
+"ans": "A",
+"why": "可信 AI 要求模型输出可解释、可追溯，通常做法是内容溯源与引用标注（答案给出依据片段或来源），并保留完整的审计记录，使结果可以被核验和追责。B 项缩短上下文与可追溯无关；C 项提高温度会让输出更随机，反而降低可核验性；D 项数据清洗提升的是数据质量，不能使输出追溯到来源。故选 A。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 9,
+"cat": "扩展：新技术 · 大模型",
+"q": "思维链(Chain-of-Thought, CoT)提示的核心作用是（ ）。",
+"opts": [
+"通过少样本示例约束输出格式，使答案更规整",
+"引导模型显式写出中间推理步骤，分步求解",
+"增大采样候选数量并投票，取多数结果作为答案",
+"通过检索外部知识为推理过程补充事实依据"
+],
+"ans": "B",
+"why": "思维链（Chain-of-Thought，CoT）提示通过示例或指令引导模型把中间推理步骤显式写出来，分步思考，从而在数学、逻辑、多步推理等复杂任务上显著提升准确率。A 项是格式约束类提示；C 项是自洽性投票（Self-Consistency）；D 项是检索增强，三者都不是 CoT 的核心作用。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 10,
+"cat": "扩展：新技术 · 大模型",
+"q": "RAG系统中，文档分块(Chunking)策略设计时主要权衡的是（ ）。",
+"opts": [
+"块大小与检索粒度、语义完整性的平衡",
+"向量维数与索引类型选择之间的平衡",
+"检索召回率与索引构建成本之间的平衡",
+"模型上下文长度与生成温度之间的平衡"
+],
+"ans": "A",
+"why": "RAG 中文档分块要在“块大小、检索粒度、语义完整性”之间权衡：块太小则上下文片段不完整、语义破碎；块太大则检索粒度粗、易超出模型上下文限制，还可能引入噪声。B 项属于向量化与索引选型；C 项是召回效果与建索引成本之间的权衡；D 项上下文长度与生成温度都是推理参数，与分块无关。故选 A。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 11,
+"cat": "扩展：新技术 · 大模型",
+"q": "高维向量检索采用近似最近邻(ANN)（如HNSW、IVF）索引的主要原因是（ ）。",
+"opts": [
+"通过提前过滤低质量文档来提升检索精度",
+"以精度损失换取检索速度与内存的优化",
+"通过增加索引副本提升检索吞吐与可用性",
+"通过缓存高频查询结果减少对索引的访问"
+],
+"ans": "B",
+"why": "高维空间暴力精确检索需遍历全量向量，在大规模数据下代价极高（时间与内存都无法承受），因此采用 ANN（如 HNSW、IVF）以可接受的小幅精度损失速度与内存占用的大幅优化。A 项是检索前的文档过滤；C 项通过冗余副本提升的是可用性与吞吐；D 项是查询缓存，都不改变“近似检索”这一本质。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 12,
+"cat": "扩展：新技术 · 大模型",
+"q": "大模型知识蒸馏(Knowledge Distillation)的核心思路是（ ）。",
+"opts": [
+"小模型学习教师模型的输出分布以逼近其能力",
+"对模型权重做低比特量化，换取更小体积与更快推理",
+"在预训练模型上注入低秩矩阵，只训练少量新增参数",
+"用同构大模型集成投票来提升单模型的输出质量"
+],
+"ans": "A",
+"why": "知识蒸馏让小模型（学生）去学习大模型（教师）输出的概率分布，即“软标签/暗知识”，从而以较低成本逼近大模型的能力，实现模型的小型化与加速。B 项是量化；C 项是 LoRA 等参数高效微调；D 项是模型集成（Ensemble），都不是蒸馏的核心思路。故选 A。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 13,
+"cat": "扩展：新技术 · 人工智能",
+"q": "应对大模型越狱(Jailbreak)攻击的常用防护手段是（ ）。",
+"opts": [
+"提高输出温度并放宽采样范围，减少固定套路复现",
+"在系统提示中声明安全规则，依赖模型自觉遵守",
+"安全对齐、敏感行为检测、输出过滤与权限最小化",
+"对用户输入做关键词黑名单过滤后再送入模型"
+],
+"ans": "C",
+"why": "防御越狱攻击依靠多层手段协同：通过安全对齐（如 RLHF，基于人类反馈的强化学习）让模型拒绝有害指令，配合敏感行为检测、输出过滤以及权限最小化，形成纵深防御。A 项提高温度会让输出更随机、更易被诱导越狱；B 项仅靠提示声明无法形成有效约束；D 项关键词黑名单容易被改写绕过，覆盖面不足。故选 C。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 14,
+"cat": "扩展：新技术 · 人工智能",
+"q": "AI Agent 的反思(Reflection)机制中，模型的主要动作是（ ）。",
+"opts": [
+"调用外部工具获取事实，替换模型自身的推断结果",
+"对自身产出做自我批判并迭代修正，提升答案质量",
+"把复杂任务拆解为多个子任务并分派给执行者",
+"在多次采样结果中投票选出出现频率最高的答案"
+],
+"ans": "B",
+"why": "反思（Reflection）机制让模型对自己的产出进行自我批判：评估答案是否正确、完整，找出不足后迭代修正再输出，从而提升答案质量。A 项是工具调用；C 项是任务规划与分解；D 项是自洽性投票，都不是反思的核心动作。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 15,
+"cat": "扩展：新技术 · 大模型",
+"q": "在RAG落地中，引用溯源(Grounding/Attribution)主要指（ ）。",
+"opts": [
+"在检索前把用户问题改写成多个子查询以提升召回",
+"让模型基于检索片段作答并标明依据来源，降低幻觉",
+"用重排序模型对候选片段二次打分，提升 Top-K 质量",
+"把知识库文档切分为合适粒度的片段并向量化入库"
+],
+"ans": "B",
+"why": "引用溯源（Grounding/Attribution）要求模型基于检索到的真实片段作答，并明确标明答案的依据来源，从而降低大模型“一本正经地胡说”的幻觉问题，也便于人工核验。A 项是查询改写；C 项是重排序（Rerank）；D 项是文档分块与向量化建索引，都不是引用溯源的含义。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 16,
+"cat": "扩展：新技术 · 大模型",
+"q": "衡量大模型综合能力常用的评测做法是（ ）。",
+"opts": [
+"比较模型参数量与训练语料规模，规模越大能力越强",
+"在公开基准上测评，并辅以领域任务与人工评估",
+"测量单次推理时延与吞吐，指标越优综合能力越强",
+"统计用户点赞与差评比例，以线上满意度为准"
+],
+"ans": "B",
+"why": "衡量大模型综合能力需要在公开基准（如 MMLU 知识、GSM8K 数学、HumanEval 代码）上测评，并结合领域任务与人工评估才能全面反映能力。A 项以规模论能力、C 项以性能论能力都以偏概全；D 项线上反馈噪声大、样本偏斜，无法覆盖知识、推理、代码等维度。故选 B。",
+"notes": [
+[
+"前沿技术 AI 与 RAG",
+"../architecture-case-notes/frontier-ai.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 17,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "微服务API网关的核心职责不包括（ ）。",
+"opts": [
+"统一入口与路由转发、协议转换与请求聚合",
+"认证鉴权、限流熔断与灰度分流控制",
+"承载业务规则计算与订单状态流转",
+"请求链路的日志埋点与监控指标上报"
+],
+"ans": "C",
+"why": "API 网关是微服务系统的流量入口，承担统一入口、路由转发、认证鉴权、限流熔断、协议转换、请求聚合、灰度分流等横切（非业务）职责，把业务复杂度收敛在网关之后，但不承载具体业务计算。题目问“不包括”。A 项、B 项、D 项都是网关的横切职责；业务规则计算与订单状态流转属于具体业务逻辑，应由后端业务服务完成。故选 C。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 18,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "Kubernetes中，实现配置与镜像分离、不改镜像即可变更配置的资源是（ ）。",
+"opts": [
+"通过标签为一组 Pod 提供统一的访问入口与负载均衡",
+"维护 Pod 的期望副本数，并在实例异常时自动重建",
+"为有状态应用提供稳定的网络标识与持久化存储卷",
+"通过环境变量或卷挂载向容器注入外部的配置数据"
+],
+"ans": "D",
+"why": "ConfigMap（存放明文配置）与 Secret（存放敏感配置，如密码、密钥）可以把配置从镜像中剥离出来，通过环境变量或卷挂载注入容器，实现“配置与镜像分离、不改镜像即可变更配置”。A 项是 Service/Ingress 的职责；B 项是 ReplicaSet/Deployment 的职责；C 项是 StatefulSet 与 PV/PVC 的职责。故选 D。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 19,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "容器编排中的 Pod 概念，其含义是（ ）。",
+"opts": [
+"最小的调度与资源分配单位，可包含多个容器",
+"集群中提供计算资源的一台物理机或虚拟机节点",
+"一份只读的容器镜像，含应用与运行时依赖",
+"按标签划分的隔离单元，容器须调度其中运行"
+],
+"ans": "A",
+"why": "Pod 是 Kubernetes 中最小的调度与资源分配单位，可包含一个或多个紧密协作的容器，这些容器共享网络命名空间（同一 IP 与端口空间）与存储卷，作为整体被调度。B 项描述的是 Node（节点）；C 项描述的是容器镜像；D 项描述的是按标签划定的调度域，都不是 Pod 的含义。故选 A。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 20,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "云原生应用中，配置中心（如Nacos/Apollo）相比环境变量的核心优势是（ ）。",
+"opts": [
+"随容器启动以环境变量注入，不依赖任何外部组件",
+"集中管理配置并支持动态推送，变更免重启生效",
+"与镜像一同打包分发，保证各环境完全一致可复现",
+"通过挂载密钥卷完成敏感配置的加密下发与轮换"
+],
+"ans": "B",
+"why": "配置中心（如 Nacos/Apollo）相比环境变量的核心优势是集中化管理、支持动态推送与版本管理，配置变更后可实时推送生效而无需重启服务；环境变量需时注入，改动通常要重启且不易集中治理。A 项是环境变量方式；C 项是不可变镜像的做法，变更需重建；D 项是密钥卷挂载，属于注入手段，都不具备配置中心的集中管理与动态推送能力。故选 B。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 21,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "微服务架构中，分布式链路追踪需要为每个请求生成并传递的标识是（ ）。",
+"opts": [
+"服务提供者实例的进程标识（PID）与启动时间",
+"会话级 Cookie 中携带的用户身份标识与登录态",
+"请求链路上透传的追踪标识与跨度标识",
+"调用方所在机器的 IP 地址与端口号"
+],
+"ans": "C",
+"why": "分布式链路追踪为每个请求生成全局唯一的 TraceID 贯穿整条调用链，并在每个调用环节生成 SpanID 标记单个跨度，各级服务透传这两个标识即可串联还原完整链路。A 项进程标识区分的是实例而非单次请求；B 项标识的是用户会话；D 项标识的是网络端点，都无法唯一标识一次跨服务请求链路。故选 C。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 22,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "Service Mesh 中，数据平面主要由（ ）组成。",
+"opts": [
+"负责下发路由规则与策略配置的控制组件",
+"提供配置可视化与流量观测的管理控制台",
+"承载业务逻辑、对外提供接口的业务服务容器",
+"与业务容器并置、代理服务间流量的边车"
+],
+"ans": "D",
+"why": "Service Mesh 分为控制平面与数据平面：数据平面由与业务容器并置（sidecar 模式）的轻量代理（如 Envoy、Mosn）组成，负责流量的转发、路由、负载均衡、限流、加密等；控制平面负责下发策略与配置。A 项与 B 项属于控制平面；C 项是业务容器本身；只有与业务容器并置的 Sidecar 代理才构成数据平面。故选 D。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 23,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "云原生中，应用以“不可变基础设施”方式部署，其含义是（ ）。",
+"opts": [
+"服务器与实例长期运行，配置一经上线不再变更",
+"基础设施创建后不再修改，变更通过重建替换",
+"只使用虚拟机部署，禁用一切容器化运行方式",
+"只允许整体回滚，禁止对线上做滚动更新"
+],
+"ans": "B",
+"why": "不可变基础设施指基础设施（镜像、实例、配置打包物）一经创建就不再修改，任何变更都通过重新构建镜像并替换旧实例完成，从而保证环境一致、可重现。A 项强调的只是配置不变，就地修改恰恰是不可变基础设施要避免的；C 项与虚拟机/容器形态无关；D 项错误，重建替换反而更利于回滚与滚动更新。故选 B。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 24,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "Serverless(FaaS)相比传统微服务的主打优势是（ ）。",
+"opts": [
+"无请求时仍常驻实例，保证调用零冷启动延迟",
+"运行环境由用户自行管理，可深度定制内核依赖",
+"按调用计费、无需管理服务器、自动弹性伸缩",
+"支持长连接与有状态会话，适合实时推送场景"
+],
+"ans": "C",
+"why": "Serverless（FaaS）让开发者无需管理服务器，平台按实际调用次数与资源用量计费，并自动弹性伸缩，事件不活跃时近乎零成本。A 项与 D 项描述的是常驻服务与长连接服务的特征；B 项恰恰相反，FaaS 的核心收益之一就是把服务器与运行环境的运维交给平台。故选 C。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 25,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "DevOps 中，CI/CD 的 CD 通常指（ ）。",
+"opts": [
+"持续集成中自动触发的单元测试与代码扫描",
+"代码仓库的分支合并策略与冲突解决流程",
+"变更评审与发布窗口的人工管控审批流程",
+"持续交付/持续部署，自动发布到目标环境"
+],
+"ans": "D",
+"why": "CI/CD 中，CI 指持续集成（Continuous Integration），CD 通常指持续交付（Continuous Delivery）或持续部署（Continuous Deployment），即把代码变更自动化地构建、测试并发布到目标环境。A 项属于 CI 侧的持续集成活动；B 项属于版本控制协作规范；C 项属于变更管理流程，都不是 CD 的含义。故选 D。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 26,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "微服务的服务注册发现主要用于（ ）。",
+"opts": [
+"集中存储各服务的业务数据，并提供统一的读写入口",
+"为服务间调用提供证书签发与链路加密的能力",
+"统一管理配置项并支持变更后动态推送到实例",
+"让消费者动态获取提供者实例地址，实现动态路由"
+],
+"ans": "D",
+"why": "服务注册发现让服务提供者启动时把实例地址注册到注册中心，消费者从注册中心动态获取提供者实例列表，从而无需硬编码固定 IP，实现动态路由、负载均衡与故障摘除。A 项是数据库/数据服务的职责；B 项是 mTLS 与证书管理的职责；C 项是配置中心的职责，都不是服务注册发现的作用。故选 D。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 27,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "云原生中GitOps实践是（ ）。",
+"opts": [
+"把数据库变更脚本纳入 Git 管理并自动执行",
+"以 Git 仓库为唯一事实源，声明状态并自动同步",
+"通过流水线脚本调用命令行工具完成集群部署",
+"在集群中开启审计日志，记录所有人工变更操作"
+],
+"ans": "B",
+"why": "GitOps 以 Git 仓库作为唯一事实源，用声明式方式描述集群的期望状态，通过同步工具（如 ArgoCD、Flux）持续比对并自动部署，任何变更都通过提交代码天然具备版本可审计、可回滚的能力。A 项只是数据库脚本的版本化；C 项是脚本化 CI 部署，缺少“以 Git 为唯一事实源、声明式同步”这一核心；D 项属于审计能力。故选 B。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 28,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "Kubernetes中Namespace的主要作用是（ ）。",
+"opts": [
+"在集群内逻辑隔离资源与划分环境、权限边界",
+"为容器设定 CPU 与内存配额上限并强制回收",
+"控制 Pod 之间的网络可达性与带宽上限设置",
+"为有状态应用提供持久化存储卷的绑定与挂载"
+],
+"ans": "A",
+"why": "Namespace 在集群内提供逻辑隔离，用于划分资源、环境（如 dev/prod）与权限边界，实现多租户管理，并可结合 ResourceQuota 做资源限额。B 项是 ResourceQuota/LimitRange 的职责；C 项由 NetworkPolicy 或 CNI 实现；D 项由 PV/PVC 完成。故选 A。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 29,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "服务网格中mTLS的作用是（ ）。",
+"opts": [
+"在边车之间双向验证身份并加密服务间流量",
+"对网关到浏览器的外部流量强制使用 HTTPS",
+"对落盘的静态数据进行加密以满足合规要求",
+"对应用日志中的敏感字段做脱敏与掩码处理"
+],
+"ans": "A",
+"why": "mTLS（双向 TLS）让服务间通信时双方各自的 sidecar 代理相互验证身份并加密传输流量，实现服务间“零信任”安全通信，防止窃听与仿冒。B 项是外部入口的 TLS 终止；C 项是存储加密；D 项是日志脱敏，都不是 mTLS 的作用。故选 A。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 30,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "云原生中可观测性三支柱的信号关联用于（ ）。",
+"opts": [
+"只保留链路追踪即可，指标与日志属于冗余信号",
+"把三类信号合并写入同一存储以便统一查询",
+"降低采样率以压缩数据量、降低存储成本",
+"用统一标识关联指标、日志与链路以定位根因"
+],
+"ans": "D",
+"why": "可观测性三支柱指指标（Metrics）、日志（Logs）、链路追踪（Tracing），把三者统一关联（如用 TraceID 串联日志与链路、由指标下钻到链路），能在故障发生时快速从表现定位到根本原因。A 项三类信号各有不可替代的定位价值，缺一不可；B 项统一存储不等于建立了关联关系；C 项降低采样会丢失关键现场证据。故选 D。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 31,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "微服务网关与服务注册中心的分工（ ）。",
+"opts": [
+"两者都持久化业务数据，互为备份以保证高可用",
+"网关做外部流量治理，注册中心维护实例列表",
+"网关承担服务发现职责，注册中心只做鉴权",
+"两者职责重叠，部署时可任选其一以简化架构"
+],
+"ans": "B",
+"why": "二者分工明确：网关负责外部流量接入侧的治理（路由、鉴权、限流、聚合等），注册中心只负责维护服务实例列表供消费者发现与负载均衡，两者各司其职、互不替代。A 项二者都不承载业务数据；C 项与 D 项把职责混淆，服务发现与流量治理无法互相替代。故选 B。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 32,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "蓝绿部署与金丝雀的共同前提（ ）。",
+"opts": [
+"新旧版本分时运行，同一时刻仅一套对外提供服务",
+"发布期间停机切换，避免流量同时打到两套环境",
+"新旧版本并行运行，且可切换流量并快速回滚",
+"每次发布全量切流，以保证新旧版本负载均衡"
+],
+"ans": "C",
+"why": "蓝绿部署（新旧两套环境并存、一键切换）与金丝雀发布（小流量逐步放量）都要求新旧版本能够同时并行运行，并具备流量/路由切换与快速回滚能力，否则无法做到平滑升级。A 项分时运行、B 项停机切换、D 项全量切流都会破坏平滑发布的前提，与两者共同依赖的能力相反。故选 C。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 33,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "服务网格数据面转发性能的主要瓶颈（ ）。",
+"opts": [
+"边车代理转发带来的额外延迟与资源开销",
+"服务实例增多导致注册中心查询变慢",
+"控制面下发策略与配置的周期设置过长",
+"业务容器自身的线程池与连接池参数配置"
+],
+"ans": "A",
+"why": "服务网格数据面的主要瓶颈来自 sidecar 代理（如 Envoy）：每个请求都要经过代理转发，引入额外网络跳数与加解密/策略处理，带来额外延迟、CPU/内存开销与连接管理负担。B 项属于注册发现的规模问题；C 项属于控制面配置时效问题；D 项是业务应用自身的性能调优，都不是数据面转发链路的固有瓶颈。故选 A。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 34,
+"cat": "软件架构设计 · 云原生与微服务",
+"q": "云原生批处理中任务(Job)/CronJob适用（ ）。",
+"opts": [
+"需要常驻监听端口并对外持续提供接口的服务",
+"需要维持长连接并向客户端主动推送消息的服务",
+"一次性执行到完成，或按时间表定时触发的任务",
+"需要稳定网络标识与有序启停的有状态服务"
+],
+"ans": "C",
+"why": "Job 用于一次性任务（跑到完成即结束），CronJob 按 cron 时间表定时触发，适合批处理、数据清洗、报表生成之类的离线任务。A 项常驻服务应用 Deployment；B 项长连接推送属于即时通信范式；D 项有状态服务应用 StatefulSet。故选 C。",
+"notes": [
+[
+"微服务架构专题",
+"../architecture-case-notes/microservices.html"
+],
+[
+"云原生架构",
+"../architecture-case-notes/cloud-native.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 35,
+"cat": "系统设计 · 高并发与缓存",
+"q": "缓存穿透问题的本质是（ ）。",
+"opts": [
+"查询根本不存在的数据，缓存与数据库均未命中",
+"热点键在某一时刻集中失效，请求瞬时回源到数据库",
+"大量缓存键在同一时间批量过期，请求集中回源",
+"缓存节点整体宕机，导致全部请求回落到数据库"
+],
+"ans": "A",
+"why": "缓存穿透是查询一个根本不存在的数据：缓存查不到、回源数据库也查不到，恶意或异常请求大量穿透缓存直击数据库，把 DB 压垮。B 项描述的是缓存击穿；C 项与 D 项是缓存雪崩的两种典型成因，都与“查不存在的数据”有本质区别。故选 A。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 36,
+"cat": "系统设计 · 高并发与缓存",
+"q": "消息队列中，死信队列（DLQ）的用途是（ ）。",
+"opts": [
+"提升消费者并发度以加快消息的消化速度",
+"隔离多次消费失败、重试耗尽的消息以便处理",
+"暂存下游不可用期间的消息，待恢复后按序重投",
+"按优先级对消息分类，保证高优消息先被消费"
+],
+"ans": "B",
+"why": "死信队列（DLQ）用于接收多次消费仍失败、重试耗尽的消息，将其从主队列隔离出来，避免“坏消息”反复阻塞消费进度，同时便于后续人工排查与补偿处理。A 项是并发调优；C 项是消息缓冲与重投机制；D 项是优先级队列的职责，与“失败隔离”不是一回事。故选 B。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 37,
+"cat": "系统设计 · 高并发与缓存",
+"q": "在缓存与数据库一致性保证中，订阅数据库binlog并异步更新缓存方案的部署方式是（ ）。",
+"opts": [
+"应用写完数据库后同步删除缓存，由业务代码保证一致性",
+"应用读取时先删除缓存再写数据库，靠延时双删兜底",
+"由中间件订阅 binlog 增量并异步更新缓存，业务零侵入",
+"为缓存设置极短的过期时间，依赖过期回源自动纠正"
+],
+"ans": "C",
+"why": "订阅 binlog 方案通过 Canal 等组件在数据库层面捕获变更事件（binlog 增量），异步解析后更新/删除缓存，应用业务代码无需改动即可保证最终一致，且不侵入业务、可靠性较高。A 项与 B 项都是应用内的侵入式方案；D 项只是弱化不一致窗口，并不解决根本问题。故选 C。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 38,
+"cat": "系统设计 · 高并发与缓存",
+"q": "限流中，令牌桶算法相比漏桶的主要特点是（ ）。",
+"opts": [
+"输出速率严格恒定，不允许任何突发流量通过",
+"无需存储令牌状态，实现上比漏桶更简单",
+"请求到达后立即转发，不做任何速率判断",
+"允许一定程度的突发流量，有令牌即可放行"
+],
+"ans": "D",
+"why": "令牌桶以固定速率向桶中放入令牌，请求需先取到令牌才放行；桶有一定容量，短时间内积累的令牌可支撑突发流量一次性放行。漏桶则强制请求匀速流出、完全平滑但不支持突发。A 项是漏桶的特征；B 项错误，令牌桶需要维护桶容量与令牌计数状态；C 项相当于不限流。故选 D。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 39,
+"cat": "系统设计 · 高并发与缓存",
+"q": "高并发秒杀场景下，将库存预扣在 Redis + 异步落库的最终一致性方案中，最重要的保障是（ ）。",
+"opts": [
+"通过原子扣减与超时释放保证不超卖、不丢单",
+"把库存放在应用本地内存，由单机串行扣减",
+"库存写入缓存后立即异步落库，不做校验与补偿",
+"先扣减后校验，允许超卖再由人工事后冲正"
+],
+"ans": "A",
+"why": "秒杀预扣库存方案最关键的保障是“不超卖、不丢单”：通过 Redis 的原子扣减保证并发下库存准确，配合超时释放（未支付回补库存）与对账补偿保证最终一致。B 项单机内存无法支撑分布式并发且易丢失；C 项不做校验与补偿会导致丢单；D 项允许超卖与“不超卖”的目标直接相悖。故选 A。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 40,
+"cat": "系统设计 · 高并发与缓存",
+"q": "缓存中热点Key（如双十一爆款）导致单节点过载的常见缓解是（ ）。",
+"opts": [
+"把热点键拆成多个随机后缀的子键分散到不同节点",
+"为热点键设置更长的过期时间以减少回源次数",
+"为该键开启持久化，避免节点重启后缓存丢失",
+"对该键的读操作加分布式锁，串行化全部访问请求"
+],
+"ans": "A",
+"why": "热点 Key 会导致大量请求集中打到某个分片/节点造成过载，常见缓解是把热点 key 随机加后缀复制/拆分成多个 key（如 key:1、key:2…），让请求分散到不同节点。B 项延长过期并不改变单键集中访问的事实；C 项持久化解决的是数据丢失，不解决单节点过载；D 项加锁串行化会进一步放大延迟。故选 A。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 41,
+"cat": "系统设计 · 高并发与缓存",
+"q": "在分布式缓存一致性哈希中，为缓解节点增减导致的大范围key迁移，常引入（ ）。",
+"opts": [
+"主从复制，通过增加只读副本提升读吞吐",
+"虚拟节点，使节点在哈希环上分布更均匀",
+"分页查询，降低单次批量读取的数据量",
+"二级索引，加速按非主键字段的检索"
+],
+"ans": "B",
+"why": "一致性哈希把节点映射到哈希环上，节点增减只影响相邻的一小段 key；但节点少时环上分布不均匀，故引入虚拟节点（每个物理节点对应多个虚拟节点分散使 key 分布更均匀、迁移更平滑。A 项主从复制解决的是冗余与读扩展，而非分布均匀性；C 项分页与 D 项索引都属于查询与存储优化。故选 B。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 42,
+"cat": "系统设计 · 高并发与缓存",
+"q": "消息队列实现削峰填谷的价值在于（ ）。",
+"opts": [
+"减少上游产生的请求总量，从源头降低系统压力",
+"提升网络带宽与硬件配置，扩大瞬时承载能力",
+"把突发流量暂存队列异步消化，平滑下游压力",
+"在入口同步阻塞调用，确保请求按到达顺序处理"
+],
+"ans": "C",
+"why": "削峰填谷借助消息队列把上游突发流量先暂存起来，下游按自身处理能力异步消费，避免瞬时洪峰直接把下游打垮，使系统压力得到平滑。A 项是流量削减而非削峰；B 项是扩容，抬高的是容量上限；D 项同步阻塞会造成请求堆积、放大延迟。故选 C。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 43,
+"cat": "系统设计 · 高并发与缓存",
+"q": "Redis实现分布式锁的要点（ ）。",
+"opts": [
+"用 SETNX 加锁，value 用固定值以便识别持有者",
+"加锁后不设过期时间，由业务代码在 finally 中释放",
+"SET NX EX 原子加锁、唯一随机值、Lua 原子释放",
+"加锁时写入客户端时间戳，释放前比对是否超时"
+],
+"ans": "C",
+"why": "Redis 实现分布式锁的要点：用 SET key value NX EX 保证“加锁+设置过期时间”原子完成；value 用唯一随机值标识持有者，释放时用 Lua 脚本先校验值再保证原子性，防止误删他人锁和进程崩溃导致死锁。A 项固定 value 无法区分持有者，可能误删他人锁；B 项不设过期，持有者宕机将造成死锁；D 项依赖客户端时间，存在时钟漂移与超时误判风险。故选 C。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 44,
+"cat": "系统设计 · 高并发与缓存",
+"q": "消息重试与顺序冲突的权衡，常见取舍是（ ）。",
+"opts": [
+"对所有消息无限重试，直到消费成功为止",
+"一旦消费失败立即丢弃，绝不重试以避免乱序",
+"顺序敏感消息按分区键保序，有限重试加死信",
+"重试前打乱消息顺序，使各分区负载更均衡"
+],
+"ans": "C",
+"why": "消息重试可能打乱顺序，实践中按业务区分：顺序敏感的消息按分区键路由到同一分区保证有序，配合有限次重试并把重试耗尽的消息转入 DLQ；即全局保序优先级高于无限重试。A 项无限重试会长期占用分区、加剧乱序；B 项直接丢弃会降低可靠性；D 项主动乱序与保序目标相悖。故选 C。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 45,
+"cat": "系统设计 · 高并发与缓存",
+"q": "限流的作用边界（ ）。",
+"opts": [
+"通过扩大集群容量提高系统可承载的请求总量",
+"对慢请求设置超时上限，避免线程被长期占用",
+"在入口按阈值拒绝超额请求，保护下游系统",
+"在依赖故障时自动切断调用并返回兜底结果"
+],
+"ans": "C",
+"why": "限流在系统入口按 QPS、并发数或资源水位等阈值，对超额请求直接拒绝（如快速失败或排队），从而保护下游不被压垮；它只控制“放多少”，不改变单个请求的处理逻辑与结果。A 项是扩容；B 项是超时控制；D 项是熔断与降级，都不是限流的作用边界。故选 C。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 46,
+"cat": "系统设计 · 高并发与缓存",
+"q": "过载保护中快速失败(Fail Fast)的语义（ ）。",
+"opts": [
+"请求失败后立即重试，直到成功或达到重试上限",
+"把请求放入队列排队，下游空闲时再依次处理",
+"过载时尽早拒绝并快速返回失败，避免资源耗尽",
+"静默丢弃无法处理的请求，不向调用方返回响应"
+],
+"ans": "C",
+"why": "Fail Fast（快速失败）指系统在过载时尽早拒绝新请求并立即返回失败，让调用方尽快感知并做出降级，避免请求堆积、线程与连接等资源被耗尽从而拖垮整个系统。A 项立即重试会进一步放大过载；B 项无限排队会耗尽队列与线程资源；D 项静默丢弃会让调用方一直等到超时。故选 C。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 47,
+"cat": "系统设计 · 高并发与缓存",
+"q": "异步化提升吞吐的原理是（ ）。",
+"opts": [
+"合并高频小请求，减少下游需要处理的请求数",
+"缩短单个请求的处理耗时，降低平均响应时间",
+"压缩传输数据体积，降低网络与序列化开销",
+"把耗时操作转入后台或队列，主流程不阻塞"
+],
+"ans": "D",
+"why": "异步化把耗时的 IO、计算等操作转入后台线程或消息队列处理，主流程提交后立即返回、不阻塞等待，从而让有限的线程/连接服务于更多请求，提升整体吞吐与并发能力。A 项是请求合并；B 项是缩短单次处理耗时；C 项是数据压缩。三者虽也能提升吞吐，但都不是“异步化”的机理——异步化改变的是执行方式，让线程不必空等 IO。故选 D。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 48,
+"cat": "系统设计 · 高并发与缓存",
+"q": "热点账户高频更新处理（ ）。",
+"opts": [
+"对账户行加行锁，保证单行更新的串行一致性",
+"把账户余额改为定时批量更新，降低更新频率",
+"把账户数据缓存在应用本地并按固定周期刷盘",
+"拆分账户为多个子账户，或本地缓冲合并更新"
+],
+"ans": "D",
+"why": "热点账户（如大商户账户）高频更新会导致单行锁竞争激烈、性能骤降，常见做法是拆分账户或多个子账户分摊，或本地缓冲合并更新、再异步落库，从而减少单行锁竞争。A 项行锁本身正是竞争来源；B 项降低的是更新频率而非单行竞争，且牺牲实时性；C 项本地缓存易造成数据不一致。故选 D。",
+"notes": [
+[
+"Redis 缓存三大问题",
+"../redis-notes/redis-cache.html"
+],
+[
+"Redis 进阶与架构",
+"../redis-notes/redis-advanced.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 49,
+"cat": "企业信息化 · 相关法律法规",
+"q": "依据《中华人民共和国数据安全法》，国家建立数据分类分级保护制度，其中对关系国家安全的数据实行（ ）。",
+"opts": [
+"与一般数据适用相同的分级保护要求",
+"由数据处理者自行确定保护级别的具体要求",
+"实行比重要数据更加严格的管理制度",
+"仅在数据出境环节受限，境内处理无特别要求"
+],
+"ans": "C",
+"why": "依据《中华人民共和国数据安全法》，国家建立数据分类分级保护制度，将数据分为一般数据、重要数据、核心数据等，对关系国家安全、国民经济命脉、重要民生、重大公共利益的数据实行更严格的管理，其中核心数据实行更加严格的管理制度。A 项、B 项、D 项都弱化或曲解了法定的分类分级要求。故选 C。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 50,
+"cat": "企业信息化 · 相关法律法规",
+"q": "下列关于开源软件的说法正确的是（ ）。",
+"opts": [
+"开源软件已放弃版权，任何人都可不受约束地使用",
+"只要不公开修改后的源码，即可闭源商用任意组件",
+"开源软件不附带许可证，使用风险由使用者承担",
+"开源软件仍受版权保护，使用须遵循许可证条款"
+],
+"ans": "D",
+"why": "开源软件仍享有版权，只是权利人通过开源许可证（GPL、MIT、Apache 等）授权他人使用；使用开源软件必须遵循相应许可证条款，如 GPL 的“传染性”要求衍生作品继续开源。A 项开源不等于放弃权利；B 项是否可闭源商用取决于具体许可证，GPL 类不允许；C 项开源项目都附带许可证。故选 D。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 51,
+"cat": "企业信息化 · 相关法律法规",
+"q": "国家标准代号中，GB/T 表示（ ）。",
+"opts": [
+"推荐性国家标准",
+"强制性国家标准",
+"行业标准",
+"企业标准"
+],
+"ans": "A",
+"why": "国家标准代号中 GB 表示强制性国家标准，GB/T 中的 T 即“推荐”拼音首字母，表示推荐性国家标准；行业标准如 QB（轻工）、YD（通信）等；企业标准代号常为 Q/ 开头。故 GB/T 表示推荐性国家标准，选 A。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 52,
+"cat": "企业信息化 · 相关法律法规",
+"q": "数据安全中数据分类分级是（ ）基础。",
+"opts": [
+"提升数据库查询性能与索引的使用效率",
+"规划网络拓扑结构与带宽资源的分配方案",
+"作为制定差异化防护策略与访问控制的依据",
+"设计前端页面结构与用户交互流程的规范"
+],
+"ans": "C",
+"why": "数据分类分级（如公开、内部、敏感、机密）是把数据按重要程度与敏感性归类，作为制定差异化防护策略（加密、脱敏、留存、授权）和确定访问控制、合规要求的前提与依据。A 项、B 项、D 项分别属于性能优化、网络规划与界面设计范畴，都与数据分类分级无关。故选 C。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 53,
+"cat": "企业信息化 · 相关法律法规",
+"q": "《民法典》关于数据与网络虚拟财产的规定（ ）。",
+"opts": [
+"未对数据与网络虚拟财产的法律地位作出规定",
+"明确数据与网络虚拟财产的保护有规定依其规定",
+"规定网络虚拟财产一律归国家所有并由国家管理",
+"规定数据仅在涉及个人信息时才受法律保护"
+],
+"ans": "B",
+"why": "《民法典》第一百二十七条规定：“法律对数据、网络虚拟财产的保护有规定的，依照其规定。”这是我国首次从基本民事法律层面确认数据与网络虚拟财产受法律保护。A 项与 D 项都否定了数据与网络虚拟财产的法律地位；C 项曲解了法条，法律并未规定虚拟财产归国家所有。故选 B。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 54,
+"cat": "企业信息化 · 相关法律法规",
+"q": "软件质量标准ISO/IEC 25010质量模型外层（ ）。",
+"opts": [
+"只包含软件产品质量一个层次，不再细分特性",
+"只规定质量特性名称，不包含子特性与度量方法",
+"分为使用质量、产品质量与数据质量等多个层面",
+"只覆盖性能效率这一个质量特性及其全部子特性"
+],
+"ans": "C",
+"why": "ISO/IEC 25010 质量模型是多层结构：除系统/软件产品质量（含功能性、性能效率、安全性等质量特性及其子特性）外，还包含使用质量（use quality）、数，从多个视角评价质量。A 项、B 项、D 项都只覆盖了模型的一部分，与多层结构的实际不符。故选 C。",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+},
+{
+"sec": "mock",
+"no": 55,
+"cat": "企业信息化 · 相关法律法规",
+"q": "软件许可中免费但不开源(如限商用)的典型形态是（ ）。",
+"opts": [
+"免费软件（Freeware）与商业软件免费版",
+"采用 GPL 许可证发布并要求衍生作品开源的软件",
+"已进入公有领域、不受版权约束的作品",
+"采用 MIT 或 Apache 等宽松许可证的软件"
+],
+"ans": "A",
+"why": "免费软件（Freeware）与商业软件的部分免费版可以免费使用，但源代码不公开且可能限制商用，属于“免费但不开源”的典型形态。B 项与 D 项都属于开源许可（GPL 具有传染性，MIT/Apache 虽宽松但源码开放）；C 项作品无版权限制、完全自由使用。故选 A。T H E       E N D功不唐捐，玉汝于成!开   启   新    征   程",
+"notes": [
+[
+"知识产权与标准化",
+"../知识产权与标注化/index.html"
+],
+[
+"电子政务与企业信息化",
+"../information-system-notes/is-egovernment.html"
+]
+]
+}
+];
+var SECNAME = {real:'真题', mock:'模拟'};
+var curSec='all', graded=false, elapsed=0, timerInt, ACTIVE=[];
+
+function visible(){ return QUESTIONS.filter(function(q){return curSec==='all'||q.sec===curSec;}); }
+function rpad(n){return (n<10?'0':'')+n;}
+function fmt(t){var m=Math.floor(t/60),s=t%60;return rpad(m)+':'+rpad(s);}
+
+function renderAll(){
+  var host=document.getElementById('questions'), h='';
+  QUESTIONS.forEach(function(q,gi){
+    var show=(curSec==='all'||q.sec===curSec);
+    h+='<div class="q-card'+(show?'':' hide')+'" data-i="'+gi+'" data-sec="'+q.sec+'">';
+    h+='<div class="q-head"><span class="q-num">第 '+q.no+' 题</span>';
+    h+='<span class="q-sec '+q.sec+'">'+SECNAME[q.sec]+'</span>';
+    h+='<span class="q-tag">'+q.cat+'</span></div>';
+    h+='<div class="q-stem">'+q.q+'</div><div class="opts">';
+    q.opts.forEach(function(o,oi){var L='ABCD'[oi]; h+='<div class="opt" data-l="'+L+'"><b>'+L+'.</b> '+o+'</div>';});
+    h+='</div>';
+    if(q.notes&&q.notes.length){
+      h+='<div class="q-notes"><span class="nl-cap">对应笔记</span>';
+      q.notes.forEach(function(n){h+='<a href="'+n[1]+'" target="_blank" rel="noopener">'+n[0]+'</a>';});
+      h+='</div>';
+    }
+    h+='<div class="review" id="rv'+gi+'"></div></div>';
+  });
+  host.innerHTML=h;
+  host.querySelectorAll('.opt').forEach(function(o){
+    o.addEventListener('click',function(){
+      if(graded)return;
+      var card=o.closest('.q-card');
+      card.querySelectorAll('.opt').forEach(function(x){x.classList.remove('picked');});
+      o.classList.add('picked'); updateAnswered();
+    });
+  });
+  ACTIVE=visible();
+  updateAnswered();
+}
+function updateAnswered(){
+  var tot=ACTIVE.length, n=0;
+  ACTIVE.forEach(function(q){
+    var c=document.querySelector('.q-card[data-i="'+QUESTIONS.indexOf(q)+'"]');
+    if(c&&c.querySelector('.opt.picked'))n++;
+  });
+  document.getElementById('answered').textContent='已答 '+n+' / '+tot;
+  document.getElementById('bar').style.width=(tot?(n/tot*100):0)+'%';
+}
+function grade(){
+  graded=true; var right=0,wrong=0,blank=0, tot=0;
+  ACTIVE.forEach(function(q){
+    var i=QUESTIONS.indexOf(q);
+    var c=document.querySelector('.q-card[data-i="'+i+'"]'); if(!c)return; tot++;
+    var picked=c.querySelector('.opt.picked'); var L=picked?picked.getAttribute('data-l'):null;
+    c.querySelectorAll('.opt').forEach(function(x){
+      x.classList.add('locked');
+      var xl=x.getAttribute('data-l');
+      if(xl===q.ans)x.classList.add('correct');
+      if(xl===L)x.classList.add('wrong');
+    });
+    var review=document.getElementById('rv'+i);
+    if(L===q.ans){right++; c.classList.add('correct'); review.innerHTML='<span class="ans">✓ 正确</span> — '+q.why;}
+    else if(L){wrong++; c.classList.add('wrong'); review.innerHTML='<span class="ans">✗ 你的答案：'+L+' · 正确答案：'+q.ans+'</span> — '+q.why;}
+    else {blank++; c.classList.add('wrong'); review.innerHTML='<span class="ans">未答 · 正确答案：'+q.ans+'</span> — '+q.why;}
+    review.classList.add('show');
+  });
+  clearInterval(timerInt);
+  var score=tot?Math.round(right/tot*100):0;
+  document.getElementById('scoreNum').textContent=score;
+  document.getElementById('scoreSub').textContent='答对 '+right+' / '+tot+' 题 · 用时 '+fmt(elapsed);
+  document.getElementById('scRight').textContent=right;
+  document.getElementById('scWrong').textContent=wrong;
+  document.getElementById('scBlank').textContent=blank;
+  document.getElementById('scorePanel').classList.add('show');
+  document.getElementById('scorePanel').scrollIntoView({behavior:'smooth'});
+}
+function reset(){
+  graded=false; elapsed=0;
+  document.getElementById('scorePanel').classList.remove('show');
+  renderAll(); startTimer();
+}
+function startTimer(){
+  clearInterval(timerInt);
+  document.getElementById('timer').textContent=fmt(150*60);
+  timerInt=setInterval(function(){
+    elapsed++; var t=150*60-elapsed; if(t<0)t=0;
+    document.getElementById('timer').textContent=fmt(t);
+    if(t<=0)grade();
+  },1000);
+}
+document.querySelectorAll('#seg button').forEach(function(b){
+  b.addEventListener('click',function(){
+    document.querySelectorAll('#seg button').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on'); curSec=b.getAttribute('data-sec');
+    graded=false; document.getElementById('scorePanel').classList.remove('show');
+    renderAll();
+  });
+});
+document.getElementById('gradeBtn').onclick=grade;
+document.getElementById('resetBtn').onclick=reset;
+renderAll(); startTimer();
+</script>
+</body>
+</html>

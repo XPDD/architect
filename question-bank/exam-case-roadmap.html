@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>案例分析 · 复习路线图（基于 8 道案例题反推）</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#05080e;--card:#111620;--elev:#161c28;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.62);--muted:rgba(255,255,255,.3);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(52,211,153,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(167,139,250,.04)0%,transparent 50%);line-height:1.65;min-height:100vh;padding:32px 16px}
+.wrap{max-width:940px;margin:0 auto}
+.back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+.hero{text-align:center;padding:38px 20px 28px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:0;left:22%;right:22%;height:1px;background:linear-gradient(90deg,transparent,var(--green),var(--cyan),transparent)}
+.hero-badge{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.2em;margin-bottom:8px}
+.hero h1{font-size:27px;font-weight:800}.hero h1 .accent{color:var(--green)}
+.hero-sub{font-size:13px;color:var(--muted);margin-top:9px}
+.hero-stats{display:flex;justify-content:center;gap:16px;margin-top:15px;flex-wrap:wrap}
+.hero-stat{padding:5px 14px;border-radius:4px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--text2)}
+.hero-stat strong{color:var(--green)}
+.sec-head{display:flex;align-items:center;gap:12px;margin:26px 0 12px}
+.sec-tag{font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;letter-spacing:.05em}
+.sec-head h2{font-size:17px;font-weight:700}
+.sec-head .rule{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.12),transparent)}
+.tier{border-radius:10px;overflow:hidden;border:1px solid var(--border);margin-bottom:12px;background:var(--card)}
+.tier-bar{display:flex;align-items:center;gap:10px;padding:11px 18px;font-family:var(--mono);font-size:12px;font-weight:700}
+.tier.p0 .tier-bar{background:rgba(248,113,113,.1);color:var(--rose);border-bottom:1px solid rgba(248,113,113,.2)}
+.tier.p1 .tier-bar{background:rgba(251,191,36,.1);color:var(--amber);border-bottom:1px solid rgba(251,191,36,.2)}
+.tier.p2 .tier-bar{background:rgba(77,124,255,.1);color:var(--blue);border-bottom:1px solid rgba(77,124,255,.2)}
+.tier-body{padding:8px 18px 14px}
+.mod{padding:13px 0;border-bottom:1px dashed rgba(255,255,255,.07)}
+.mod:last-child{border-bottom:none}
+.mod-top{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:6px}
+.mod-name{font-size:14.5px;font-weight:700;color:var(--text)}
+.mod-case{font-family:var(--mono);font-size:10px;color:var(--muted);background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:1px 7px}
+.mod ul{list-style:none;padding:0}
+.mod ul li{font-size:13px;color:var(--text2);padding:1px 0 1px 17px;position:relative;line-height:1.7}
+.mod ul li::before{content:'';position:absolute;left:5px;top:10px;width:4px;height:4px;border-radius:50%;background:rgba(52,211,153,.5)}
+.mod ul li b{color:var(--text);font-weight:600}
+.notes{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:9px}
+.nl-cap{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.05em}
+.notes a,.link{font-size:11px;font-family:var(--mono);text-decoration:none;color:var(--cyan);background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:4px;padding:2px 8px;transition:.15s;display:inline-block}
+.notes a:hover,.link:hover{background:rgba(0,212,255,.14);border-color:rgba(0,212,255,.4)}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text2)}
+.tbl th{background:rgba(255,255,255,.03);color:var(--text);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td b{color:var(--text)}
+.pill{font-family:var(--mono);font-size:10px;font-weight:700;padding:1px 7px;border-radius:4px}
+.pill.p0{color:var(--rose);background:rgba(248,113,113,.12)}
+.pill.p1{color:var(--amber);background:rgba(251,191,36,.12)}
+.pill.p2{color:var(--blue);background:rgba(77,124,255,.12)}
+.strategy{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 20px}
+.strategy ol{margin-left:18px}
+.strategy li{font-size:13.5px;color:var(--text2);margin:6px 0;line-height:1.75}
+.strategy li b{color:var(--text)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.actions a{font-size:12px;text-decoration:none;border-radius:6px;padding:8px 16px;font-family:var(--mono);border:1px solid rgba(52,211,153,.4);color:var(--green)}
+.actions a:hover{background:rgba(52,211,153,.08)}
+.actions a.alt{border-color:rgba(167,139,250,.4);color:var(--purple)}
+.actions a.alt:hover{background:rgba(167,139,250,.08)}
+.footer{text-align:center;padding:22px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+@media(max-width:640px){.tbl{display:block;overflow-x:auto;white-space:nowrap}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回题库索引</a>
+
+  <div class="hero">
+    <div class="hero-badge">CASE REVIEW ROADMAP · 案例分析</div>
+    <h1>案例分析 <span class="accent">复习路线图</span></h1>
+    <div class="hero-sub">由 8 道案例题（一模 5 + 补充 3）反推考点，按 P0–P2 优先级编排</div>
+    <div class="hero-stats">
+      <div class="hero-stat">案例 <strong>8</strong> 道</div>
+      <div class="hero-stat">模块 <strong>8</strong> 个</div>
+      <div class="hero-stat">笔记关联 <strong>20+</strong> 篇</div>
+    </div>
+  </div>
+
+  <div class="sec-head"><span class="sec-tag" style="color:var(--green);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25)">优先级</span><h2>P0 · 保底必拿</h2><span class="rule"></span></div>
+  <div class="tier p0">
+    <div class="tier-bar">◆ 第一题必答 + 高频选做，务必吃透</div>
+    <div class="tier-body">
+
+      <div class="mod">
+        <div class="mod-top"><span class="mod-name">质量属性与架构评估</span><span class="mod-case">一模试题一 · 传统 case-quality</span></div>
+        <ul>
+          <li><b>质量属性六要素</b>：刺激源 / 刺激 / 环境 / 制品 / 响应 / 响应度量（口诀：谁·干什么·什么环境·对啥·啥反馈·怎么量）</li>
+          <li><b>属性分类</b>：运行期（性能/可用性/安全性/可伸缩性/互操作性）vs 开发期（可修改性/可测试性/可扩展性/可移植性）</li>
+          <li><b>效用树</b>：树根 → 质量属性 → 属性分类 → 质量属性场景；场景标注优先级 (H/M/L)</li>
+          <li><b>评估方法</b>：SAAM / ATAM（四阶段）/ CBAM；敏感点（单属性）· 权衡点（多属性）· 风险点</li>
+          <li>练习：把 (a)~(h) 快速归类到 性能 / 可用性 / 安全性 / 可修改性</li>
+        </ul>
+        <div class="notes"><span class="nl-cap">对应笔记</span>
+          <a href="../quality-notes/quality-attributes.html" target="_blank" rel="noopener">软件质量属性全解</a>
+          <a href="../quality-notes/arch-evaluation.html" target="_blank" rel="noopener">架构评估 SAAM·ATAM·CBAM</a>
+          <a href="../quality-notes/quality-evaluation.html" target="_blank" rel="noopener">质量属性+架构评估</a>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="mod-top"><span class="mod-name">数据库 / 缓存 / 分布式</span><span class="mod-case">一模试题四</span></div>
+        <ul>
+          <li><b>Redis 三种集群模式</b>（主从 / 哨兵 / Cluster）优缺点对比；自建集群 vs 云托管（成本/灵活性/扩展性）</li>
+          <li><b>缓存三大问题</b>：穿透 / 击穿 / 雪崩；热点 Key、一致性哈希、分布式锁</li>
+          <li>反规范化设计方法与数据不一致解决；读写分离 / 主从复制 / 分库分表</li>
+          <li>分布式事务、CAP 与 BASE 理论</li>
+        </ul>
+        <div class="notes"><span class="nl-cap">对应笔记</span>
+          <a href="../redis-notes/redis-cluster.html" target="_blank" rel="noopener">Redis 集群与高可用</a>
+          <a href="../redis-notes/redis-cache.html" target="_blank" rel="noopener">Redis 缓存三大问题</a>
+          <a href="../database-notes/functional-dependency-nf.html" target="_blank" rel="noopener">函数依赖与范式</a>
+          <a href="../database-notes/distributed-nosql.html" target="_blank" rel="noopener">分布式数据库与 NoSQL</a>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="mod-top"><span class="mod-name">微服务 / 云原生</span><span class="mod-case">一模试题五</span></div>
+        <ul>
+          <li><b>API 网关作用</b>：统一入口 / 路由转发 / 负载均衡 / 聚合响应 / 认证授权 / 限流熔断 / 协议转换 / 缓存</li>
+          <li><b>DevOps 与 CI/CD</b>：自动化测试、快速反馈、频繁部署、环境一致性</li>
+          <li>服务治理：注册发现 / 配置中心 / 熔断降级限流 / 可观测 / 服务网格；微服务优劣势与 DDD 拆分</li>
+        </ul>
+        <div class="notes"><span class="nl-cap">对应笔记</span>
+          <a href="../architecture-case-notes/microservices.html" target="_blank" rel="noopener">微服务架构专题</a>
+          <a href="../architecture-case-notes/cloud-native.html" target="_blank" rel="noopener">云原生架构</a>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="mod-top"><span class="mod-name">大数据架构</span><span class="mod-case">补充试题二 · 2023 真题</span></div>
+        <ul>
+          <li><b>Lambda 三层</b>：批处理层 / 加速层 / 服务层；<b>Kappa</b>：单一流处理链路</li>
+          <li>原始主数据用<b>不可变追加式存储</b>，保留全部历史数据</li>
+          <li>架构图分层与组件：采集(Nginx/Flume/Kafka) → 集成(Sqoop/ETL) → 计算(Spark/Flink/MapReduce) → 存储(HDFS/HBase/MemSQL)</li>
+        </ul>
+        <div class="notes"><span class="nl-cap">对应笔记</span>
+          <a href="../database-notes/distributed-nosql.html" target="_blank" rel="noopener">分布式数据库与 NoSQL</a>
+          <a href="../未来信息系统/index.html" target="_blank" rel="noopener">未来信息综合技术</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sec-head"><span class="sec-tag" style="color:var(--amber);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25)">优先级</span><h2>P1 · 常考、性价比高</h2><span class="rule"></span></div>
+  <div class="tier p1">
+    <div class="tier-bar">◆ 选做题常见，按优势选题</div>
+    <div class="tier-body">
+
+      <div class="mod">
+        <div class="mod-top"><span class="mod-name">面向对象建模 / UML / 设计模式</span><span class="mod-case">一模试题二</span></div>
+        <ul>
+          <li><b>用例图</b>：包含 include / 扩展 extend / 泛化；参与者识别</li>
+          <li>类图、状态图、序列图（消息、分支片段、与协作图对比）</li>
+          <li>设计模式选型：<b>桥接</b>（抽象与实现解耦）、适配器、工厂等，并说明"为何适用"</li>
+        </ul>
+        <div class="notes"><span class="nl-cap">对应笔记</span>
+          <a href="../software-engineering-notes/oo-uml-patterns.html" target="_blank" rel="noopener">OO·UML·设计模式</a>
+          <a href="../software-engineering-notes/gof-23-patterns.html" target="_blank" rel="noopener">设计模式 23 种 GoF</a>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="mod-top"><span class="mod-name">非功能需求 + C/S 架构选型</span><span class="mod-case">补充试题三</span></div>
+        <ul>
+          <li><b>非功能需求四类</b>：操作性需求 / 性能需求 / 安全性需求 / 文化需求（含义+归类）</li>
+          <li><b>瘦客户端 vs 胖客户端 C/S</b> 的权衡（业务逻辑位置、运维、缓存、加密）</li>
+        </ul>
+        <div class="notes"><span class="nl-cap">对应笔记</span>
+          <a href="../software-engineering-notes/system-design.html" target="_blank" rel="noopener">系统设计（内聚耦合/概要/详细）</a>
+          <a href="../architecture-notes/arch-styles.html" target="_blank" rel="noopener">软件架构风格全览</a>
+          <a href="../architecture-case-notes/layered-architecture.html" target="_blank" rel="noopener">层次架构</a>
+        </div>
+      </div>
+
+      <div class="mod">
+        <div class="mod-top"><span class="mod-name">项目管理（进度 / 成本）</span><span class="mod-case">补充试题一</span></div>
+        <ul>
+          <li><b>关键路径</b>与网络图；工期估算、赶工 / 加班成本权衡</li>
+          <li>项目计划应包含的内容（背景、目标、进度、预算、变更流程等）</li>
+        </ul>
+        <div class="notes"><span class="nl-cap">对应笔记</span>
+          <a href="../project-management-notes/pm-schedule.html" target="_blank" rel="noopener">进度管理与关键路径</a>
+          <a href="../project-management-notes/pm-config.html" target="_blank" rel="noopener">配置管理与质量风险管理</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sec-head"><span class="sec-tag" style="color:var(--blue);background:rgba(77,124,255,.1);border:1px solid rgba(77,124,255,.25)">优先级</span><h2>P2 · 冷门，会则答</h2><span class="rule"></span></div>
+  <div class="tier p2">
+    <div class="tier-bar">◆ 低频／边缘化，遇陌生技术可直接放弃</div>
+    <div class="tier-body">
+      <div class="mod">
+        <div class="mod-top"><span class="mod-name">嵌入式软件可靠性</span><span class="mod-case">一模试题三</span></div>
+        <ul>
+          <li><b>系统可靠性四子特性</b>：成熟性 / 容错性 / 易恢复性 / 可靠性的依从性</li>
+          <li>提高可靠性技术：冗余 / 软件容错 / 双机容错 / 集群；串并联可靠度计算</li>
+          <li><b>恢复块方法</b>（主块/验证测试/异常处理，单机）vs <b>N 版本程序设计</b>（多机、表决）</li>
+          <li>硬件 vs 软件可靠性差异（浴缸曲线 / 无老化 / 维修 / 报警）</li>
+        </ul>
+        <div class="notes"><span class="nl-cap">对应笔记</span>
+          <a href="../软件可靠性/index.html" target="_blank" rel="noopener">软件可靠性</a>
+          <a href="../computer-system-notes/reliability.html" target="_blank" rel="noopener">计算机可靠性（串并联）</a>
+          <a href="../embedded-notes/emb-overview.html" target="_blank" rel="noopener">嵌入式系统概述</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-head"><span class="sec-tag" style="color:var(--cyan);background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.25)">对照</span><h2>案例 → 考点 对照矩阵</h2><span class="rule"></span></div>
+  <table class="tbl">
+    <thead><tr><th>案例</th><th>主题</th><th>主要考点</th><th>优先级</th></tr></thead>
+    <tbody>
+      <tr><td><b>一模 试题一</b></td><td>系统架构评估</td><td>质量属性六要素 · 效用树 · ATAM/CBAM · 敏感点/权衡点</td><td><span class="pill p0">P0</span></td></tr>
+      <tr><td><b>一模 试题二</b></td><td>OO 建模</td><td>参与者 · 桥接模式 · 状态图</td><td><span class="pill p1">P1</span></td></tr>
+      <tr><td><b>一模 试题三</b></td><td>嵌入式可靠性</td><td>可靠性特征差异 · 恢复块/N 版本</td><td><span class="pill p2">P2</span></td></tr>
+      <tr><td><b>一模 试题四</b></td><td>分布式缓存</td><td>Redis 集群三模式 · ElastiCache 对比</td><td><span class="pill p0">P0</span></td></tr>
+      <tr><td><b>一模 试题五</b></td><td>Web / 微服务</td><td>API 网关 · DevOps/CI-CD · 微服务优劣</td><td><span class="pill p0">P0</span></td></tr>
+      <tr><td><b>补充 试题一</b></td><td>项目管理</td><td>关键路径 · 赶工成本 · 项目计划内容</td><td><span class="pill p1">P1</span></td></tr>
+      <tr><td><b>补充 试题二</b></td><td>大数据架构</td><td>Lambda/Kappa · 架构图分层 · 不可变存储</td><td><span class="pill p0">P0</span></td></tr>
+      <tr><td><b>补充 试题三</b></td><td>软件系统设计</td><td>非功能需求四类 · 瘦/胖客户端 C/S</td><td><span class="pill p1">P1</span></td></tr>
+    </tbody>
+  </table>
+
+  <div class="sec-head"><span class="sec-tag" style="color:var(--purple);background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.25)">策略</span><h2>备考策略</h2><span class="rule"></span></div>
+  <div class="strategy">
+    <ol>
+      <li><b>主攻第一题</b>：架构评估是唯一必答题，考点固定、紧贴教材，是全场最稳的送分题，优先吃透。</li>
+      <li><b>4 选 3 选题</b>：第 1 题必答，其余 4 题选 2；按自身优势（后端优先数据库/分布式/云原生）选择，遇陌生技术果断放弃。</li>
+      <li><b>背答题模板</b>：每个分论点按「概念一句话 → 项目问题 → 方案取舍 → 具体技术 → 量化结果」展开；结尾<b>务必补写"不足与解决措施"</b>。</li>
+      <li><b>趋势研判</b>：前沿技术（云原生/微服务/大数据）已成主流选做；软件工程、嵌入式逐步淡化——按 P0 → P1 → P2 分配时间。</li>
+    </ol>
+    <div class="actions">
+      <a href="exam-case-review.html">📝 案例复习导航与步骤</a>
+      <a href="../architecture-case-notes/answer-templates.html">✍️ 案例答题技巧</a>
+      <a class="alt" href="exam-2026-mock-case.html">▶ 一模案例分析（5 题）</a>
+      <a class="alt" href="exam-2026-extra-case.html">▶ 补充案例分析（3 题）</a>
+    </div>
+  </div>
+
+  <div class="footer">案例分析复习路线图 · 基于 8 道案例题反推 · 2026</div>
+</div>
+</body>
+</html>
