@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架构论文写作 · 真题练习（上）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>架构论文写作 · 真题练习（上）</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { topic:"考试方式", q:"论文科目考试时长为多少分钟？能否提前交卷？",
+    options:["A 120分钟，不得提前交卷","B 90分钟，可提前30分钟交卷","C 150分钟，可提前交卷","D 120分钟，结束前60分钟可交卷"],
+    answer:0, explain:"<b>解析：</b>论文考试时长 120 分钟，<b>不得提前交卷离场</b>；上午的综合知识/案例分析才是「结束前60分钟可交卷」。A 正确。" },
+  { topic:"考试方式", q:"论文考试题目为「四选一」，关于题目分布的说法正确的是？",
+    options:["A 四题全部考软件架构","B 必有一题考察软件架构，另有三类（数据库/分布式/其他）","C 四题全部是项目管理","D 随机抽取，不保证有软件架构题"],
+    answer:1, explain:"<b>解析：</b>论文=四选一，<b>必有一题考察软件架构</b>；题型分软件架构、数据库、分布式系统场景、其他（项目管理/软件工程/企业集成/测试/运维）。B 正确。" },
+  { topic:"考试方式", q:"自 2024 年起，软考考试频次与及格线是？",
+    options:["A 一年一次，60分及格","B 一年两次，45分及格，一科不过全部重考","C 一年两次，每科独立及格","D 一年一次，45分及格"],
+    answer:1, explain:"<b>解析：</b>从2024年开始一年考2次；每科及格分数为45分，<b>一科不过，全部重考</b>。B 正确。" },
+  { topic:"出题特点", q:"2023-2025 三年出题特点中，属于「必考主线」的是？",
+    options:["A 项目管理与软件工程","B 云原生 + 数据架构","C 区块链与物联网","D 嵌入式与移动开发"],
+    answer:1, explain:"<b>解析：</b>两大必考主线=<b>云原生</b>（边云协同→云上运维→事件驱动→Serverless/云原生数据库）和<b>数据架构</b>（多源集成→Lambda→多模型→云原生数据库）。B 正确；AI 渗透、经典周期重考、场景方案是其他趋势。" },
+  { topic:"出题特点", q:"近 6 年周期性重考的经典题目包括？",
+    options:["A SOA、软件维护、多源数据集成、可靠性","B Serverless、秒杀、性能测试","C 云原生数据库、向量数据库","D 区块链、大数据、物联网"],
+    answer:0, explain:"<b>解析：</b>周期性重考的经典题=<b>SOA、软件维护、多源数据集成、可靠性</b>等（2021/2018 SOA、多次软件维护、多次数据集成）。A 正确；B/C 是近年新考点，D 非周期性经典。" },
+  { topic:"出题特点", q:"近 3 年出题的第五大趋势（从宽泛转向）是什么？",
+    options:["A 转向纯理论考核","B 转向具体场景解决方案（如分布式事务、性能测试、秒杀）","C 转向只考AI","D 转向只考数据库SQL"],
+    answer:1, explain:"<b>解析：</b>第五大趋势=从宽泛的架构设计题目转向<b>具体场景解决方案</b>，如分布式事务、性能测试、秒杀场景；这类题实战性强，不一定适合每个同学。B 正确。" },
+  { topic:"四大心得", q:"心得一：考试已逐渐从「知识型」考核转变为哪种考核趋势？",
+    options:["A 记忆型","B 趋势型","C 计算型","D 操作型"],
+    answer:1, explain:"<b>解析：</b>考试已从<b>知识型</b>考核转变为<b>趋势型</b>考核且节奏加快——过去掌握 SOA/SSH/层次架构即可，现在必须理解云原生、数据智能、AI工程化等当前技术浪潮。B 正确。" },
+  { topic:"四大心得", q:"心得二：论文的灵魂在于真实性。备考建议是？",
+    options:["A 背诵大量范文","B 深度复盘2-3年最复杂的项目，为1-2个核心项目准备素材库","C 只准备虚构项目","D 多背技术名词"],
+    answer:1, explain:"<b>解析：</b>真实性=深度复盘过去2-3年最复杂项目（为什么这么设计/遇到什么坑/重做用什么新架构），为1-2个核心项目准备素材库（背景、角色、选型对比、问题方案、量化数据）。B 正确。" },
+  { topic:"四大心得", q:"心得三：论文论述的核心是什么？",
+    options:["A 技术点的罗列","B 技术的决策过程（为什么、对比、取舍）","C 堆砌技术名词","D 展示代码实现"],
+    answer:1, explain:"<b>解析：</b>论述核心=<b>技术的决策过程</b>，架构师价值是做出权衡而非堆名词。每个技术点后必须跟选择理由，主动说明被否决的备选方案（如对比 Kafka 与 RabbitMQ 后选 Kafka）。B 正确。" },
+  { topic:"四大心得", q:"心得四：价值体现依赖什么？哪种写法最令人信服？",
+    options:["A 定性描述，如系统性能提升","B 量化成果，如TP99从500ms降到100ms、并发从1000QPS到5000QPS","C 大量形容词","D 引用别人的数据"],
+    answer:1, explain:"<b>解析：</b>价值体现依赖<b>量化成果</b>——响应时间、QPS/TPS、可用性99.9%→99.99%、MTTR缩短等，论述后单独写「应用效果与分析」用数据证明。B 正确。" },
+  { topic:"评分标准", q:"下列哪种情况需要扣 5-10 分？",
+    options:["A 有独特见解和深入体会","B 没有写摘要或摘要过于简略无实质内容","C 项目难度很高","D 内容符合最新趋势"],
+    answer:1, explain:"<b>解析：</b>扣5-10分=无摘要/摘要简略无实质内容、过分自我吹嘘夸大、内容为大学生实习级低应用水平。B 正确；A/C/D 是加分项。" },
+  { topic:"评分标准", q:"下列哪种情况可直接判为不及格？",
+    options:["A 摘要略长","B 正文少于1000字且内容空洞不切题","C 项目规模小但真实","D 使用经典技术架构"],
+    answer:1, explain:"<b>解析：</b>直接不及格=虚构情节/严重不真实、无实战纯理论、内容方法过于陈旧、不切题意内容空洞<b>正文少于1000字</b>、文理不通错别字多。B 正确。" },
+  { topic:"万能模板", q:"论文字数分配建议（万能模板公式）是？",
+    options:["A 摘要200+背景300+正文800+结尾200","B 摘要300+背景400+回应子题200+主体1000+结尾300","C 摘要500+背景500+正文500","D 全文2000字内不细分"],
+    answer:1, explain:"<b>解析：</b>字数分配=摘要300+项目背景400+回应子题200+主体1000+结尾300，<b>总字数2000~2600</b>。B 正确；正文不得少于1000字。" },
+  { topic:"万能模板", q:"下列项目最不建议选做论文项目的是？",
+    options:["A 银行ERP系统","B 进销存/图书管理这类小型系统","C 医院OA系统","D 大型云计算信息系统"],
+    answer:1, explain:"<b>解析：</b>不建议选=小型企业项目（进销存、图书管理、单机版）、尚未完成项目、纯建网站、硬件项目、纯技术项目。B 正确；A/C/D 属推荐范围（政府/大型信息系统）。" },
+  { topic:"万能模板", q:"摘要与正文的关系是什么？",
+    options:["A 承接关系，正文续着摘要写","B 总分关系，摘要写过正文还要再写","C 完全相同","D 正文不能重复摘要内容"],
+    answer:1, explain:"<b>解析：</b>摘要与正文是<b>总分关系不是承接关系</b>——千万不要觉得摘要里写过正文就不需要再写；更不能正文续着摘要写。B 正确。" },
+  { topic:"万能模板", q:"项目背景部分的最佳写法策略是？",
+    options:["A 与论文主题强相关","B 尽量通用化、不涉及论文主题，考场上任何题目都可默写","C 越详细越好","D 只写技术不写项目"],
+    answer:1, explain:"<b>解析：</b>背景建议350-450字、<b>尽量通用化、不要和论文主题相关</b>，考场上无论什么主题都可直接默写，最后加一句过渡句即可。B 正确。" },
+  { topic:"万能模板", q:"关于虚构项目的合理性（问题5），下列说法正确的是？",
+    options:["A 项目时间越久远越好","B 名称可写真实公司名以显真实","C 时间3-5年内、级别省市级/集团级、名称写某地级市/某医院、金额与团队规模匹配","D 项目级别越低越好"],
+    answer:2, explain:"<b>解析：</b>合理性=时间离考试3-5年内且已完成、级别省市级/集团级（勿县级）、名称只写某地级市/某医院/某公司、金额与人数时间匹配（如20人×15月≈600万）。C 正确。" },
+  { topic:"万能模板", q:"结尾在论文中的双重作用是什么？",
+    options:["A 只总结项目收获","B 总结收获 + 作为整体补救论文的最后一步（字数不够多写、字数多了少写）","C 只写项目不足","D 重复摘要内容"],
+    answer:1, explain:"<b>解析：</b>结尾=总结项目收获和不足 + <b>整体补救论文的最后一步</b>——字数不够就多写，字数多了就少写，前面写得差结尾就要重视。B 正确。" }
+];
+</script>
+<script>
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

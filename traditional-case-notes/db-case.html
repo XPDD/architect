@@ -116,9 +116,21 @@
           <tr><td><span class="note-highlight">4NF</span></td><td>在 3NF 上，一个主键<strong>只对应一个多值</strong>（如学生-住址-电话的多值依赖需拆表）</td></tr>
         </tbody>
       </table>
+      <div class="note-section"><p><span class="note-highlight">独立多值依赖为何违反 4NF</span>（学生信息表（学生ID，住址，电话号码））：</p>
+      <ul>
+        <li>判断链：主键是单字段「学生ID」→ 无部分依赖，满足 2NF；住址/电话互不决定 → 无传递依赖，满足 3NF 甚至 BCNF；但「学生ID →→ 住址」和「学生ID →→ 电话」是<strong>两条独立的非平凡多值依赖</strong> → 不满足 4NF。</li>
+        <li>危害：<span class="hl-orange">笛卡尔积冗余</span>——一个学生 2 个住址 × 3 个电话，表里就要存 2×3=6 行（全排列），浪费空间且易产生更新异常。</li>
+        <li>解法：<span class="hl-green">拆成两张表</span> (学生ID, 住址) 和 (学生ID, 电话号码)，各自独立多值互不干扰。</li>
+      </ul>
+      <p><strong>口诀</strong>：遇到「两个属性各自独立地一对多还塞同一张表」→ 不满足 <strong>4NF</strong>，拆表解决。</p></div>
 
       <div class="numbered-header"><span class="num">2</span>并发控制 + 封锁协议</div>
       <div class="note-section"><p><span class="note-highlight">并发三大问题</span>：<strong>丢失更新</strong>（两个事务改同一数据互相覆盖）、<strong>不可重复读</strong>（一事务重复读两次数据有误）、<strong>读脏数据</strong>（读到另一事务已修改但随后回滚的数据）。</p>
+      <ul>
+        <li><span class="hl-orange">读脏数据</span>：读到<span class="hl-orange">未提交、可能回滚</span>的假数据。例：A 读余额 1000 → B 改 800（未提交）→ A 再读=800（脏）→ B 回滚余额回 1000，A 用 800 决策全错。</li>
+        <li><span class="hl-purple">不可重复读</span>：同一事务两次读同一行<span class="hl-purple">结果不一致</span>（被别人已提交事务改掉）。例：事务 A 第一次读余额 1000 → B 提交改 500 → A 第二次读=500。</li>
+        <li><strong>区别一句话</strong>：脏读是"读到别人<strong>没提交会回滚</strong>的假数据"，不可重复读是"读到别人<strong>已提交</strong>的真数据但两次读不一致"。两者都防 → <strong>三级封锁协议</strong>（S 锁全程持有）。</li>
+      </ul></div>
       <ul>
         <li><span class="hl-purple">X 锁（排它锁/写锁）</span>：加 X 锁后只允许本事务读改，其他事务不能加任何锁。</li>
         <li><span class="hl-green">S 锁（共享锁/读锁）</span>：加 S 锁后其他事务只能再加 S 锁（可读）不能加 X 锁（不能改）。</li>
@@ -131,6 +143,11 @@
           <tr><td><span class="hl-green">三级</span></td><td>一级 + 读前加 S 锁、事务结束才释放；解决<strong>丢失更新、读脏数据、不可重复读</strong></td></tr>
         </tbody>
       </table>
+      <div class="note-section"><p><span class="note-highlight">封锁协议定义</span>：对数据加锁时遵守的一组规则，规定<strong>何时加 S 锁/X 锁、锁持有多久才释放</strong>，靠它保证并发事务调度正确（等价于串行）。</p>
+      <ul>
+        <li><span class="hl-orange">为什么三级能全解决</span>：写前拿 X 锁且持有到事务结束 → 防<strong>丢失更新</strong>（第二个事务等锁释放）；读前加 S 锁 → 读不到被 X 锁保护的数据 → 防<strong>读脏数据</strong>；S 锁<strong>持有到事务结束</strong>才释放 → 事务内数据不被改 → 防<strong>不可重复读</strong>（二级"读完即放"就防不住这个）。</li>
+        <li><strong>口诀</strong>：一级锁到提交（防丢更）→ 二级读完即放（再防脏读）→ 三级持锁到底（全防住）。</li>
+      </ul></div>
 
       <div class="numbered-header"><span class="num">3</span>主从数据库 + 读写分离</div>
       <div class="note-section"><p><span class="note-highlight">主从数据库架构</span>：一个主服务器复制数据到一个/多个从服务器，写操作（INSERT/UPDATE/DELETE）在主服务器执行后同步到从服务器。特点：<strong>数据冗余和读取负载均衡、高可用性、备份恢复</strong>。</p>

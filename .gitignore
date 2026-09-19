@@ -1,6 +1,8 @@
 *
 !*.html
 !*/
+!essays/*.md
+!essays/*.txt
 .*
 !README.md
 !.gitignore

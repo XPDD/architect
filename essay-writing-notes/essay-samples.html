@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 七篇范文鉴赏</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-surface: #161c28; --bg-elevated: #1a2030; --bg-cue: #0d1320;
+    --border-default: rgba(255,255,255,.06); --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --cyan-glow: rgba(0,212,255,.25); --blue: #4d7cff; --blue-glow: rgba(77,124,255,.3); --purple: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+  .page { max-width: 960px; margin: 36px auto; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 0 0 1px rgba(0,212,255,.04), 0 4px 32px rgba(0,0,0,.4), 0 24px 80px rgba(0,0,0,.3); position: relative; }
+  .page::before { content: ''; position: absolute; inset: -1px; border-radius: var(--radius-lg); padding: 1px; background: linear-gradient(135deg, rgba(0,212,255,.15), transparent 30%, transparent 70%, rgba(77,124,255,.1)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 0; }
+  .header { background: linear-gradient(180deg, rgba(0,212,255,.04) 0%, transparent 100%), var(--bg-elevated); padding: 30px 44px 26px; position: relative; border-bottom: 1px solid var(--border-default); z-index: 1; }
+  .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent); }
+  .header-top { display: flex; align-items: flex-start; gap: 16px; } .header-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .header-badge { width: 36px; height: 36px; background: linear-gradient(135deg, rgba(0,212,255,.15), rgba(77,124,255,.1)); border: 1px solid rgba(0,212,255,.2); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .header-badge::after { content: ''; position: absolute; inset: 2px; border-radius: 4px; border: 1px solid rgba(0,212,255,.1); }
+  .header-badge-icon { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); position: relative; z-index: 1; }
+  .header-title-group { flex: 1; } .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; line-height: 1.3; }
+  .header-meta { display: flex; gap: 20px; margin-top: 14px; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: .04em; }
+  .header-meta .meta-item { display: flex; align-items: center; gap: 8px; } .header-meta .meta-dot { width: 5px; height: 5px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 6px var(--cyan-glow); }
+
+  .cornell { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto auto; grid-template-areas: "cue notes" "summary summary"; gap: 0; position: relative; z-index: 1; }
+  .cornell-cue { grid-area: cue; background: linear-gradient(180deg, rgba(0,212,255,.02), transparent 80%), var(--bg-cue); padding: 24px 18px; border-right: 1px solid rgba(0,212,255,.06); }
+  .cue-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,212,255,.08); }
+  .cue-item { font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.55; padding: 9px 10px; margin-bottom: 6px; border-radius: var(--radius); background: rgba(255,255,255,.02); border: 1px solid transparent; font-weight: 500; }
+  .cue-item .q-mark { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: rgba(0,212,255,.1); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-family: var(--font-mono); font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+
+  .cornell-notes { grid-area: notes; padding: 24px 32px 20px; }
+  .notes-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--blue); letter-spacing: .18em; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(77,124,255,.08); }
+
+  .numbered-header { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 8px; }
+  .numbered-header .num { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: 700; border-radius: 4px; box-shadow: 0 0 12px var(--cyan-glow); }
+
+  .note-section { margin-bottom: 10px; }
+  .note-section h4 { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .note-section h4 .dot { width: 6px; height: 6px; border-radius: 1px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan-glow); flex-shrink: 0; }
+  .note-section > p { font-size: 12.5px; color: rgba(255,255,255,.78); line-height: 1.7; }
+  .note-section ul { list-style: none; padding-left: 0; }
+  .note-section ul li { font-size: 12.5px; padding: 1px 0 1px 20px; position: relative; color: rgba(255,255,255,.75); line-height: 1.65; }
+  .note-section ul li::before { content: ''; position: absolute; left: 6px; top: 8px; width: 4px; height: 4px; border-radius: 50%; background: rgba(0,212,255,.4); }
+  .note-highlight { display: inline; background: linear-gradient(180deg, transparent 58%, rgba(0,212,255,.12) 58%); padding: 0 2px; font-weight: 600; color: var(--cyan); }
+
+  .feynman { margin-top: 16px; padding: 16px 18px; background: linear-gradient(135deg, rgba(52,211,153,.04), rgba(52,211,153,.01)); border-radius: var(--radius); border: 1px solid rgba(52,211,153,.1); border-left: 2px solid var(--green); position: relative; }
+  .feynman::before { content: '\2726'; position: absolute; right: 14px; top: 12px; font-size: 14px; color: var(--green); opacity: .5; }
+  .feynman-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--green); letter-spacing: .14em; margin-bottom: 6px; }
+  .feynman p { font-size: 12.5px; color: rgba(255,255,255,.7); line-height: 1.75; }
+  .feynman p strong { color: var(--green); }
+
+  .diagram { margin-top: 16px; padding: 16px 18px; background: rgba(255,255,255,.01); border-radius: var(--radius); border: 1px solid rgba(255,255,255,.04); overflow-x: auto; }
+  .diagram-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--purple); letter-spacing: .14em; margin-bottom: 12px; }
+
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 5px 0; }
+  .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 8px 11px; font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,.7); text-align: center; white-space: nowrap; }
+  .flow-box.accent { border-color: rgba(0,212,255,.2); background: rgba(0,212,255,.06); color: var(--cyan); font-weight: 700; box-shadow: 0 0 16px rgba(0,212,255,.08), inset 0 1px 0 rgba(255,255,255,.03); }
+  .flow-box.primary { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.08); color: var(--blue); font-weight: 700; }
+  .flow-box.warn { border-color: rgba(251,191,36,.25); background: rgba(251,191,36,.06); color: var(--amber); font-weight: 600; }
+  .flow-box.green { border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.06); color: var(--green); font-weight: 600; }
+  .flow-box.rose { border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); color: var(--rose); font-weight: 600; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 24px; color: rgba(255,255,255,.15); font-size: 14px; flex-shrink: 0; }
+  .flow-v-arrow { display: flex; justify-content: center; color: rgba(255,255,255,.15); font-size: 14px; line-height: 1; margin: 3px 0; }
+
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+  .compare-table thead th { background: rgba(255,255,255,.03); color: var(--text-secondary); font-weight: 600; text-align: left; padding: 8px 10px; font-size: 10px; font-family: var(--font-mono); letter-spacing: .06em; border-bottom: 1px solid rgba(0,212,255,.1); }
+  .compare-table thead th:first-child { border-radius: var(--radius) 0 0 0; } .compare-table thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+  .compare-table tbody td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.03); color: rgba(255,255,255,.75); font-size: 12px; line-height: 1.55; }
+  .compare-table tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius); } .compare-table tbody tr:last-child td:last-child { border-radius: 0 0 var(--radius) 0; }
+  .compare-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.01); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
+  .card { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 10px 12px; }
+  .card-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 4px; background: rgba(77,124,255,.15); border: 1px solid rgba(77,124,255,.25); color: var(--blue); font-family: var(--font-mono); font-size: 10px; font-weight: 700; margin-bottom: 4px; }
+  .card-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .card-list { list-style: none; } .card-list li { font-size: 11px; color: rgba(255,255,255,.65); line-height: 1.6; padding-left: 10px; position: relative; }
+  .card-list li::before { content: '\203A'; position: absolute; left: 0; color: var(--cyan); }
+
+  .hl-orange { color: var(--amber); background: linear-gradient(180deg, transparent 58%, rgba(251,191,36,.15) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-green { color: var(--green); background: linear-gradient(180deg, transparent 58%, rgba(52,211,153,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-purple { color: var(--purple); background: linear-gradient(180deg, transparent 58%, rgba(167,139,250,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-red { color: var(--rose); background: linear-gradient(180deg, transparent 58%, rgba(248,113,113,.12) 58%); padding: 0 2px; font-weight: 600; }
+
+  .cornell-summary { grid-area: summary; padding: 18px 44px 22px; background: linear-gradient(180deg, rgba(255,255,255,.01) 0%, transparent 100%); border-top: 1px solid rgba(255,255,255,.04); position: relative; }
+  .cornell-summary::before { content: ''; position: absolute; top: 0; left: 44px; right: 44px; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,.12), var(--cyan), transparent); }
+  .cornell-summary h3 { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 8px; }
+  .cornell-summary .summary-text { font-size: 13.5px; font-weight: 600; color: var(--text-primary); line-height: 1.65; letter-spacing: .01em; padding-left: 14px; border-left: 2px solid var(--cyan); box-shadow: -4px 0 12px rgba(0,212,255,.06); }
+  .cornell-summary .summary-text strong { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+  .cornell-summary .summary-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { font-size: 10px; padding: 3px 10px; border-radius: 3px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); color: var(--text-secondary); font-weight: 500; font-family: var(--font-mono); letter-spacing: .03em; }
+  .tag.primary { background: rgba(0,212,255,.08); border-color: rgba(0,212,255,.15); color: var(--cyan); font-weight: 600; }
+
+  @media (max-width: 768px) {
+    .page { max-width: 100%; margin: 0; border-radius: 0; border: none; box-shadow: none; } .page::before { display: none; }
+    .header { padding: 20px 16px 16px; } .header-top { flex-direction: column; gap: 12px; } .header-title { font-size: 17px; }
+    .cornell { grid-template-columns: 1fr; grid-template-areas: "cue" "notes" "summary"; }
+    .cornell-cue { border-right: none; border-bottom: 1px solid rgba(0,212,255,.06); padding: 16px; }
+    .cornell-notes { padding: 16px; } .cornell-summary { padding: 16px; } .cornell-summary::before { left: 16px; right: 16px; }
+    .card-grid { grid-template-columns: 1fr; } .flow-arrow { width: 14px; }
+    .compare-table { font-size: 10px; display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="header-badge"><span class="header-badge-icon">范</span></div>
+      </div>
+      <div class="header-title-group">
+        <div class="header-kicker">康奈尔分析 / 范文鉴赏</div>
+        <div class="header-title">七篇范文鉴赏 — 层次架构 → 云原生</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-dot"></span>2026-09-16</div>
+      <div class="meta-item"><span class="meta-dot"></span>架构直播9：论文-下 P8-P35 精华</div>
+      <div class="meta-item"><span class="meta-dot"></span>7 篇范文 · 写法得失</div>
+    </div>
+  </div>
+
+  <div class="cornell">
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span> 范文1（层次架构）：三层C/S 各层怎么选型？两大难点如何解决？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 范文2（SOA）：三角色是什么？它结尾写法的错误？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 范文3（UML建模）：用了哪四种图？类图怎么才能写得好？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 范文4（架构风格）：三种风格如何对应三层？为什么被评"写得最好"？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 范文5（架构评估）：质量属性/评估方法/ATAM四阶段是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 范文6（微服务）：拆分/治理/熔断怎么写？结尾缺陷？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 范文7（云原生）：三大服务怎么分？最大败笔是什么？</div>
+    </div>
+
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <!-- ===== 范文1 ===== -->
+      <div class="numbered-header"><span class="num">1</span>范文1：论层次架构（银行远期结售汇 · 三层C/S）</div>
+      <div class="note-section">
+        <p><strong>项目：</strong>2019年1月主持远期结售汇系统，综合业务系统子系统。选 <span class="note-highlight">三层C/S结构</span>：字符终端（表示层）→ CICS TRANSACTION SERVER（中间层）→ DB2 UDB7.1（数据层）。</p>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">✓</div>
+          <div class="card-title"><span class="hl-green">三层选型理由</span></div>
+          <ul class="card-list">
+            <li>表示层：字符终端 CITE（VB开发）——比 IBM 图形终端响应更快</li>
+            <li>中间层：IBM CTS——兼容原大型机体系、保护投资、缩短开发周期</li>
+            <li>数据层：DB2 UDB7.1——大型事务处理出色、延续技术连续性</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">✓</div>
+          <div class="card-title"><span class="hl-green">两大难点解决</span></div>
+          <ul class="card-list">
+            <li>CICS SWITCH 组：一组相同 CTS 消除单点故障 + 数据库连接池提速</li>
+            <li>并行批量：OPC 统一提交 + DB2 PARTITION 分片并行，支持断点重提</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-section">
+        <h4><span class="dot"></span>结尾：总结不足 + 改进（范例写法）</h4>
+        <ul>
+          <li>不足1：负载均衡算法过于简单 → 改为<strong>基于统计的概率分配</strong></li>
+          <li>不足2：并行批量设计不严谨致资源冲突 → 调整作业顺序 / DB2 共享锁 / 制定作业提交规范</li>
+          <li><span class="hl-green">评价：结构完整、技术细节扎实，是"问题→方案→结果"的典范</span></li>
+        </ul>
+      </div>
+
+      <!-- ===== 范文2 ===== -->
+      <div class="numbered-header"><span class="num">2</span>范文2：论面向服务架构（水利大坝施工质量监控 · SOA）</div>
+      <div class="note-section">
+        <p><strong>项目：</strong>2016年8月参与胶凝砂砾石坝施工质量监控系统，担任系统分析师。功能：采料/运料/拌合/碾压/温湿度监控。采用 <span class="note-highlight">SOA 企业应用集成</span>。</p>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box primary">服务提供者<br><small>设计/描述/发布服务</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box accent">服务注册中心<br><small>UDDI 发布 · 独立性与松耦合</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box green">服务请求者<br><small>Web Service 调用</small></div>
+      </div>
+      <div class="note-section">
+        <h4><span class="dot"></span>写法亮点 + 失误</h4>
+        <ul>
+          <li><span class="hl-green">亮点</span>：拆出两个核心服务——标准拌合对比服务（预留标准拌合比输入接口）、碾压轨迹生成服务（预留 GPS/超宽带两种数据格式接口）</li>
+          <li><span class="hl-green">亮点</span>：服务数量少（粗粒度）、减少服务间通信，WSDL 描述 + UDDI 发布</li>
+          <li><span class="hl-red">失误</span>：正文只写业务+SOA概念，技术点太少——"尽量把技术加上去，更容易得分"</li>
+          <li><span class="hl-red">失误</span>：结尾用大段介绍 SOA 优势替代"项目效果+不足"，且优势未结合项目——<strong>不推荐</strong></li>
+        </ul>
+      </div>
+
+      <!-- ===== 范文3 ===== -->
+      <div class="numbered-header"><span class="num">3</span>范文3：论面向对象建模（数据安全访问平台 · UML）</div>
+      <div class="note-section">
+        <p><strong>项目：</strong>2018年"数据安全访问平台"，数据中心二期。目标：建立统一数据访问接口、规范并强制审计数据库访问行为。采用 <span class="note-highlight">精简 RUP + UML + Rational Rose</span>。</p>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">①</div>
+          <div class="card-title">四种图的应用</div>
+          <ul class="card-list">
+            <li>用例图：描述用户与系统交互；55个用例，仅5个关键高风险用例细化（前置/后置条件、基本流、扩展流）</li>
+            <li>类图：描述核心概念（逻辑连接、用户、受限角色、认证SQL等）</li>
+            <li>部署图：描述网络部署；监控子系统需接入核心交换机镜像端口</li>
+            <li>活动图：描述应用流程；泳道表达应用开发方与信息中心交互</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">✗</div>
+          <div class="card-title"><span class="hl-red">讲师指出的不足</span></div>
+          <ul class="card-list">
+            <li>部署图/活动图应分开写，内容少可直接去掉</li>
+            <li>类图写太少、只在摆概念——应按"定义概念类→识别类关系→添加职责"结合项目写</li>
+            <li>类图对应关系写错了</li>
+            <li>Word 文档与模型靠截图手工维护一致性，繁琐易错（应引入 Soda 工具）</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ===== 范文4 ===== -->
+      <div class="numbered-header"><span class="num">4</span>范文4：论软件系统架构风格（公交车联网一体化）★最好的一篇</div>
+      <div class="note-section">
+        <p><strong>项目：</strong>2016年浙江某市公交"车联网一体化"，担任架构师。底层 CAN 数据协议达 86 种，4人架构小组，7个月完成。</p>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">①</div>
+          <div class="card-title">底层 · 虚拟机风格·解释器</div>
+          <ul class="card-list">
+            <li>解决 86 种 CAN 协议兼容：XML 映射"协议链-数据帧-数据字节-数据位"4层结构</li>
+            <li>jdom + Java反射动态生成对象，基于可变模板的解释器，模板可热部署</li>
+            <li>协议变更只改模板文件，86 个描述文件搞定全部协议</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">②</div>
+          <div class="card-title">中间层 · 独立构件·隐式调用</div>
+          <ul class="card-list">
+            <li>ActiveMQ 消息发布/订阅，解耦各 Web 应用（调度/机护/电池监控）</li>
+            <li>Spring 配置化管理队列，主题可随时增改、监听组合灵活</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-section">
+        <h4><span class="dot"></span>应用层 · B/S 风格 + 讲师的"范文级"评价</h4>
+        <ul>
+          <li>B/S 解决公交行业"推广难、维护难"：子公司遍布全市、内网+APN专网，C/S 更新要跑全城；用 HTML5+前端缓存+WebSocket 补交互</li>
+          <li><span class="hl-green">评价：正文写得很好</span>——正好3段、每段先一句话介绍风格特点再结合项目问题讲解</li>
+          <li><span class="hl-green">评价：每段都加入具体技术点和设计实现过程，结尾有上线效果+客户评价+不足及改进（新购PC、服务器冗余+心跳）</span></li>
+        </ul>
+      </div>
+
+      <!-- ===== 范文5 ===== -->
+      <div class="numbered-header"><span class="num">5</span>范文5：论软件系统架构评估（漏洞挖掘系统 · ATAM）</div>
+      <div class="note-section">
+        <p><strong>项目：</strong>2016年国家某安全中心漏洞挖掘系统，担任系统架构设计师 + 评估小组负责人。架构采用 SOA，评估采用 <span class="note-highlight">基于场景的 ATAM</span>。</p>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">①</div>
+          <div class="card-title">质量属性（前4为核心）</div>
+          <ul class="card-list">
+            <li>性能：系统响应能力（响应时间）</li>
+            <li>可用性：正常运行比例（故障间隔/恢复速度）</li>
+            <li>可修改性：以较高性价比变更系统的能力</li>
+            <li>安全性：向合法用户服务、拒绝非授权</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">②</div>
+          <div class="card-title">评估方法选型</div>
+          <ul class="card-list">
+            <li>问卷调查：主观，不适合</li>
+            <li>度量：客观但需对架构精确了解，不适合</li>
+            <li>基于场景：对系统中等了解即可 → 选用；分 ATAM / SAAM / CBAM</li>
+          </ul>
+        </div>
+      </div>
+      <div class="flow-row">
+        <div class="flow-box primary">描述介绍<br><small>介绍ATAM+商业动机+架构</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box accent">调查分析<br><small>收集场景·质量效应树</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box green">测试<br><small>定优先级·双机热备/集群</small></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box warn">报告<br><small>风险点/敏感点/权衡点文档</small></div>
+      </div>
+      <div class="note-section">
+        <h4><span class="dot"></span>ATAM 输出 + 点评</h4>
+        <ul>
+          <li>风险点：IP 不能实时捕获丢漏洞信息；消息处理超12小时积压</li>
+          <li>敏感点：加密级别、漏洞规则修改；权衡点：规则严格度↔准确率/性能、加密↔安全/性能</li>
+          <li>测试阶段优先级：可用性最高 > 性能 > 可修改性/安全性；双机热备、集群部署、RAID5、非对称加密+信息摘要</li>
+          <li><span class="hl-green">评价：评估方法选型→四阶段结合项目描述，全程无误；结尾有上线效果+客户评价，字数够可不写不足</span></li>
+        </ul>
+      </div>
+
+      <!-- ===== 范文6 ===== -->
+      <div class="numbered-header"><span class="num">6</span>范文6：论微服务架构及其应用（在线问诊互联网医院）</div>
+      <div class="note-section">
+        <p><strong>项目：</strong>2019年3月"在线问诊互联网医院平台"，担任架构师。核心功能：用户信息、病历、推荐处方、药品配送。旧单体已无法适应快速扩张 → <span class="note-highlight">微服务改造</span>。</p>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">①</div>
+          <div class="card-title">微服务拆分（职责单一）</div>
+          <ul class="card-list">
+            <li>边界明确、不重复开发；每个服务独立数据库</li>
+            <li>基础服务层：网关/认证/权限/用户/IM/支付</li>
+            <li>业务服务层：诊疗/订单/处方/病历；工具服务层：定时/文件/日志/分布式事务</li>
+            <li>认证与用户分离：认证宕机不影响用户服务，容错更高</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">②</div>
+          <div class="card-title">治理 + 限流熔断</div>
+          <ul class="card-list">
+            <li>治理：Nacos 注册中心（服务名查 IP/端口、30秒心跳、异常剔除）+ 配置中心（动态配置免发版）</li>
+            <li>限流熔断：Hystrix 断路器，节点故障返回备选响应，防雪崩</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-section">
+        <h4><span class="dot"></span>结尾</h4>
+        <ul>
+          <li><span class="hl-green">亮点</span>：上线效果量化（4W+医生注册、百万患者、按服务发版、水平扩容）</li>
+          <li><span class="hl-red">不足</span>：没展开"不足和解决措施"，只写了微服务带来的好处——"还是没有写不足之处和解决措施好"</li>
+        </ul>
+      </div>
+
+      <!-- ===== 范文7 ===== -->
+      <div class="numbered-header"><span class="num">7</span>范文7：论云原生架构及其应用（OJ 程序在线评测系统）</div>
+      <div class="note-section">
+        <p><strong>项目：</strong>2019年《程序在线评测比赛考试系统》(OJ)，联合高校研发。核心：代码在线提交自动评测。担任架构师，采用 <span class="note-highlight">Spring Cloud + Docker 云原生</span>。</p>
+      </div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">①</div>
+          <div class="card-title">前端 Web 服务</div>
+          <ul class="card-list">
+            <li>前置 Nginx 负载均衡（最小连接法）+ 前端网站 Nginx 集群</li>
+            <li>反向代理路由模式，内外网逻辑隔离</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">②</div>
+          <div class="card-title">平台保障服务</div>
+          <ul class="card-list">
+            <li>API 路由网关 + Eureka 服务注册中心（三大角色）+ 监控平台</li>
+            <li>两两互相注册，网关多实例注册，保障高可靠</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-section">
+        <h4><span class="dot"></span>业务服务 + 场景问题（加分项）</h4>
+        <ul>
+          <li>业务服务：题库/评测机/考试/比赛/抄袭判定，Docker 容器打包，多实例集群（评测机/抄袭判定压力大）</li>
+          <li>场景1 跨域：前后端分离 Ajax 受限 → Spring Boot CORS 解决</li>
+          <li>场景2 评测机宕机：大量不安全代码致全部宕机 → 心跳+快照回滚+机器学习预判断，10秒自动重置</li>
+          <li><span class="hl-red">最大败笔：整个过程几乎没写"云原生架构"的内容，也没突出用云原生后的好处</span></li>
+          <li><span class="hl-red">第一个问题（跨域）太低级，不该是架构师考虑的问题；结尾记得呼应题目点题</span></li>
+        </ul>
+      </div>
+
+      <div class="feynman">
+        <div class="feynman-label">&#x25C6; 费曼</div>
+        <p><strong>七篇范文就是七套"答题模板"。</strong> 记住三条铁律：① <strong>每段都要"先一句话介绍概念/风格特点，再结合项目讲问题→方案→技术→结果"</strong>（范文4 是最佳示范）；② <strong>正文技术点要给足、给具体</strong>（范文2 吃了只写概念的亏）；③ <strong>结尾三件套：量化上线效果 + 客户评价 + 不足解决思路</strong>（范文6 缺不足被点名）。再记住两个反面教材：范文7 最大的坑是"通篇没讲题目的'云原生'"，说明论文必须<strong>紧扣题眼</strong>；范文2 的教训是结尾别写成"概念宣讲会"，要回到自己项目。</p>
+      </div>
+
+      <div class="diagram">
+        <div class="diagram-label">&#x25C6; 逻辑关系 — 七篇范文 → 可复用的写作套路</div>
+        <div style="text-align:center;">
+          <div class="flow-row">
+            <div class="flow-box accent">范文1 层次C/S</div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box primary">范文2 SOA</div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box green">范文3 UML</div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box warn">范文4 风格</div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box rose">范文5 评估</div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box primary">范文6 微服务</div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box green">范文7 云原生</div>
+          </div>
+          <div class="flow-v-arrow">&#x2193; 提炼通用套路</div>
+          <div class="flow-row">
+            <div class="flow-box">概念一句话</div><div class="flow-arrow">→</div>
+            <div class="flow-box">项目问题</div><div class="flow-arrow">→</div>
+            <div class="flow-box accent">方案+取舍</div><div class="flow-arrow">→</div>
+            <div class="flow-box">具体技术</div><div class="flow-arrow">→</div>
+            <div class="flow-box warn">量化结果</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">七篇范文 = 七套架构论文模板：<strong>层次C/S</strong>（三层选型+并行批量/CICS集群）、<strong>SOA</strong>（提供者-注册中心-请求者，正文要多写技术）、<strong>UML</strong>（用例/类/部署/活动图，类图要"定义概念类→识别关系→添加职责"）、<strong>架构风格</strong>（解释器/隐式调用/B/S 三层对应，范文级示范）、<strong>架构评估</strong>（质量属性+方法选型+ATAM四阶段）、<strong>微服务</strong>（职责单一拆分+Nacos治理+Hystrix熔断）、<strong>云原生</strong>（Nginx集群+Eureka+Docker容器，切忌脱离题眼）。通用套路=<strong>概念一句话→项目问题→方案取舍→具体技术→量化结果</strong>。</div>
+      <div class="summary-tags">
+        <span class="tag primary">范文鉴赏</span>
+        <span class="tag">层次架构</span>
+        <span class="tag">SOA</span>
+        <span class="tag">UML</span>
+        <span class="tag">架构风格</span>
+        <span class="tag">ATAM</span>
+        <span class="tag">微服务</span>
+        <span class="tag">云原生</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

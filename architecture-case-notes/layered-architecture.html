@@ -146,6 +146,12 @@
           <tr><td><span class="note-highlight">O/R Mapping</span></td><td>对象/关系映射，在「对象」与「关系型数据库记录」之间相互转换</td></tr>
         </tbody>
       </table>
+      <div class="note-section"><p><span class="note-highlight">在线访问 vs 离线数据</span>：</p>
+      <ul>
+        <li><span class="hl-purple">在线访问</span>＝业务逻辑<strong>持续占用数据库连接</strong>，边操作边与库交互，连接直到事务结束才释放（连接占用久、对连接池压力大），如 pl/sql、navicat。</li>
+        <li><span class="hl-orange">离线数据模式</span>＝一次性取出数据 → 按预定义结构（DTO/本地对象）<strong>放到本地内存</strong> → 后续操作<strong>与后台连接/事务完全无关</strong> → 最后批量写回。</li>
+        <li><strong>一句话记忆</strong>：在线访问＝一直连着库操作；离线数据＝先拷到本地再操作、最后批量回写。</li>
+      </ul></div>
 
       <div class="numbered-header"><span class="num">4</span>工厂模式 · 事务 · 连接池</div>
       <div class="note-section"><ul>

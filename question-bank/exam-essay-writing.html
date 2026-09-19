@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>架构论文写作 · 真题练习</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--green:#34d399;--rose:#f87171;--amber:#fbbf24;--purple:#a78bfa;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.04)0%,transparent 50%);min-height:100vh;line-height:1.6;padding:32px 16px}
+  .wrap{max-width:720px;margin:0 auto}
+  .topbar{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+  .brand{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--cyan);letter-spacing:.04em;display:flex;align-items:center;gap:8px}
+  .brand .dot{width:8px;height:8px;border-radius:50%;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+  .score{margin-left:auto;font-family:var(--mono);font-size:14px;color:var(--text2)}
+  .score b{color:var(--green);font-size:18px}
+  .progress{height:4px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden;margin-bottom:24px}
+  .progress .bar{height:100%;background:linear-gradient(90deg,var(--cyan),var(--blue));width:0;transition:width .35s ease}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 28px 24px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .q-meta{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+  .q-num{font-family:var(--mono);font-size:12px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--cyan),var(--blue));padding:3px 10px;border-radius:4px}
+  .q-topic{font-family:var(--mono);font-size:11px;color:var(--purple);padding:3px 10px;border:1px solid rgba(167,139,250,.3);border-radius:4px;background:rgba(167,139,250,.08)}
+  .q-text{font-size:16px;font-weight:600;line-height:1.7;margin-bottom:20px;color:var(--text);white-space:pre-line}
+  .options{display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;transition:border-color .15s,background .15s;font-size:14px;color:var(--text2)}
+  .opt:hover:not(.locked){border-color:rgba(0,212,255,.3);background:rgba(0,212,255,.04)}
+  .opt .key{font-family:var(--mono);font-weight:700;font-size:13px;color:var(--cyan);width:22px;flex-shrink:0}
+  .opt.locked{cursor:default}
+  .opt.correct{border-color:rgba(52,211,153,.5);background:rgba(52,211,153,.08);color:var(--text)} .opt.correct .key{color:var(--green)}
+  .opt.wrong{border-color:rgba(248,113,113,.5);background:rgba(248,113,113,.08);color:var(--text)} .opt.wrong .key{color:var(--rose)}
+  .opt.dim{opacity:.4}
+  .explain{display:none;margin-top:18px;padding:14px 16px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .explain b{color:var(--green)} .explain.show{display:block}
+  .actions{margin-top:22px;display:flex;justify-content:flex-end}
+  .btn{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan);border:1px solid rgba(0,212,255,.3);background:rgba(0,212,255,.06);padding:9px 20px;border-radius:var(--radius);cursor:pointer;transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.12)}
+  .btn.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;border:none;box-shadow:0 0 16px rgba(0,212,255,.25)} .btn:disabled{opacity:.3;cursor:not-allowed}
+  .result{text-align:center;padding:30px 0}
+  .result .big{font-family:var(--mono);font-size:64px;font-weight:800;color:var(--cyan);text-shadow:0 0 30px rgba(0,212,255,.3)}
+  .result .label{font-size:15px;color:var(--text2);margin:10px 0 4px} .result .msg{font-size:13px;color:var(--muted);margin-bottom:24px}
+  .stats{display:flex;gap:16px;justify-content:center;margin-bottom:26px}
+  .stat{padding:10px 22px;border:1px solid var(--border);border-radius:var(--radius);background:rgba(255,255,255,.02)}
+  .stat .v{font-family:var(--mono);font-size:22px;font-weight:700} .stat .k{font-size:11px;color:var(--muted)}
+  .stat.g .v{color:var(--green)} .stat.r .v{color:var(--rose)} .stat.a .v{color:var(--amber)}
+  @media(max-width:560px){.q-text{font-size:14.5px}.opt{font-size:13px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="dot"></span>架构论文写作 · 真题练习</div>
+    <div class="score">得分 <b id="score">0</b></div>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+  <div id="stage"></div>
+</div>
+
+<script>
+const QUESTIONS = [
+  { topic:"论文结构", q:"论文摘要需要包含的六要素（时项岗职投历）之外，最关键的一条是什么？",
+    options:["A 尽可能多的技术名词堆砌","B 结合具体题目说明本文结构","C 详细列出项目全部功能模块","D 预测未来技术发展趋势"],
+    answer:1, explain:"<b>解析：</b>摘要=时间+项目+岗位+职责+投入+历时+成功好评，最后一句必须<b>结合题目说明本文结构</b>（下面将从XX三方面论述），让阅卷官一目了然。B 正确；A 堆名词反而扣分，C 模块应放到子问题1，D 与论文无关。" },
+  { topic:"论文结构", q:"论文背景部分建议的字数范围是？其核心定位是什么？",
+    options:["A 100-200字，介绍题目概念","B 350-450字，只写项目、可适配任何题目","C 600-800字，详细展开技术方案","D 越短越好，一句话带过"],
+    answer:1, explain:"<b>解析：</b>背景建议 350-450 字，<b>只跟项目有关</b>，写清痛点→立项→目标→角色。价值在于<b>可适配任何论文题目</b>，考前背熟即可临场套用。B 正确；A 太短且跑题，C 与子问题3重复，D 没有铺垫作用。" },
+  { topic:"论文结构", q:"总分原则在论文写作中指的是什么？",
+    options:["A 摘要必须总结全部内容","B 总分总结构，开头结尾呼应","C 子问题2的解答方向作为子问题3的总论点","D 三个子问题都要先总后分"],
+    answer:2, explain:"<b>解析：</b>总分原则=若第三问没给定论点，<b>把第二问的解答方向作为第三问的论点</b>，让全文总论点→分论点闭环。C 正确；A/B 是常见误解，D 不是本原则含义。" },
+  { topic:"论文结构", q:"关于子问题3（一般分为3点分段回答）的写法，下列说法正确的是？",
+    options:["A 只需列出技术清单即可","B 每点：先解释论点→结合项目问题→方案取舍→技术→结果","C 可以把项目的不足写进去以体现客观","D 直接复述子问题2的内容"],
+    answer:1, explain:"<b>解析：</b>子问题3每点套路=先解释论点→记叙项目关联→项目之前的问题→做的方案→方案取舍→选哪个→涉及技术→结果如何。B 正确；A 光列技术无论证，C 不足要放到<b>结尾</b>写，D 与子2重复。" },
+  { topic:"论文结构", q:"关于论文结尾「不足和解决思路」的写法，下列策略正确的是？",
+    options:["A 无论字数多少都必须写","B 前面已写2000字以上，可以不写","C 只在字数不够时必须写不足来水字数","D 结尾只需要写项目收获，不需要写效果"],
+    answer:1, explain:"<b>解析：</b>结尾必写=上线效果（量化数据）+客户评价+项目收获；<b>不足和解决思路看字数</b>——前面已2000字可不写，字数不够则必须写，<b>水2、300字</b>。B 正确；A 不对（字数够可省），C 表述片面的必须，D 上线效果是必写项。" },
+  { topic:"论题预测", q:"关于2025年11月论文预测的「论题一：云原生微服务架构与服务治理」，讲师预测的核心逻辑是？",
+    options:["A 考过的内容不会再考","B 考题从宽泛概念转向具体技术点，微服务治理是自然延伸","C 只考最新的人工智能技术","D 服务网格已经考过，不会再考"],
+    answer:1, explain:"<b>解析：</b>云原生考题已从宽泛概念转向具体技术点——2025年5月考事件驱动（微服务通信）、11月考 Serverless（演进形态），<b>微服务本身及治理技术（服务网格、可观测性）是自然延伸</b>。B 正确；A 错（同类深化会再考），C 片面，D 服务网格尚未独立命题。" },
+  { topic:"论题预测", q:"预测「论题二：数据库架构与多模数据架构」中，向量数据库（Milvus/Weaviate/PGVector）的主要应用场景是？",
+    options:["A 传统交易账务处理","B 风控与社交关系分析","C RAG、推荐、相似度检索","D 核心ERP系统"],
+    answer:2, explain:"<b>解析：</b>向量数据库（Milvus/Weaviate/PGVector）应用在<b>RAG、推荐、相似度检索</b>；A/D 是云原生关系库（TiDB/OceanBase）场景；B 是图数据库（Neo4j/TuGraph）场景。" },
+  { topic:"论题预测", q:"预测「论题三：高并发系统性能优化」中，讲师梳理的五步优化链路（自前向后）正确的是？",
+    options:["A 容量保障→瓶颈分析→异步化→缓存→韧性","B 瓶颈分析→多级缓存→异步化→系统韧性→容量保障","C 缓存→限流→压测→扩容→监控","D 异步化→缓存→韧性→压测→监控"],
+    answer:1, explain:"<b>解析：</b>性能优化链路=①<b>瓶颈分析</b>（CPU/内存/IO/网络·火焰图·慢查询）→②<b>多级缓存</b>（本地→Redis→CDN）→③<b>异步化</b>（MQ削峰·最终一致·死信队列）→④<b>系统韧性</b>（Sentinel熔断·令牌桶/漏桶·舱壁）→⑤<b>容量保障</b>（全链路压测·弹性伸缩·混沌工程）。B 正确。" },
+  { topic:"论题预测", q:"预测「论题四：论AIGC技术对软件架构设计的影响与应用」的可能考察方向不包括？",
+    options:["A 利用AIGC辅助设计文档生成与技术方案评审","B 探讨AI编程助手对开发流程和架构模式的影响","C 设计基于大模型的智能编程或系统运维助手","D 用AIGC替代微服务架构设计"],
+    answer:3, explain:"<b>解析：</b>AIGC 考察方向=文档辅助生成、方案辅助评审、AI编程助手影响、大模型智能编程/运维助手。D 用AIGC替代架构设计是夸大说法，不属于考察方向。" },
+  { topic:"范文鉴赏", q:"范文1（银行远期结售汇·三层C/S）中，解决中间层单点故障的核心技术是？",
+    options:["A 数据库主从复制","B CICS SWITCH 组（一组相同的CTS）","C 微服务熔断","D 消息队列削峰"],
+    answer:1, explain:"<b>解析：</b>范文1用 <b>CICS SWITCH 组</b>——一组相同 CTS 共同作为中间层，消除单点故障、保障高可用，并配合简单负载均衡+连接池提速。B 正确；A 数据层技术，C/D 与三层C/S时代无关。" },
+  { topic:"范文鉴赏", q:"范文2（SOA·水利大坝质量监控）中，SOA 的三个核心角色是？",
+    options:["A 生产者、消费者、消息中间件","B 服务提供者、服务注册中心、服务请求者","C 网关、注册中心、配置中心","D 客户端、服务端、数据库"],
+    answer:1, explain:"<b>解析：</b>SOA 三角色=服务提供者（设计/描述/发布）、服务注册中心（UDDI、独立性与松耦合）、服务请求者（Web Service 调用）。B 正确；C 是微服务组件，A/D 概念混淆。" },
+  { topic:"范文鉴赏", q:"范文2 结尾写法的最大问题是什么？",
+    options:["A 没有写项目上线时间","B 用大段介绍SOA优势替代项目效果与不足，且优势未结合项目","C 字数太少","D 技术名词过多"],
+    answer:1, explain:"<b>解析：</b>范文2结尾以介绍 SOA 优势为主，<b>未结合项目</b>，且省略了项目效果与不足——讲师明确不推荐这样写。B 正确；结尾应回归项目、量化效果、写不足。" },
+  { topic:"范文鉴赏", q:"范文3（UML建模）中，关于「类图」的写法，讲师给出的改进建议是？",
+    options:["A 类图不需要写，直接删掉","B 只列出概念名称即可","C 按「定义概念类→识别类的关系→为类添加职责」结合项目书写","D 类图只能画图不能文字描述"],
+    answer:2, explain:"<b>解析：</b>范文3的类图写太少、在摆概念——应<b>定义概念类→识别类关系→添加职责</b>并结合项目讲解。C 正确；A 错误，B 正是原文缺陷，D 无此限制。" },
+  { topic:"范文鉴赏", q:"范文4（公交车联网一体化）被讲师评为「正文写得很不错」，其三大亮点之一是？",
+    options:["A 每段只写架构概念不写项目","B 每段先一句话介绍风格特点，再结合项目问题讲解，并加入具体技术点","C 用大量代码展示实现细节","D 把三个架构风格揉在一段写"],
+    answer:1, explain:"<b>解析：</b>范文4亮点=正文正好3段、每段<b>先一句话介绍风格特点→再结合项目问题综合讲解</b>，且每段都加入具体技术点和设计实现过程，结尾有效果+评价+不足及改进。B 正确；A/C/D 都是反面写法。" },
+  { topic:"范文鉴赏", q:"范文5（架构评估）中，ATAM 评估的四个阶段顺序是？",
+    options:["A 调查分析→描述介绍→测试→报告","B 描述和介绍→调查和分析→测试→报告","C 测试→描述→分析→总结","D 报告→测试→调查→描述"],
+    answer:1, explain:"<b>解析：</b>ATAM 四阶段=<b>描述和介绍→调查和分析→测试→报告</b>。B 正确；A/C/D 顺序错误。报告阶段产出风险点、敏感点、权衡点及评估文档。" },
+  { topic:"范文鉴赏", q:"范文5 中，系统架构评估主要关注的质量属性前四个是？",
+    options:["A 性能、可用性、可修改性、安全性","B 性能、可测试性、可靠性、易用性","C 可移植性、可维护性、性能、安全","D 可用性、可伸缩性、可扩展性、兼容性"],
+    answer:0, explain:"<b>解析：</b>质量效应树的核心四个质量属性=<b>性能、可用性、可修改性、安全性</b>（其余还有可测试性、可靠性、易用性等）。A 正确；B/D 混入其他属性。" },
+  { topic:"范文鉴赏", q:"范文6（微服务）中，服务拆分秉持的核心原则是？",
+    options:["A 按团队人数拆分","B 职责单一，边界明确，不重复开发相同业务","C 按数据库数量拆分","D 按访问频率拆分"],
+    answer:1, explain:"<b>解析：</b>范文6拆分原则=不同微服务<b>边界明确、不重复开发相同业务（职责单一）</b>，且每个服务有独立数据库。B 正确；A/C/D 都不是职责驱动拆分的依据。" },
+  { topic:"范文鉴赏", q:"范文6 中，防止「因某个服务异常导致雪崩效应」的技术是？",
+    options:["A Nacos 注册中心","B 负载均衡算法","C Netflix Hystrix 断路器","D Docker 容器化"],
+    answer:2, explain:"<b>解析：</b>范文6通过 <b>Netflix Hystrix 实现断路器模式</b>——服务故障时返回备选响应、不长时间等待，防止故障蔓延导致雪崩。C 正确；A 用于注册发现，B 用于选实例，D 是部署方式。" },
+  { topic:"范文鉴赏", q:"范文7（云原生OJ系统）被讲师指出的「最大败笔」是？",
+    options:["A 用了太多技术框架","B 几乎没写云原生架构的内容，也没有突出用云原生之后的好处","C 评测机宕机问题写得太多","D 结尾没有客户评价"],
+    answer:1, explain:"<b>解析：</b>范文7整个正文重点写 Nginx/Eureka/Docker 等技术实现，但<b>几乎没有涉及「云原生架构」本身，也没突出云原生带来的好处</b>——这是最大败笔。B 正确；A 不是问题，C/D 非主因。" },
+  { topic:"范文鉴赏", q:"范文7 中解决「评测机被大量不安全代码打挂」问题的措施，最不符合架构师身份的是？",
+    options:["A 心跳机制","B 快照回滚机制","C 机器学习预判断机制","D 让前端限制用户提交次数（讲师认为跨域问题「太低级」）"],
+    answer:3, explain:"<b>解析：</b>讲师批评范文7的第一个问题（跨域）太低级，不该由架构师考虑；本题以评测机宕机的三道措施（心跳/快照回滚/ML预判断）为对比，D 属于前端层面低级问题，最不符合架构师职责。A/B/C 均为架构层面韧性手段。" }
+];
+</script>
+<script>
+let idx = 0, score = 0, answered = false;
+const stage = document.getElementById('stage');
+const scoreEl = document.getElementById('score');
+const barEl = document.getElementById('bar');
+
+function render() {
+  const total = QUESTIONS.length;
+  if (idx >= total) return renderResult();
+  const q = QUESTIONS[idx];
+  barEl.style.width = ((idx) / total * 100) + '%';
+  answered = false;
+  const letters = ['A','B','C','D','E'];
+  let opts = q.options.map((o,i)=>`<div class="opt" data-i="${i}"><span class="key">${letters[i]}</span><span>${o}</span></div>`).join('');
+  stage.innerHTML = `
+    <div class="card">
+      <div class="q-meta"><span class="q-num">第 ${idx+1} / ${total} 题</span><span class="q-topic">${q.topic}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="options">${opts}</div>
+      <div class="explain" id="explain"><b>✓ 解析：</b>${q.explain}</div>
+      <div class="actions"><button class="btn primary" id="next" disabled>下一题</button></div>
+    </div>`;
+  document.querySelectorAll('.opt').forEach(opt=>{ opt.addEventListener('click', ()=>onAnswer(opt, q)); });
+  document.getElementById('next').addEventListener('click', ()=>{ idx++; render(); });
+}
+
+function onAnswer(el, q) {
+  if (answered) return;
+  answered = true;
+  const i = parseInt(el.dataset.i);
+  const opts = document.querySelectorAll('.opt');
+  opts.forEach((o,oIdx)=>{ o.classList.add('locked'); if (oIdx===q.answer) o.classList.add('correct'); else o.classList.add('dim'); });
+  if (i === q.answer) { score++; scoreEl.textContent = score; }
+  else { el.classList.remove('dim'); el.classList.add('wrong'); }
+  document.getElementById('explain').classList.add('show');
+  const next = document.getElementById('next');
+  next.disabled = false;
+  next.textContent = (idx + 1 === QUESTIONS.length) ? '查看结果' : '下一题';
+}
+
+function renderResult() {
+  barEl.style.width = '100%';
+  const total = QUESTIONS.length;
+  const pct = Math.round(score / total * 100);
+  let msg = pct >= 80 ? '掌握得很好！' : pct >= 60 ? '基本掌握，错题回顾对应笔记。' : '还需加强，重看笔记再练。';
+  stage.innerHTML = `
+    <div class="card result">
+      <div class="big">${pct}%</div>
+      <div class="label">练习完成 · 正确率 ${pct}%</div>
+      <div class="msg">${msg}</div>
+      <div class="stats">
+        <div class="stat g"><div class="v">${score}</div><div class="k">答对</div></div>
+        <div class="stat r"><div class="v">${total-score}</div><div class="k">答错</div></div>
+        <div class="stat a"><div class="v">${total}</div><div class="k">总题数</div></div>
+      </div>
+      <button class="btn primary" onclick="restart()">重新练习</button>
+    </div>`;
+}
+
+function restart(){ idx = 0; score = 0; scoreEl.textContent = '0'; render(); }
+
+(function(){
+  const h = decodeURIComponent(location.hash.replace('#',''));
+  if (!h) return;
+  let target = -1;
+  if (/^\d+$/.test(h)) { target = parseInt(h) - 1; }
+  else { for (let i=0;i<QUESTIONS.length;i++){ if (QUESTIONS[i].topic === h) { target = i; break; } } }
+  if (target >= 0 && target < QUESTIONS.length) idx = target;
+})();
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 2026年论文预测</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-surface: #161c28; --bg-elevated: #1a2030; --bg-cue: #0d1320;
+    --border-default: rgba(255,255,255,.06); --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --cyan-glow: rgba(0,212,255,.25); --blue: #4d7cff; --blue-glow: rgba(77,124,255,.3); --purple: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+  .page { max-width: 960px; margin: 36px auto; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 0 0 1px rgba(0,212,255,.04), 0 4px 32px rgba(0,0,0,.4), 0 24px 80px rgba(0,0,0,.3); position: relative; }
+  .page::before { content: ''; position: absolute; inset: -1px; border-radius: var(--radius-lg); padding: 1px; background: linear-gradient(135deg, rgba(0,212,255,.15), transparent 30%, transparent 70%, rgba(77,124,255,.1)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 0; }
+  .header { background: linear-gradient(180deg, rgba(0,212,255,.04) 0%, transparent 100%), var(--bg-elevated); padding: 30px 44px 26px; position: relative; border-bottom: 1px solid var(--border-default); z-index: 1; }
+  .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent); }
+  .header-top { display: flex; align-items: flex-start; gap: 16px; } .header-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .header-badge { width: 36px; height: 36px; background: linear-gradient(135deg, rgba(0,212,255,.15), rgba(77,124,255,.1)); border: 1px solid rgba(0,212,255,.2); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .header-badge::after { content: ''; position: absolute; inset: 2px; border-radius: 4px; border: 1px solid rgba(0,212,255,.1); }
+  .header-badge-icon { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); position: relative; z-index: 1; }
+  .header-title-group { flex: 1; } .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; line-height: 1.3; }
+  .header-meta { display: flex; gap: 20px; margin-top: 14px; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: .04em; }
+  .header-meta .meta-item { display: flex; align-items: center; gap: 8px; } .header-meta .meta-dot { width: 5px; height: 5px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 6px var(--cyan-glow); }
+
+  .cornell { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto auto; grid-template-areas: "cue notes" "summary summary"; gap: 0; position: relative; z-index: 1; }
+  .cornell-cue { grid-area: cue; background: linear-gradient(180deg, rgba(0,212,255,.02), transparent 80%), var(--bg-cue); padding: 24px 18px; border-right: 1px solid rgba(0,212,255,.06); }
+  .cue-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,212,255,.08); }
+  .cue-item { font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.55; padding: 9px 10px; margin-bottom: 6px; border-radius: var(--radius); background: rgba(255,255,255,.02); border: 1px solid transparent; font-weight: 500; }
+  .cue-item .q-mark { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: rgba(0,212,255,.1); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-family: var(--font-mono); font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+
+  .cornell-notes { grid-area: notes; padding: 24px 32px 20px; }
+  .notes-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--blue); letter-spacing: .18em; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(77,124,255,.08); }
+
+  .numbered-header { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 8px; }
+  .numbered-header .num { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: 700; border-radius: 4px; box-shadow: 0 0 12px var(--cyan-glow); }
+
+  .note-section { margin-bottom: 10px; }
+  .note-section h4 { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .note-section h4 .dot { width: 6px; height: 6px; border-radius: 1px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan-glow); flex-shrink: 0; }
+  .note-section > p { font-size: 12.5px; color: rgba(255,255,255,.78); line-height: 1.7; }
+  .note-section ul { list-style: none; padding-left: 0; }
+  .note-section ul li { font-size: 12.5px; padding: 1px 0 1px 20px; position: relative; color: rgba(255,255,255,.75); line-height: 1.65; }
+  .note-section ul li::before { content: ''; position: absolute; left: 6px; top: 8px; width: 4px; height: 4px; border-radius: 50%; background: rgba(0,212,255,.4); }
+  .note-highlight { display: inline; background: linear-gradient(180deg, transparent 58%, rgba(0,212,255,.12) 58%); padding: 0 2px; font-weight: 600; color: var(--cyan); }
+
+  .feynman { margin-top: 16px; padding: 16px 18px; background: linear-gradient(135deg, rgba(52,211,153,.04), rgba(52,211,153,.01)); border-radius: var(--radius); border: 1px solid rgba(52,211,153,.1); border-left: 2px solid var(--green); position: relative; }
+  .feynman::before { content: '\2726'; position: absolute; right: 14px; top: 12px; font-size: 14px; color: var(--green); opacity: .5; }
+  .feynman-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--green); letter-spacing: .14em; margin-bottom: 6px; }
+  .feynman p { font-size: 12.5px; color: rgba(255,255,255,.7); line-height: 1.75; }
+  .feynman p strong { color: var(--green); }
+
+  .diagram { margin-top: 16px; padding: 16px 18px; background: rgba(255,255,255,.01); border-radius: var(--radius); border: 1px solid rgba(255,255,255,.04); overflow-x: auto; }
+  .diagram-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--purple); letter-spacing: .14em; margin-bottom: 12px; }
+
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 5px 0; }
+  .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 8px 11px; font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,.7); text-align: center; white-space: nowrap; }
+  .flow-box.accent { border-color: rgba(0,212,255,.2); background: rgba(0,212,255,.06); color: var(--cyan); font-weight: 700; box-shadow: 0 0 16px rgba(0,212,255,.08), inset 0 1px 0 rgba(255,255,255,.03); }
+  .flow-box.primary { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.08); color: var(--blue); font-weight: 700; }
+  .flow-box.warn { border-color: rgba(251,191,36,.25); background: rgba(251,191,36,.06); color: var(--amber); font-weight: 600; }
+  .flow-box.green { border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.06); color: var(--green); font-weight: 600; }
+  .flow-box.rose { border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); color: var(--rose); font-weight: 600; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 24px; color: rgba(255,255,255,.15); font-size: 14px; flex-shrink: 0; }
+  .flow-v-arrow { display: flex; justify-content: center; color: rgba(255,255,255,.15); font-size: 14px; line-height: 1; margin: 3px 0; }
+
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+  .compare-table thead th { background: rgba(255,255,255,.03); color: var(--text-secondary); font-weight: 600; text-align: left; padding: 8px 10px; font-size: 10px; font-family: var(--font-mono); letter-spacing: .06em; border-bottom: 1px solid rgba(0,212,255,.1); }
+  .compare-table thead th:first-child { border-radius: var(--radius) 0 0 0; } .compare-table thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+  .compare-table tbody td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.03); color: rgba(255,255,255,.75); font-size: 12px; line-height: 1.55; }
+  .compare-table tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius); } .compare-table tbody tr:last-child td:last-child { border-radius: 0 0 var(--radius) 0; }
+  .compare-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.01); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
+  .card { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 10px 12px; }
+  .card-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 4px; background: rgba(77,124,255,.15); border: 1px solid rgba(77,124,255,.25); color: var(--blue); font-family: var(--font-mono); font-size: 10px; font-weight: 700; margin-bottom: 4px; }
+  .card-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .card-list { list-style: none; } .card-list li { font-size: 11px; color: rgba(255,255,255,.65); line-height: 1.6; padding-left: 10px; position: relative; }
+  .card-list li::before { content: '\203A'; position: absolute; left: 0; color: var(--cyan); }
+
+  .hl-orange { color: var(--amber); background: linear-gradient(180deg, transparent 58%, rgba(251,191,36,.15) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-green { color: var(--green); background: linear-gradient(180deg, transparent 58%, rgba(52,211,153,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-purple { color: var(--purple); background: linear-gradient(180deg, transparent 58%, rgba(167,139,250,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-red { color: var(--rose); background: linear-gradient(180deg, transparent 58%, rgba(248,113,113,.12) 58%); padding: 0 2px; font-weight: 600; }
+
+  .cornell-summary { grid-area: summary; padding: 18px 44px 22px; background: linear-gradient(180deg, rgba(255,255,255,.01) 0%, transparent 100%); border-top: 1px solid rgba(255,255,255,.04); position: relative; }
+  .cornell-summary::before { content: ''; position: absolute; top: 0; left: 44px; right: 44px; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,.12), var(--cyan), transparent); }
+  .cornell-summary h3 { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 8px; }
+  .cornell-summary .summary-text { font-size: 13.5px; font-weight: 600; color: var(--text-primary); line-height: 1.65; letter-spacing: .01em; padding-left: 14px; border-left: 2px solid var(--cyan); box-shadow: -4px 0 12px rgba(0,212,255,.06); }
+  .cornell-summary .summary-text strong { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+  .cornell-summary .summary-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { font-size: 10px; padding: 3px 10px; border-radius: 3px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); color: var(--text-secondary); font-weight: 500; font-family: var(--font-mono); letter-spacing: .03em; }
+  .tag.primary { background: rgba(0,212,255,.08); border-color: rgba(0,212,255,.15); color: var(--cyan); font-weight: 600; }
+
+  @media (max-width: 768px) {
+    .page { max-width: 100%; margin: 0; border-radius: 0; border: none; box-shadow: none; } .page::before { display: none; }
+    .header { padding: 20px 16px 16px; } .header-top { flex-direction: column; gap: 12px; } .header-title { font-size: 17px; }
+    .cornell { grid-template-columns: 1fr; grid-template-areas: "cue" "notes" "summary"; }
+    .cornell-cue { border-right: none; border-bottom: 1px solid rgba(0,212,255,.06); padding: 16px; }
+    .cornell-notes { padding: 16px; } .cornell-summary { padding: 16px; } .cornell-summary::before { left: 16px; right: 16px; }
+    .card-grid { grid-template-columns: 1fr; } .flow-arrow { width: 14px; }
+    .compare-table { font-size: 10px; display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="header-badge"><span class="header-badge-icon">26</span></div>
+      </div>
+      <div class="header-title-group">
+        <div class="header-kicker">康奈尔分析 / 2026 论文预测</div>
+        <div class="header-title">2026年上半年论文预测 — 官方三方向</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-dot"></span>2026-09-16</div>
+      <div class="meta-item"><span class="meta-dot"></span>《2026年上半年架构论文预测.pdf》原文</div>
+      <div class="meta-item"><span class="meta-dot"></span>架构 · 数据库 · AI 大模型</div>
+    </div>
+  </div>
+
+  <div class="cornell">
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span> 2026上半年预测的三大方向是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 架构方向具体有哪些论题？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 数据库方向有哪些？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 未来信息技术方向预测什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 与 2025.11 预测的重叠点在哪？</div>
+    </div>
+
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <!-- ===== 原文 ===== -->
+      <div class="numbered-header"><span class="num">1</span>2026 年上半年论文预测（原文）</div>
+      <div class="compare-table">
+        <thead><tr><th>方向</th><th>预测论题</th></tr></thead>
+        <tbody>
+          <tr><td>1. 架构方向</td><td>论领域驱动设计（DDD）· 论服务网格（Service Mesh）· 论云原生 · 论高并发系统</td></tr>
+          <tr><td>2. 数据库方向</td><td>大数据架构 · 数据安全</td></tr>
+          <tr><td>3. 未来信息技术</td><td>AI 大模型架构</td></tr>
+        </tbody>
+      </div>
+
+      <!-- ===== 解读 ===== -->
+      <div class="numbered-header"><span class="num">2</span>预测解读：与"2025.11 预估"高度呼应</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">①</div>
+          <div class="card-title"><span class="hl-green">服务网格（新提！）</span></div>
+          <ul class="card-list">
+            <li>2025.11 预估就强调"服务网格、可观测性尚未独立命题，完全有可能考到"</li>
+            <li>2026 上半年明确列入 —— <strong>最大黑马，优先准备</strong></li>
+            <li>考点：Sidecar（Envoy）、Istio 流量管理、零信任 mTLS</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">②</div>
+          <div class="card-title"><span class="hl-green">DDD / 高并发 / 云原生</span></div>
+          <ul class="card-list">
+            <li>DDD 领域驱动 = 微服务拆分原则（2025.11 论题一的考察点）</li>
+            <li>高并发系统 = 2025.11 论题三"性能优化场景"延续</li>
+            <li>云原生 = 年年必考主线</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">③</div>
+          <div class="card-title"><span class="hl-green">数据库：大数据架构 / 数据安全</span></div>
+          <ul class="card-list">
+            <li>大数据架构：Lambda/Kappa/湖仓一体（历年反复出现）</li>
+            <li>数据安全：新角度，可能考安全架构+合规</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">④</div>
+          <div class="card-title"><span class="hl-green">AI 大模型架构</span></div>
+          <ul class="card-list">
+            <li>延续 2025.11 "AIGC 影响"预测，落到"大模型架构"</li>
+            <li>考点：LLM 网关、Prompt 编排、RAG、向量库、私有化</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ===== 备考优先级 ===== -->
+      <div class="numbered-header"><span class="num">3</span>备考优先级建议（按命中概率）</div>
+      <div class="flow-row">
+        <div class="flow-box rose">服务网格<br><small>★★★ 新提黑马</small></div>
+        <div class="flow-arrow">|</div>
+        <div class="flow-box accent">DDD 拆分<br><small>★★★ 微服务核心</small></div>
+        <div class="flow-arrow">|</div>
+        <div class="flow-box primary">高并发/云原生<br><small>★★★ 必考主线</small></div>
+        <div class="flow-arrow">|</div>
+        <div class="flow-box warn">AI 大模型架构<br><small>★★ 新趋势</small></div>
+        <div class="flow-arrow">|</div>
+        <div class="flow-box green">大数据架构/数据安全<br><small>★★ 数据必考</small></div>
+      </div>
+
+      <div class="feynman">
+        <div class="feynman-label">&#x25C6; 费曼</div>
+        <p><strong>今年考什么？官方预测文件写得很直白：架构方向（DDD、服务网格、云原生、高并发）、数据库方向（大数据架构、数据安全）、未来信息技术（AI大模型架构）。</strong> 对照 2025.11 直播预估，两者是"姊妹篇"——直播讲的是备考思路（考题从概念转向技术深化），预测文件给出的是具体题目。<strong>最大增量是"服务网格（Service Mesh）"第一次被点名，这是 2025.11 预估里说"尚未独立命题、完全可能考到"的那个缺口，今年很可能兑现，务必优先准备。</strong></p>
+      </div>
+
+      <div class="diagram">
+        <div class="diagram-label">&#x25C6; 逻辑关系 — 2026 预测全景</div>
+        <div style="text-align:center;">
+          <div class="flow-row">
+            <div class="flow-box accent">架构<br><small>DDD·服务网格·云原生·高并发</small></div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box primary">数据库<br><small>大数据架构·数据安全</small></div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box warn">未来信息<br><small>AI 大模型架构</small></div>
+          </div>
+          <div class="flow-v-arrow">&#x2193;</div>
+          <div class="flow-row">
+            <div class="flow-box">与 2025.11 预估呼应 · 服务网格首次点名 · 每个方向备好 1 个项目 + 技术栈</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">2026 上半年官方预测三大方向：<strong>架构方向</strong>=论 DDD、论服务网格、论云原生、论高并发系统；<strong>数据库方向</strong>=大数据架构、数据安全；<strong>未来信息技术</strong>=AI 大模型架构。<strong>服务网格（Service Mesh）首次点名是最大黑马</strong>（2025.11 预估已埋此伏笔），DDD=微服务拆分、高并发=性能优化延续、AI 大模型=2025.11 AIGC 预测的落地，均需各备 1 个项目+技术栈。</div>
+      <div class="summary-tags">
+        <span class="tag primary">2026预测</span>
+        <span class="tag">服务网格</span>
+        <span class="tag">DDD</span>
+        <span class="tag">高并发</span>
+        <span class="tag">云原生</span>
+        <span class="tag">大数据架构</span>
+        <span class="tag">数据安全</span>
+        <span class="tag">AI大模型</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

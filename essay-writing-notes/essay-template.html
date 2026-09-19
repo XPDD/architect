@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 万能模板与常见问题</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-surface: #161c28; --bg-elevated: #1a2030; --bg-cue: #0d1320;
+    --border-default: rgba(255,255,255,.06); --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --cyan-glow: rgba(0,212,255,.25); --blue: #4d7cff; --blue-glow: rgba(77,124,255,.3); --purple: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+  .page { max-width: 960px; margin: 36px auto; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 0 0 1px rgba(0,212,255,.04), 0 4px 32px rgba(0,0,0,.4), 0 24px 80px rgba(0,0,0,.3); position: relative; }
+  .page::before { content: ''; position: absolute; inset: -1px; border-radius: var(--radius-lg); padding: 1px; background: linear-gradient(135deg, rgba(0,212,255,.15), transparent 30%, transparent 70%, rgba(77,124,255,.1)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 0; }
+  .header { background: linear-gradient(180deg, rgba(0,212,255,.04) 0%, transparent 100%), var(--bg-elevated); padding: 30px 44px 26px; position: relative; border-bottom: 1px solid var(--border-default); z-index: 1; }
+  .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent); }
+  .header-top { display: flex; align-items: flex-start; gap: 16px; } .header-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .header-badge { width: 36px; height: 36px; background: linear-gradient(135deg, rgba(0,212,255,.15), rgba(77,124,255,.1)); border: 1px solid rgba(0,212,255,.2); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .header-badge::after { content: ''; position: absolute; inset: 2px; border-radius: 4px; border: 1px solid rgba(0,212,255,.1); }
+  .header-badge-icon { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); position: relative; z-index: 1; }
+  .header-title-group { flex: 1; } .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; line-height: 1.3; }
+  .header-meta { display: flex; gap: 20px; margin-top: 14px; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: .04em; }
+  .header-meta .meta-item { display: flex; align-items: center; gap: 8px; } .header-meta .meta-dot { width: 5px; height: 5px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 6px var(--cyan-glow); }
+
+  .cornell { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto auto; grid-template-areas: "cue notes" "summary summary"; gap: 0; position: relative; z-index: 1; }
+  .cornell-cue { grid-area: cue; background: linear-gradient(180deg, rgba(0,212,255,.02), transparent 80%), var(--bg-cue); padding: 24px 18px; border-right: 1px solid rgba(0,212,255,.06); }
+  .cue-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,212,255,.08); }
+  .cue-item { font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.55; padding: 9px 10px; margin-bottom: 6px; border-radius: var(--radius); background: rgba(255,255,255,.02); border: 1px solid transparent; font-weight: 500; }
+  .cue-item .q-mark { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: rgba(0,212,255,.1); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-family: var(--font-mono); font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+
+  .cornell-notes { grid-area: notes; padding: 24px 32px 20px; }
+  .notes-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--blue); letter-spacing: .18em; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(77,124,255,.08); }
+
+  .numbered-header { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 8px; }
+  .numbered-header .num { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: 700; border-radius: 4px; box-shadow: 0 0 12px var(--cyan-glow); }
+
+  .note-section { margin-bottom: 10px; }
+  .note-section h4 { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .note-section h4 .dot { width: 6px; height: 6px; border-radius: 1px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan-glow); flex-shrink: 0; }
+  .note-section > p { font-size: 12.5px; color: rgba(255,255,255,.78); line-height: 1.7; }
+  .note-section ul { list-style: none; padding-left: 0; }
+  .note-section ul li { font-size: 12.5px; padding: 1px 0 1px 20px; position: relative; color: rgba(255,255,255,.75); line-height: 1.65; }
+  .note-section ul li::before { content: ''; position: absolute; left: 6px; top: 8px; width: 4px; height: 4px; border-radius: 50%; background: rgba(0,212,255,.4); }
+  .note-highlight { display: inline; background: linear-gradient(180deg, transparent 58%, rgba(0,212,255,.12) 58%); padding: 0 2px; font-weight: 600; color: var(--cyan); }
+
+  .feynman { margin-top: 16px; padding: 16px 18px; background: linear-gradient(135deg, rgba(52,211,153,.04), rgba(52,211,153,.01)); border-radius: var(--radius); border: 1px solid rgba(52,211,153,.1); border-left: 2px solid var(--green); position: relative; }
+  .feynman::before { content: '\2726'; position: absolute; right: 14px; top: 12px; font-size: 14px; color: var(--green); opacity: .5; }
+  .feynman-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--green); letter-spacing: .14em; margin-bottom: 6px; }
+  .feynman p { font-size: 12.5px; color: rgba(255,255,255,.7); line-height: 1.75; }
+  .feynman p strong { color: var(--green); }
+
+  .diagram { margin-top: 16px; padding: 16px 18px; background: rgba(255,255,255,.01); border-radius: var(--radius); border: 1px solid rgba(255,255,255,.04); overflow-x: auto; }
+  .diagram-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--purple); letter-spacing: .14em; margin-bottom: 12px; }
+
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 5px 0; }
+  .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 8px 11px; font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,.7); text-align: center; white-space: nowrap; }
+  .flow-box.accent { border-color: rgba(0,212,255,.2); background: rgba(0,212,255,.06); color: var(--cyan); font-weight: 700; box-shadow: 0 0 16px rgba(0,212,255,.08), inset 0 1px 0 rgba(255,255,255,.03); }
+  .flow-box.primary { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.08); color: var(--blue); font-weight: 700; }
+  .flow-box.warn { border-color: rgba(251,191,36,.25); background: rgba(251,191,36,.06); color: var(--amber); font-weight: 600; }
+  .flow-box.green { border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.06); color: var(--green); font-weight: 600; }
+  .flow-box.rose { border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); color: var(--rose); font-weight: 600; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 24px; color: rgba(255,255,255,.15); font-size: 14px; flex-shrink: 0; }
+  .flow-v-arrow { display: flex; justify-content: center; color: rgba(255,255,255,.15); font-size: 14px; line-height: 1; margin: 3px 0; }
+
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+  .compare-table thead th { background: rgba(255,255,255,.03); color: var(--text-secondary); font-weight: 600; text-align: left; padding: 8px 10px; font-size: 10px; font-family: var(--font-mono); letter-spacing: .06em; border-bottom: 1px solid rgba(0,212,255,.1); }
+  .compare-table thead th:first-child { border-radius: var(--radius) 0 0 0; } .compare-table thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+  .compare-table tbody td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.03); color: rgba(255,255,255,.75); font-size: 12px; line-height: 1.55; }
+  .compare-table tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius); } .compare-table tbody tr:last-child td:last-child { border-radius: 0 0 var(--radius) 0; }
+  .compare-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.01); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
+  .card { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 10px 12px; }
+  .card-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 4px; background: rgba(77,124,255,.15); border: 1px solid rgba(77,124,255,.25); color: var(--blue); font-family: var(--font-mono); font-size: 10px; font-weight: 700; margin-bottom: 4px; }
+  .card-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .card-list { list-style: none; } .card-list li { font-size: 11px; color: rgba(255,255,255,.65); line-height: 1.6; padding-left: 10px; position: relative; }
+  .card-list li::before { content: '\203A'; position: absolute; left: 0; color: var(--cyan); }
+
+  .hl-orange { color: var(--amber); background: linear-gradient(180deg, transparent 58%, rgba(251,191,36,.15) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-green { color: var(--green); background: linear-gradient(180deg, transparent 58%, rgba(52,211,153,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-purple { color: var(--purple); background: linear-gradient(180deg, transparent 58%, rgba(167,139,250,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-red { color: var(--rose); background: linear-gradient(180deg, transparent 58%, rgba(248,113,113,.12) 58%); padding: 0 2px; font-weight: 600; }
+
+  .cornell-summary { grid-area: summary; padding: 18px 44px 22px; background: linear-gradient(180deg, rgba(255,255,255,.01) 0%, transparent 100%); border-top: 1px solid rgba(255,255,255,.04); position: relative; }
+  .cornell-summary::before { content: ''; position: absolute; top: 0; left: 44px; right: 44px; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,.12), var(--cyan), transparent); }
+  .cornell-summary h3 { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 8px; }
+  .cornell-summary .summary-text { font-size: 13.5px; font-weight: 600; color: var(--text-primary); line-height: 1.65; letter-spacing: .01em; padding-left: 14px; border-left: 2px solid var(--cyan); box-shadow: -4px 0 12px rgba(0,212,255,.06); }
+  .cornell-summary .summary-text strong { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+  .cornell-summary .summary-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { font-size: 10px; padding: 3px 10px; border-radius: 3px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); color: var(--text-secondary); font-weight: 500; font-family: var(--font-mono); letter-spacing: .03em; }
+  .tag.primary { background: rgba(0,212,255,.08); border-color: rgba(0,212,255,.15); color: var(--cyan); font-weight: 600; }
+
+  @media (max-width: 768px) {
+    .page { max-width: 100%; margin: 0; border-radius: 0; border: none; box-shadow: none; } .page::before { display: none; }
+    .header { padding: 20px 16px 16px; } .header-top { flex-direction: column; gap: 12px; } .header-title { font-size: 17px; }
+    .cornell { grid-template-columns: 1fr; grid-template-areas: "cue" "notes" "summary"; }
+    .cornell-cue { border-right: none; border-bottom: 1px solid rgba(0,212,255,.06); padding: 16px; }
+    .cornell-notes { padding: 16px; } .cornell-summary { padding: 16px; } .cornell-summary::before { left: 16px; right: 16px; }
+    .card-grid { grid-template-columns: 1fr; } .flow-arrow { width: 14px; }
+    .compare-table { font-size: 10px; display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="header-badge"><span class="header-badge-icon">模</span></div>
+      </div>
+      <div class="header-title-group">
+        <div class="header-kicker">康奈尔分析 / 万能模板 + 常见问题</div>
+        <div class="header-title">万能模板：摘要 / 背景 / 正文 / 结尾 + 6 问</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-dot"></span>2026-09-16</div>
+      <div class="meta-item"><span class="meta-dot"></span>架构直播8：论文-上 P15-P29 精华</div>
+      <div class="meta-item"><span class="meta-dot"></span>万能模板 · 常见问题</div>
+    </div>
+  </div>
+
+  <div class="cornell">
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span> 论文字数怎么分配？总字数范围？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 如何选合适的项目？哪些项目不能选？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 摘要的万能公式与注意事项？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 背景怎么写才通用可套用？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 正文与结尾的关键策略？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 项目时间/级别/名称/金额怎么编才合理？</div>
+    </div>
+
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <!-- ===== 字数分配 ===== -->
+      <div class="numbered-header"><span class="num">1</span>字数分配公式（总 2000~2600 字）</div>
+      <div class="flow-row">
+        <div class="flow-box accent">摘要 300字</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box primary">项目背景 400字</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box green">回应子题 200字</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box warn">主体 1000字</div>
+        <div class="flow-arrow">+</div>
+        <div class="flow-box rose">结尾 300字</div>
+      </div>
+      <div class="note-section">
+        <ul>
+          <li>总字数保证在 <span class="note-highlight">2000~2600字</span>；正文 <span class="hl-green">不得少于 1000字</span>（否则不及格）</li>
+        </ul>
+      </div>
+
+      <!-- ===== 选项目 ===== -->
+      <div class="numbered-header"><span class="num">2</span>如何选项目（万能模板第一步）</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">✓</div>
+          <div class="card-title"><span class="hl-green">推荐选择</span></div>
+          <ul class="card-list">
+            <li>中大型商业项目：金额 400W 以上，研发周期 8 个月以上</li>
+            <li>政府/大型信息系统：国企、事业单位、军方、医院、银行、股份公司的 ERP/OA、云计算/大数据系统</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">✗</div>
+          <div class="card-title"><span class="hl-red">不建议选</span></div>
+          <ul class="card-list">
+            <li>小型企业项目：进销存、图书管理、单机版</li>
+            <li>尚未完成的项目（须已完成并上线，最好三年内）</li>
+            <li>纯建网站：静态门户无后台大型应用</li>
+            <li>硬件项目：综合布线、安防、视频会议</li>
+            <li>纯技术项目：数据迁移、内部技术研究</li>
+          </ul>
+        </div>
+      </div>
+      <div class="note-section">
+        <p><strong>零基础怎么办？</strong>参考范文用别人项目模仿，或去 GitHub 找开源项目读文档，让大模型按考试需求生成文章再熟悉。</p>
+      </div>
+
+      <!-- ===== 摘要 ===== -->
+      <div class="numbered-header"><span class="num">3</span>摘要（300~330字 · 提前准备）</div>
+      <div class="note-section">
+        <h4><span class="dot"></span>万能公式</h4>
+        <ul>
+          <li>公式：<span class="note-highlight">时间 + 项目 + 项目简介 + 个人岗位 + 工作职责 + 投入 + 历时 + 成功交付客户好评 + 结合具体题目说明本文结构</span></li>
+          <li>逻辑分两段：第一段通用介绍项目背景；第二段按论文题目发挥、回应子题目并介绍结构</li>
+          <li>包含：项目名称、（金额、历时）、团队介绍、项目简介、我的责任、本文讨论主题概括</li>
+        </ul>
+        <h4><span class="dot"></span>关键注意事项</h4>
+        <ul>
+          <li><span class="hl-red">摘要与正文是总分关系，不是承接关系</span>——摘要写过的东西正文还要写，但正文不能续着摘要写</li>
+          <li>注意字数：第一段写多了，第二段收着写</li>
+        </ul>
+      </div>
+
+      <!-- ===== 背景 ===== -->
+      <div class="numbered-header"><span class="num">4</span>项目背景（350-450字 · 提前准备）</div>
+      <div class="note-section">
+        <ul>
+          <li>公式：<span class="note-highlight">为什么做这个项目 + 岗位职责 + 项目规模 + 开发周期 + 项目功能和技术介绍 + 回应子题目并过渡到主体</span></li>
+          <li>不要写太多、会显得啰嗦；<strong>尽量通用化、不要和论文主题相关</strong>，考试时无论什么主题都可直接默写</li>
+          <li>在背景最后写一句过渡语句，过渡到下一个论点</li>
+          <li>内容：项目开发的原因、你的岗位职责、开发周期及规模、功能介绍、所用技术</li>
+        </ul>
+      </div>
+
+      <!-- ===== 正文结尾 ===== -->
+      <div class="numbered-header"><span class="num">5</span>正文与结尾</div>
+      <div class="note-section">
+        <h4><span class="dot"></span>正文（1200字左右）</h4>
+        <ul>
+          <li>按论文题目和子题目要求写作，<strong>一定要回应论文子题目</strong></li>
+          <li>正文不在万能模板里，需按不同题目准备——先准备好万能模板，正文后补</li>
+        </ul>
+      </div>
+      <div class="note-section">
+        <h4><span class="dot"></span>结尾（400-600字 · 整体补救的最后一步）</h4>
+        <ul>
+          <li>公式：<span class="note-highlight">项目上线及运行效果 + 客户评价 + 项目收获 + 项目不足和解决思路</span></li>
+          <li><span class="hl-green">弹性策略</span>：字数不够 → 结尾多写；字数多了 → 结尾少写；前面写得很差 → 结尾一定要重视</li>
+          <li>不足要写小问题（别出现大问题），写"经过后期纠偏没对项目产生影响"</li>
+        </ul>
+      </div>
+
+      <!-- ===== 常见问题 ===== -->
+      <div class="numbered-header"><span class="num">6</span>六大常见问题（官方答疑）</div>
+      <div class="compare-table">
+        <thead><tr><th>问题</th><th>回答</th></tr></thead>
+        <tbody>
+          <tr><td>1. 字数怎么分配？</td><td>摘要300 + 背景400 + 回应子题200 + 主体1000 + 结尾300；总 2000~2600</td></tr>
+          <tr><td>2. 没做过架构师怎么办？</td><td>专业人员从架构师角度写熟悉项目；零基础参考范文+大模型拆解生成文章再记忆</td></tr>
+          <tr><td>3. 内部项目没客户？</td><td>当普通项目写：某年某月公司要做什么项目，任命我为架构师，结尾仍写"客户一致满意"</td></tr>
+          <tr><td>4. 要不要写论文题目？</td><td>不需要</td></tr>
+          <tr><td>5. 项目背景怎么构造？</td><td>时间离考试3-5年内、持续8个月+、已完成；级别省市级/集团级；名称写"某地级市/某医院/某公司"；金额与人数/时间对应（20人×15月≈600万）</td></tr>
+          <tr><td>6. 不会写论文？</td><td>第一篇耗时很正常，目的是学会"题目+知识点+模板+项目"结合；第一篇完成备考就完成一半；AI时代要学会用大模型助力</td></tr>
+        </tbody>
+      </div>
+
+      <div class="feynman">
+        <div class="feynman-label">&#x25C6; 费曼</div>
+        <p><strong>万能模板=把论文拆成 5 个"预制件"，考前背熟、考场拼装。</strong> 摘要和背景是最值钱的两个预制件——背景（350-450字）刻意写成"与任何题目无关"，这样考场上直接默写，只需末尾加一句过渡。摘要按"时间+项目+岗位+职责+投入+历时+好评+结构"八件套填空。正文是唯一不能预制、必须针对题目写 1200 字的部分（回应子题+技术决策+量化效果）。结尾是"字数调节阀"，多了删、少了补。<strong>口诀：背景要"万金油"，摘要要"八件套"，正文必须"贴题"，结尾负责"找平"。</strong></p>
+      </div>
+
+      <div class="diagram">
+        <div class="diagram-label">&#x25C6; 逻辑关系 — 万能模板拼装流程</div>
+        <div style="text-align:center;">
+          <div class="flow-row">
+            <div class="flow-box accent">选项目<br><small>400W+·8个月+</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box primary">摘要<br><small>300字·八件套</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box green">背景<br><small>400字·万金油</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box warn">正文<br><small>1200字·贴题</small></div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box rose">结尾<br><small>300字·找平</small></div>
+          </div>
+          <div class="flow-row" style="margin-top:6px;">
+            <div class="flow-box">作业：① 用模板写第一篇论文 ② 把近6年不超纲题目各写3个论点、挑3个主题重点记忆</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">万能模板=选项目（400W+/8个月+，避开小项目/未完成/纯网站/硬件/纯技术）→ <strong>摘要300字（时间+项目+岗位+职责+投入+历时+好评+结构八件套）→ 背景400字（刻意通用化的万金油，考场默写+过渡句）→ 正文1200字（必须回应子题目）→ 结尾300字（上线效果+客户评价+收获+不足，兼当字数调节阀）</strong>；总字数2000~2600；项目背景虚构要合理（时间3-5年内、级别省市级、金额与团队人数匹配）。</div>
+      <div class="summary-tags">
+        <span class="tag primary">万能模板</span>
+        <span class="tag">摘要八件套</span>
+        <span class="tag">背景万金油</span>
+        <span class="tag">正文贴题</span>
+        <span class="tag">结尾找平</span>
+        <span class="tag">选项目</span>
+        <span class="tag">常见问题</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

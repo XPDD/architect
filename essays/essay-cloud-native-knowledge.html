@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>论云原生架构及其应用 · 记忆知识卡</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-surface: #161c28; --bg-elevated: #1a2030; --bg-cue: #0d1320;
+    --border-default: rgba(255,255,255,.06); --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --cyan-glow: rgba(0,212,255,.25); --blue: #4d7cff; --purple: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; padding: 36px 0;
+  }
+  .page { max-width: 1020px; margin: 0 auto; padding: 0 20px; }
+  .back { display: inline-block; color: var(--cyan); text-decoration: none; font-family: var(--font-mono); font-size: 12px; margin-bottom: 14px; }
+  .back:hover { opacity: .8; }
+  .card { background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 18px; box-shadow: 0 4px 32px rgba(0,0,0,.35); }
+  .card-header { padding: 16px 24px; border-bottom: 1px solid var(--border-default); display: flex; align-items: center; gap: 12px; background: linear-gradient(180deg, rgba(0,212,255,.04), transparent); }
+  .card-header .num { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 8px; background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #fff; font-family: var(--font-mono); font-size: 14px; font-weight: 700; border-radius: 4px; box-shadow: 0 0 12px var(--cyan-glow); }
+  .card-header h2 { font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+  .card-header .sub { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-left: auto; }
+  .card-body { padding: 20px 24px; }
+
+  .hero { background: linear-gradient(180deg, rgba(0,212,255,.06), transparent), var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 26px 32px; margin-bottom: 18px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; bottom: 0; left: 15%; right: 15%; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent); }
+  .hero-kicker { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 6px; }
+  .hero h1 { font-size: 22px; font-weight: 800; }
+  .hero h1 .accent { color: var(--cyan); text-shadow: 0 0 16px var(--cyan-glow); }
+  .hero-meta { display: flex; gap: 18px; margin-top: 10px; font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+
+  .thesis { padding: 16px 18px; border-radius: var(--radius); border: 1px solid rgba(0,212,255,.15); border-left: 3px solid var(--cyan); background: rgba(0,212,255,.05); margin-bottom: 14px; }
+  .thesis-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .14em; margin-bottom: 6px; }
+  .thesis p { font-size: 13px; line-height: 1.75; color: rgba(255,255,255,.85); }
+  .thesis strong { color: var(--cyan); }
+
+  .flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+  .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.07); border-radius: var(--radius); padding: 8px 12px; font-size: 12px; color: rgba(255,255,255,.75); }
+  .flow-box.accent { border-color: rgba(0,212,255,.25); background: rgba(0,212,255,.07); color: var(--cyan); font-weight: 700; }
+  .flow-box.blue { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.07); color: var(--blue); font-weight: 600; }
+  .flow-box.green { border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.06); color: var(--green); font-weight: 600; }
+  .flow-box.amber { border-color: rgba(251,191,36,.25); background: rgba(251,191,36,.06); color: var(--amber); font-weight: 600; }
+  .flow-arrow { color: rgba(255,255,255,.2); font-size: 14px; flex-shrink: 0; }
+  .flow-v { text-align: center; color: rgba(255,255,255,.2); margin: 2px 0; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead th { background: rgba(255,255,255,.03); color: var(--text-secondary); font-weight: 600; text-align: left; padding: 9px 12px; font-size: 10px; font-family: var(--font-mono); letter-spacing: .06em; border-bottom: 1px solid rgba(0,212,255,.12); white-space: nowrap; }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,.03); color: rgba(255,255,255,.78); line-height: 1.6; vertical-align: top; }
+  tbody tr:nth-child(even) td { background: rgba(255,255,255,.01); }
+  tbody tr:hover td { background: rgba(0,212,255,.03); }
+  td.term { font-weight: 700; color: var(--cyan); white-space: nowrap; }
+  td.term .en { display: block; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 400; margin-top: 2px; letter-spacing: .02em; }
+  td .tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-family: var(--font-mono); margin-left: 4px; }
+
+  .card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .mini-card { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 12px 14px; }
+  .mini-card h4 { font-size: 12px; font-weight: 700; margin-bottom: 6px; color: var(--text-primary); }
+  .mini-card h4 .en { display: block; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 400; margin-top: 2px; }
+  .mini-card ul { list-style: none; }
+  .mini-card li { font-size: 11.5px; color: rgba(255,255,255,.68); padding-left: 12px; position: relative; line-height: 1.7; }
+  .mini-card li::before { content: '\203A'; position: absolute; left: 0; color: var(--cyan); }
+
+  .data-strip { display: flex; flex-wrap: wrap; gap: 8px; }
+  .data-pill { padding: 6px 12px; border-radius: 4px; background: rgba(52,211,153,.06); border: 1px solid rgba(52,211,153,.2); color: var(--green); font-size: 12px; font-family: var(--font-mono); font-weight: 600; }
+  .data-pill b { font-weight: 800; }
+
+  .rhyme { padding: 14px 16px; border-radius: var(--radius); border: 1px solid rgba(167,139,250,.2); background: linear-gradient(135deg, rgba(167,139,250,.06), transparent); }
+  .rhyme-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--purple); letter-spacing: .14em; margin-bottom: 6px; }
+  .rhyme p { font-size: 12.5px; color: rgba(255,255,255,.75); line-height: 1.8; }
+  .rhyme strong { color: var(--purple); }
+
+  .footer { text-align: center; padding: 10px; font-size: 11px; color: var(--text-muted); }
+  .footer a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(0,212,255,.2); }
+  @media (max-width: 768px) { .card-grid { grid-template-columns: 1fr; } .card-body { padding: 14px; } body { padding: 16px 0; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="index.html">← 返回论文索引</a>
+
+  <div class="hero">
+    <div class="hero-kicker">记忆知识卡 · CLOUD-NATIVE KNOWLEDGE</div>
+    <h1>论云原生架构及其应用 — <span class="accent">名词记忆卡</span></h1>
+    <div class="hero-meta">
+      <span>用于背诵论文</span>
+      <span>每个名词：是什么 / 为什么 / 解决什么问题</span>
+      <span>EN · 中英对照</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">0</span><h2>记忆主线（先背这个）</h2><span class="sub">MAIN THREAD</span></div>
+    <div class="card-body">
+      <div class="thesis">
+        <div class="thesis-label">◈ 总论点 · MAIN THESIS</div>
+        <p><strong>云原生 = 把基础设施关注点从业务代码中剥离给云设施</strong> → 让平台<strong>状态外置化、交付声明化、运维自动化、运行可观测化</strong>。<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">Cloud-Native = peel infrastructure concerns out of business code → state externalized / delivery declarative / ops automated / runtime observable.</span></p>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.14em;margin-bottom:6px;">◈ 动因（为什么改）· WHY REFACTOR</div>
+      <div class="flow-row">
+        <div class="flow-box amber">① CBSD 集成规模扩大</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box amber">② 环境变量爆炸（78 项）</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box amber">③ 治理与业务逻辑耦合</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-box accent">向云原生演化</div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.14em;margin:10px 0 6px;">◈ 六段式结构 · STRUCTURE</div>
+      <div class="flow-row">
+        <div class="flow-box">摘要</div><div class="flow-arrow">→</div>
+        <div class="flow-box">背景</div><div class="flow-arrow">→</div>
+        <div class="flow-box">子问题1 项目</div><div class="flow-arrow">→</div>
+        <div class="flow-box">子问题2 总论点</div><div class="flow-arrow">→</div>
+        <div class="flow-box accent">子问题3 三个分论点</div><div class="flow-arrow">→</div>
+        <div class="flow-box">结尾 量化+不足</div>
+      </div>
+      <div class="flow-v">↓</div>
+      <div class="flow-row">
+        <div class="flow-box blue">分论点一 容器化交付</div>
+        <div class="flow-box green">分论点二 K8s编排+状态+安全</div>
+        <div class="flow-box amber">分论点三 可观测+工作流+GitOps</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">1</span><h2>分论点一：容器化与构件标准化交付</h2><span class="sub">DELIVERY</span></div>
+    <div class="card-body">
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>名词 · TERM</th><th>是什么 · WHAT</th><th>为什么 · WHY</th><th>解决什么问题 · PROBLEM SOLVED</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="term">CBSD 构件化开发<span class="tag">核心角度</span><span class="en">Component-Based Software Development</span></td>
+            <td>用现成构件（OpenClaw / ClawHub / 飞书桥接）搭系统，不自研</td>
+            <td>避免重复造轮子、周期短成本低</td>
+            <td>平台聚焦编排治理，借力成熟开源</td>
+          </tr>
+          <tr>
+            <td class="term">容器化 + 多阶段构建<span class="en">Containerization + Multi-stage Build</span></td>
+            <td>应用+运行环境打成标准镜像；构建/运行两阶段分离只留产物</td>
+            <td>"一次构建、到处运行" Build once, run anywhere</td>
+            <td>异构环境、版本漂移、"在我机器上能跑"；新环境数小时→拉镜像即运行</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">2</span><h2>分论点二：K8s 编排、状态外置与零信任安全</h2><span class="sub">RUNTIME</span></div>
+    <div class="card-body">
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>名词 · TERM</th><th>是什么 · WHAT</th><th>为什么 · WHY</th><th>解决什么问题 · PROBLEM SOLVED</th></tr></thead>
+        <tbody>
+          <tr><td class="term">Kubernetes<span class="en">K8s 容器编排平台 · Orchestration</span></td><td>容器编排平台（调度/部署/伸缩/自愈）</td><td>容器多了要统一管</td><td>人工调度、故障恢复、资源分配</td></tr>
+          <tr><td class="term">Deployment<span class="en">无状态部署对象 · Stateless</span></td><td>管无状态应用的声明式对象</td><td>声明期望状态，K8s 自动收敛</td><td>滚动更新、Pod 挂了自动重建</td></tr>
+          <tr><td class="term">探针（就绪/存活）<span class="tag">量化:秒级</span><span class="en">Probe · Readiness / Liveness</span></td><td>健康检查：存活=进程活着(死则重启)；就绪=能接流量(否则摘除)</td><td>进程活着 ≠ 可服务</td><td>发布秒级摘除异常实例、平滑滚动</td></tr>
+          <tr><td class="term">HPA 自动伸缩<span class="en">Horizontal Pod Autoscaler</span></td><td>按指标（CPU 70%）自动增减副本</td><td>流量有峰谷，人工调不现实</td><td>弹性：高峰扩容、低谷回收（1-5 副本）</td></tr>
+          <tr><td class="term">StatefulSet<span class="tag">核心</span><span class="en">有状态副本集 · Stateful</span></td><td>管<strong>有状态</strong>应用，实例有稳定身份+持久存储</td><td>Agent 有状态（在线/记忆/会话/沙箱），Deployment 管不了</td><td>有状态实例的稳定标识、状态保存与恢复</td></tr>
+          <tr><td class="term">状态机 + 心跳<span class="en">State Machine + Heartbeat</span></td><td>状态机定义生命周期（部署中/在线/离线/工作中）；心跳定期上报"活着"</td><td>要统一登记监控每个实例真实状态</td><td>Agent 状态不可视、假死检测、统一监控</td></tr>
+          <tr><td class="term">存储计算分离<span class="en">Storage-Compute Separation</span></td><td>计算与数据分离：状态/记忆→PostgreSQL，文件/产出→OSS</td><td>实例是临时的、数据是持久的</td><td><strong>状态外置</strong>：实例重建后状态可恢复</td></tr>
+          <tr><td class="term">NetworkPolicy<span class="tag">量化:端口</span><span class="en">网络策略 · Zero Trust</span></td><td>集群内网络白名单（按端口/IP/标签）</td><td>默认集群内全通，要最小访问</td><td>缩小攻击面：入口仅 3001，出口仅 53/5432/443</td></tr>
+          <tr><td class="term">零信任<span class="en">Zero Trust</span></td><td>默认不信任任何网络位置，逐请求认证授权</td><td>内网不可信</td><td>服务间最小权限、边界安全升级</td></tr>
+          <tr><td class="term">WebShell/WebSocket 代理<span class="en">Bidirectional Proxy</span></td><td>用 client-node 把浏览器操作代理到远端实例/沙箱</td><td>Agent 在远端/沙箱，需要安全运维通道</td><td>免暴露 SSH 即可安全运维远端实例</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">3</span><h2>分论点三：可观测性、工作流与 GitOps</h2><span class="sub">OBSERVABILITY & DELIVERY</span></div>
+    <div class="card-body">
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>名词 · TERM</th><th>是什么 · WHAT</th><th>为什么 · WHY</th><th>解决什么问题 · PROBLEM SOLVED</th></tr></thead>
+        <tbody>
+          <tr><td class="term">三支柱 Logging/Metrics/Tracing<span class="en">Three Pillars · 可观测性</span></td><td>日志（发生了什么）+ 指标（定量状态）+ 追踪（请求跨哪些服务）</td><td>分布式系统故障定位难</td><td>全链路可追踪、故障快速定位</td></tr>
+          <tr><td class="term">飞书 Webhook 告警<span class="tag">真实细节</span><span class="en">Feishu Webhook Alerting</span></td><td>告警自动推送到飞书群机器人</td><td>告警要触达人才有效</td><td>运维无需值守获知异常</td></tr>
+          <tr><td class="term">Prefect + work pool<span class="en">工作流引擎 + K8s Work Pool</span></td><td>工作流引擎；work pool 把每个 Flow 提交为独立 K8s Job</td><td>裸 CronJob 管不了依赖/重试</td><td>DAG 依赖、失败重试、并发限流、幂等；夜间流水线</td></tr>
+          <tr><td class="term">GitOps<span class="tag">量化:2天</span><span class="en">声明式交付 · Git as source of truth</span></td><td>Git 仓库为部署唯一事实来源，改仓库→流水线自动应用</td><td>部署要可回滚、可审计</td><td>声明式交付、staging/prod 隔离、平均 2 天/版本</td></tr>
+          <tr><td class="term">Nexus<span class="en">私有镜像仓库 · Image Registry</span></td><td>私有镜像仓库</td><td>镜像不能都推公共仓库</td><td>内部镜像托管、版本化</td></tr>
+          <tr><td class="term">Terraform (IaC)<span class="en">Infrastructure as Code</span></td><td>用代码声明云资源（基础设施即代码）</td><td>手工建基建不可重复</td><td>基建可版本化、复杂度收敛于平台层</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">4</span><h2>加分项：理论映射（必背）</h2><span class="sub">KNOWLEDGE MAPPING</span></div>
+    <div class="card-body">
+      <div class="card-grid">
+        <div class="mini-card"><h4>云原生 7 原则<span class="en">Cloud-Native Principles</span></h4><ul><li>服务化 Service-ization</li><li>弹性 Elasticity</li><li>可观测 Observability</li><li>韧性 Resilience</li><li>所有过程自动化 Automation</li><li>零信任 Zero Trust</li><li>架构持续演进 Continuous Evolution</li></ul></div>
+        <div class="mini-card"><h4>7 大架构模式<span class="en">Architecture Patterns</span></h4><ul><li>服务化 Service-ization</li><li>Mesh 化 Mesh</li><li>Serverless 无服务器</li><li>存储计算分离 Storage-Compute Sep.</li><li>分布式事务 Distributed Transaction</li><li>可观测 Observability</li><li>事件驱动 Event-Driven</li></ul></div>
+        <div class="mini-card"><h4>微服务 4 类约束<span class="en">Microservice Constraints</span></h4><ul><li>个体：单一职责、低耦合 Single Responsibility</li><li>横向：可发现性、可交互性 Discoverability</li><li>纵向：数据存储隔离 Data Isolation</li><li>全局：故障发现时效、根因精确 Time-to-Detect</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">5</span><h2>量化成果（结尾背诵）</h2><span class="sub">RESULTS</span></div>
+    <div class="card-body">
+      <div class="data-strip">
+        <div class="data-pill">Agent <b>200+</b></div>
+        <div class="data-pill">日均任务 <b>1000+</b></div>
+        <div class="data-pill">LLM 网关 <b>50 QPS</b></div>
+        <div class="data-pill">可用性 <b>99.9%</b></div>
+        <div class="data-pill">发布 <b>2天/版本</b></div>
+        <div class="data-pill">异常摘除 <b>秒级</b></div>
+      </div>
+      <div class="rhyme" style="margin-top:14px;">
+        <div class="rhyme-label">✦ 记忆口诀 · MEMORY RHYME</div>
+        <p><strong>眼界新（云原生/AI）→ 故事真（CBSD 真实项目）→ 讲决策（为什么：K8s 不用 Compose、Prefect 不用裸 Cron、GitOps 不用直接改）→ 用数据（200 / 1000 / 50 / 99.9%）。</strong> 不及格雷区：虚构 + 纯理论 + 跑题 + 正文 &lt;1000 字。<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">New tech · True story · Decisions with reasons · Numbers as proof.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer"><a href="index.html">← 返回论文索引</a> · 记忆知识卡 · 配套《论云原生架构及其应用》</div>
+</div>
+</body>
+</html>

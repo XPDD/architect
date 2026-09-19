@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>论微服务架构及其应用 · 考点知识卡</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-surface: #161c28; --bg-elevated: #1a2030; --bg-cue: #0d1320;
+    --border-default: rgba(255,255,255,.06); --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --cyan-glow: rgba(0,212,255,.25); --blue: #4d7cff; --purple: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh; padding: 36px 0;
+  }
+  .page { max-width: 1020px; margin: 0 auto; padding: 0 20px; }
+  .back { display: inline-block; color: var(--cyan); text-decoration: none; font-family: var(--font-mono); font-size: 12px; margin-bottom: 14px; }
+  .back:hover { opacity: .8; }
+  .card { background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 18px; box-shadow: 0 4px 32px rgba(0,0,0,.35); }
+  .card-header { padding: 16px 24px; border-bottom: 1px solid var(--border-default); display: flex; align-items: center; gap: 12px; background: linear-gradient(180deg, rgba(0,212,255,.04), transparent); }
+  .card-header .num { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; height: 28px; padding: 0 8px; background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #fff; font-family: var(--font-mono); font-size: 14px; font-weight: 700; border-radius: 4px; box-shadow: 0 0 12px var(--cyan-glow); }
+  .card-header h2 { font-size: 16px; font-weight: 800; letter-spacing: -.01em; }
+  .card-header .sub { font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); margin-left: auto; }
+  .card-body { padding: 20px 24px; }
+
+  .hero { background: linear-gradient(180deg, rgba(0,212,255,.06), transparent), var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); padding: 26px 32px; margin-bottom: 18px; position: relative; overflow: hidden; }
+  .hero::after { content: ''; position: absolute; bottom: 0; left: 15%; right: 15%; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent); }
+  .hero-kicker { font-family: var(--font-mono); font-size: 10px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 6px; }
+  .hero h1 { font-size: 22px; font-weight: 800; }
+  .hero h1 .accent { color: var(--cyan); text-shadow: 0 0 16px var(--cyan-glow); }
+  .hero-meta { display: flex; gap: 18px; margin-top: 10px; font-size: 11px; color: var(--text-muted); font-family: var(--font-mono); }
+
+  .thesis { padding: 16px 18px; border-radius: var(--radius); border: 1px solid rgba(0,212,255,.15); border-left: 3px solid var(--cyan); background: rgba(0,212,255,.05); margin-bottom: 14px; }
+  .thesis-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .14em; margin-bottom: 6px; }
+  .thesis p { font-size: 13px; line-height: 1.75; color: rgba(255,255,255,.85); }
+  .thesis strong { color: var(--cyan); }
+
+  .warn { padding: 16px 18px; border-radius: var(--radius); border: 1px solid rgba(248,113,113,.25); border-left: 3px solid var(--rose); background: rgba(248,113,113,.05); margin-bottom: 14px; }
+  .warn-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--rose); letter-spacing: .14em; margin-bottom: 6px; }
+  .warn p { font-size: 12.5px; line-height: 1.75; color: rgba(255,255,255,.78); }
+  .warn strong { color: var(--rose); }
+
+  .flow-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 6px 0; }
+  .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.07); border-radius: var(--radius); padding: 8px 12px; font-size: 12px; color: rgba(255,255,255,.75); }
+  .flow-box.accent { border-color: rgba(0,212,255,.25); background: rgba(0,212,255,.07); color: var(--cyan); font-weight: 700; }
+  .flow-box.blue { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.07); color: var(--blue); font-weight: 600; }
+  .flow-box.green { border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.06); color: var(--green); font-weight: 600; }
+  .flow-box.amber { border-color: rgba(251,191,36,.25); background: rgba(251,191,36,.06); color: var(--amber); font-weight: 600; }
+  .flow-box.rose { border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); color: var(--rose); font-weight: 600; }
+  .flow-arrow { color: rgba(255,255,255,.2); font-size: 14px; flex-shrink: 0; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  thead th { background: rgba(255,255,255,.03); color: var(--text-secondary); font-weight: 600; text-align: left; padding: 9px 12px; font-size: 10px; font-family: var(--font-mono); letter-spacing: .06em; border-bottom: 1px solid rgba(0,212,255,.12); white-space: nowrap; }
+  tbody td { padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,.03); color: rgba(255,255,255,.78); line-height: 1.6; vertical-align: top; }
+  tbody tr:nth-child(even) td { background: rgba(255,255,255,.01); }
+  tbody tr:hover td { background: rgba(0,212,255,.03); }
+  td.term { font-weight: 700; color: var(--cyan); white-space: nowrap; }
+  td.term .en { display: block; font-size: 10px; color: var(--text-muted); font-family: var(--font-mono); font-weight: 400; margin-top: 2px; letter-spacing: .02em; }
+  td .tag { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 3px; background: rgba(0,212,255,.08); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-family: var(--font-mono); margin-left: 4px; }
+  td.yes { color: var(--green); font-weight: 700; }
+  td.no { color: var(--rose); font-weight: 700; }
+  td.part { color: var(--amber); font-weight: 700; }
+
+  .rhyme { padding: 14px 16px; border-radius: var(--radius); border: 1px solid rgba(167,139,250,.2); background: linear-gradient(135deg, rgba(167,139,250,.06), transparent); }
+  .rhyme-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--purple); letter-spacing: .14em; margin-bottom: 6px; }
+  .rhyme p { font-size: 12.5px; color: rgba(255,255,255,.75); line-height: 1.8; }
+  .rhyme strong { color: var(--purple); }
+
+  .footer { text-align: center; padding: 10px; font-size: 11px; color: var(--text-muted); }
+  .footer a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(0,212,255,.2); }
+  @media (max-width: 768px) { .card-body { padding: 14px; } body { padding: 16px 0; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="index.html">← 返回论文索引</a>
+
+  <div class="hero">
+    <div class="hero-kicker">考点知识卡 · MICROSERVICE KNOWLEDGE</div>
+    <h1>论微服务架构及其应用 — <span class="accent">考点记忆卡</span></h1>
+    <div class="hero-meta">
+      <span>依据考试讲义预测论题一 / 范文6</span>
+      <span>拆分 → 治理 → 熔断可观测</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">0</span><h2>写作主线（考试框架）</h2><span class="sub">MAIN THREAD</span></div>
+    <div class="card-body">
+      <div class="thesis">
+        <div class="thesis-label">◈ 微服务论题 = "拆开之后怎么管"</div>
+        <p><strong>服务拆分 → 服务治理（注册/配置/网关）→ 容错可观测（熔断/降级/限流）</strong>。<br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">Split → Govern (registry/config/gateway) → Resilience & Observability (circuit breaker / fallback / rate limit).</span></p>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.14em;margin-bottom:6px;">◈ 完整技术栈 · TECH STACK</div>
+      <div class="flow-row">
+        <div class="flow-box accent">DDD 拆分</div><div class="flow-arrow">+</div>
+        <div class="flow-box blue">注册/配置/网关</div><div class="flow-arrow">+</div>
+        <div class="flow-box green">熔断/降级/限流/负载均衡</div><div class="flow-arrow">+</div>
+        <div class="flow-box amber">可观测性</div><div class="flow-arrow">+</div>
+        <div class="flow-box">K8s / 服务网格</div>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-muted);letter-spacing:.14em;margin:10px 0 6px;">◈ 范文6 参考 · SAMPLE</div>
+      <div class="flow-row">
+        <div class="flow-box amber">在线问诊互联网医院</div><div class="flow-arrow">→</div>
+        <div class="flow-box blue">职责单一拆分</div><div class="flow-arrow">→</div>
+        <div class="flow-box">Nacos 注册中心 + 配置中心</div><div class="flow-arrow">→</div>
+        <div class="flow-box rose">Hystrix 熔断</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">1</span><h2>分论点一：服务拆分（解耦）</h2><span class="sub">SPLIT</span></div>
+    <div class="card-body">
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>名词 · TERM</th><th>是什么 · WHAT</th><th>为什么 · WHY</th><th>解决什么问题 · PROBLEM SOLVED</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="term">微服务架构<span class="en">Microservices</span></td>
+            <td>把单体拆成一组独立部署、独立演进的小服务，服务间通过网络通信</td>
+            <td>单体耦合重、无法独立伸缩/发布</td>
+            <td>独立部署与扩展、故障隔离、技术异构</td>
+          </tr>
+          <tr>
+            <td class="term">DDD 领域驱动拆分<span class="en">Domain-Driven Design</span></td>
+            <td>按业务领域边界拆（用户/订单/支付域），每个域一个服务</td>
+            <td>按代码/技术拆会导致边界混乱</td>
+            <td>单一职责、低耦合、领域自治（论题一 2025.11 考点）</td>
+          </tr>
+          <tr>
+            <td class="term">拆分取舍<span class="en">Trade-off</span></td>
+            <td>独立演进/弹性 <b>vs</b> 运维复杂度/分布式复杂度</td>
+            <td>不是拆得越多越好</td>
+            <td>适度拆分 + 治理兜底</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">2</span><h2>分论点二：服务治理（注册/配置/网关）</h2><span class="sub">GOVERNANCE</span></div>
+    <div class="card-body">
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>名词 · TERM</th><th>是什么 · WHAT</th><th>为什么 · WHY</th><th>解决什么问题 · PROBLEM SOLVED</th></tr></thead>
+        <tbody>
+          <tr><td class="term">注册发现<span class="en">Nacos / Eureka</span></td><td>服务启动注册到注册中心，消费者按服务名查 IP/端口</td><td>实例 IP 动态变化，硬编码失效</td><td>服务地址动态发现、心跳健康检查、异常实例剔除</td></tr>
+          <tr><td class="term">配置中心<span class="en">Apollo / Nacos</span></td><td>配置统一托管，动态下发</td><td>改配置要重发版，慢且易错</td><td>动态配置、免发版切换（日志开关/限流阈值）</td></tr>
+          <tr><td class="term">API 网关<span class="en">Gateway</span></td><td>所有流量的统一入口：路由、鉴权、限流</td><td>服务直连导致横切逻辑分散</td><td>统一收敛鉴权/限流/灰度，屏蔽内部服务结构</td></tr>
+          <tr><td class="term">负载均衡<span class="en">Load Balancing</span></td><td>把请求分发给多个实例（Ribbon/网关 LB）</td><td>多副本需要分发策略</td><td>分摊压力、避免单点过热</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">3</span><h2>分论点三：容错与可观测（雪崩防护）</h2><span class="sub">RESILIENCE</span></div>
+    <div class="card-body">
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>名词 · TERM</th><th>是什么 · WHAT</th><th>为什么 · WHY</th><th>解决什么问题 · PROBLEM SOLVED</th></tr></thead>
+        <tbody>
+          <tr><td class="term">熔断<span class="en">Circuit Breaker · Hystrix</span></td><td>依赖服务故障时快速失败返回备选，别死等</td><td>依赖挂了会拖垮调用方（雪崩）</td><td><b>别人坏了我不等</b>，防雪崩，论文最亮技术点</td></tr>
+          <tr><td class="term">降级<span class="en">Fallback / Degradation</span></td><td>高峰时主动砍掉非核心功能，返回兜底结果</td><td>资源有限，保核心业务</td><td><b>我主动砍功能</b>，保证核心链路可用</td></tr>
+          <tr><td class="term">限流<span class="en">Rate Limiting · Sentinel</span></td><td>限制单位时间请求量（令牌桶/漏桶）</td><td>流量洪峰打爆系统</td><td><b>进门限量</b>，平滑流量保护后端</td></tr>
+          <tr><td class="term">分布式事务<span class="en">Seata / TCC</span></td><td>跨服务的最终一致性（两阶段/TCC/消息）</td><td>一个业务跨多个库/服务</td><td>数据一致性（写不出时可不展开）</td></tr>
+          <tr><td class="term">异步解耦<span class="en">Kafka / RabbitMQ</span></td><td>消息队列削峰填谷、事件驱动</td><td>同步调用耦合强、峰值硬扛</td><td>异步解耦、削峰、可重试</td></tr>
+          <tr><td class="term">可观测性<span class="en">SkyWalking / Three Pillars</span></td><td>链路追踪 + 日志 + 指标</td><td>调用链跨服务，故障难定位</td><td>全链路追踪、根因定位</td></tr>
+          <tr><td class="term">服务网格 / K8s<span class="en">Istio / Kubernetes</span></td><td>网格把连接/安全/流量下沉基础设施；K8s 做编排</td><td>SDK 侵入强 / 部署要统一</td><td>零侵入治理；弹性伸缩、自愈、自动交付</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="rhyme" style="margin-top:12px;">
+        <div class="rhyme-label">✦ 口诀 · MEMORY RHYME</div>
+        <p><strong>熔断"别人坏了我不等" · 降级"我主动砍功能" · 限流"进门限量"。</strong><br><span style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);">Breaker: don't wait on a failing dependency · Fallback: I proactively cut features · Rate limit: control the entrance.</span></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><span class="num">4</span><h2>当前论文 vs 考点差距</h2><span class="sub">GAP ANALYSIS</span></div>
+    <div class="card-body">
+      <div class="warn">
+        <div class="warn-label">✔ 现状</div>
+        <p>新版《论微服务架构及其应用.docx》已基于<strong>真实微服务项目 wisdom-saas</strong>（Spring Cloud Alibaba）重写：Nacos 注册配置、Spring Cloud Gateway、Feign 契约、LoadBalancer、Redis 分布式锁、XXL-Job、RocketMQ、溯源限流、Prometheus 可观测<strong>全部真实命中考点</strong>；仅熔断降级（未用 Sentinel）与分布式事务（未用 Seata）如实写入结尾"不足"，不再有跑题风险。</p>
+      </div>
+      <div class="table-wrap">
+      <table>
+        <thead><tr><th>考点技术栈</th><th>本项目(wisdom-saas)是否具备</th><th>当前论文是否写到</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td class="term">服务拆分（职责单一）</td><td class="yes">✅</td><td class="yes">✅</td><td>19 服务模块按业务域拆分 + API 契约双工程</td></tr>
+          <tr><td class="term">服务注册发现 Nacos/Eureka</td><td class="yes">✅ Nacos 2.3.2</td><td class="yes">✅</td><td>注册 + 心跳 + 秒级感知</td></tr>
+          <tr><td class="term">配置中心 Apollo/Nacos</td><td class="yes">✅ Nacos</td><td class="yes">✅</td><td>动态配置、免发版切换</td></tr>
+          <tr><td class="term">API 网关</td><td class="yes">✅ Spring Cloud Gateway</td><td class="yes">✅</td><td>40 路由 + 统一认证/灰度/日志</td></tr>
+          <tr><td class="term">熔断/降级/限流</td><td class="part">限流✅ / 熔断❌</td><td class="part">✅ 限流（熔断写入不足）</td><td>溯源 C 端 Redis 计数限流；无 Sentinel，如实写不足</td></tr>
+          <tr><td class="term">负载均衡</td><td class="yes">✅ LoadBalancer + 灰度</td><td class="yes">✅</td><td>grayLb:// 灰度负载均衡</td></tr>
+          <tr><td class="term">分布式事务 Seata</td><td class="no">❌ 未使用</td><td class="part">❌（写入不足）</td><td>补偿与重试为主，如实写不足</td></tr>
+          <tr><td class="term">消息异步 Kafka/RabbitMQ</td><td class="yes">✅ starter-mq + RocketMQ</td><td class="yes">✅</td><td>IoT 消息总线 / WebSocket 广播</td></tr>
+          <tr><td class="term">可观测性</td><td class="yes">✅</td><td class="yes">✅</td><td>Prometheus + Spring Boot Admin + access-log 跨服务聚合</td></tr>
+          <tr><td class="term">并发控制（电商防超卖）</td><td class="yes">✅ Redis + Redisson</td><td class="yes">✅</td><td>分布式锁 16 处，大促强一致</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer"><a href="index.html">← 返回论文索引</a> · 微服务考点知识卡 · 与《论云原生架构及其应用》成对使用</div>
+</div>
+</body>
+</html>

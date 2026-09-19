@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 四大心得与评分标准</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep: #0a0e17; --bg-card: #111620; --bg-surface: #161c28; --bg-elevated: #1a2030; --bg-cue: #0d1320;
+    --border-default: rgba(255,255,255,.06); --text-primary: rgba(255,255,255,.92); --text-secondary: rgba(255,255,255,.55); --text-muted: rgba(255,255,255,.28);
+    --cyan: #00d4ff; --cyan-glow: rgba(0,212,255,.25); --blue: #4d7cff; --blue-glow: rgba(77,124,255,.3); --purple: #a78bfa;
+    --green: #34d399; --amber: #fbbf24; --rose: #f87171;
+    --radius: 6px; --radius-lg: 10px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+    --font-mono: 'JetBrains Mono', 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+  }
+  body {
+    font-family: var(--font-sans); color: var(--text-primary); background: #05080e;
+    background-image: radial-gradient(ellipse at 20% 0%, rgba(0,212,255,.03) 0%, transparent 50%), radial-gradient(ellipse at 80% 100%, rgba(77,124,255,.03) 0%, transparent 50%);
+    line-height: 1.6; -webkit-font-smoothing: antialiased; min-height: 100vh;
+  }
+  .page { max-width: 960px; margin: 36px auto; background: var(--bg-card); border: 1px solid var(--border-default); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 0 0 1px rgba(0,212,255,.04), 0 4px 32px rgba(0,0,0,.4), 0 24px 80px rgba(0,0,0,.3); position: relative; }
+  .page::before { content: ''; position: absolute; inset: -1px; border-radius: var(--radius-lg); padding: 1px; background: linear-gradient(135deg, rgba(0,212,255,.15), transparent 30%, transparent 70%, rgba(77,124,255,.1)); -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 0; }
+  .header { background: linear-gradient(180deg, rgba(0,212,255,.04) 0%, transparent 100%), var(--bg-elevated); padding: 30px 44px 26px; position: relative; border-bottom: 1px solid var(--border-default); z-index: 1; }
+  .header::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--cyan), var(--blue), transparent); }
+  .header-top { display: flex; align-items: flex-start; gap: 16px; } .header-brand { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .header-badge { width: 36px; height: 36px; background: linear-gradient(135deg, rgba(0,212,255,.15), rgba(77,124,255,.1)); border: 1px solid rgba(0,212,255,.2); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .header-badge::after { content: ''; position: absolute; inset: 2px; border-radius: 4px; border: 1px solid rgba(0,212,255,.1); }
+  .header-badge-icon { font-family: var(--font-mono); font-size: 16px; font-weight: 700; color: var(--cyan); text-shadow: 0 0 12px var(--cyan-glow); position: relative; z-index: 1; }
+  .header-title-group { flex: 1; } .header-kicker { font-family: var(--font-mono); font-size: 9px; font-weight: 600; color: var(--cyan); letter-spacing: .2em; margin-bottom: 4px; }
+  .header-title { font-size: 20px; font-weight: 800; color: var(--text-primary); letter-spacing: -.02em; line-height: 1.3; }
+  .header-meta { display: flex; gap: 20px; margin-top: 14px; font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: .04em; }
+  .header-meta .meta-item { display: flex; align-items: center; gap: 8px; } .header-meta .meta-dot { width: 5px; height: 5px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 6px var(--cyan-glow); }
+
+  .cornell { display: grid; grid-template-columns: 240px 1fr; grid-template-rows: auto auto; grid-template-areas: "cue notes" "summary summary"; gap: 0; position: relative; z-index: 1; }
+  .cornell-cue { grid-area: cue; background: linear-gradient(180deg, rgba(0,212,255,.02), transparent 80%), var(--bg-cue); padding: 24px 18px; border-right: 1px solid rgba(0,212,255,.06); }
+  .cue-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0,212,255,.08); }
+  .cue-item { font-size: 12px; color: rgba(255,255,255,.7); line-height: 1.55; padding: 9px 10px; margin-bottom: 6px; border-radius: var(--radius); background: rgba(255,255,255,.02); border: 1px solid transparent; font-weight: 500; }
+  .cue-item .q-mark { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 4px; background: rgba(0,212,255,.1); border: 1px solid rgba(0,212,255,.15); color: var(--cyan); font-family: var(--font-mono); font-size: 11px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+
+  .cornell-notes { grid-area: notes; padding: 24px 32px 20px; }
+  .notes-header { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--blue); letter-spacing: .18em; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(77,124,255,.08); }
+
+  .numbered-header { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--text-primary); margin: 16px 0 8px; }
+  .numbered-header .num { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; padding: 0 6px; background: linear-gradient(135deg, var(--cyan), var(--blue)); color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: 700; border-radius: 4px; box-shadow: 0 0 12px var(--cyan-glow); }
+
+  .note-section { margin-bottom: 10px; }
+  .note-section h4 { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+  .note-section h4 .dot { width: 6px; height: 6px; border-radius: 1px; background: var(--cyan); box-shadow: 0 0 8px var(--cyan-glow); flex-shrink: 0; }
+  .note-section > p { font-size: 12.5px; color: rgba(255,255,255,.78); line-height: 1.7; }
+  .note-section ul { list-style: none; padding-left: 0; }
+  .note-section ul li { font-size: 12.5px; padding: 1px 0 1px 20px; position: relative; color: rgba(255,255,255,.75); line-height: 1.65; }
+  .note-section ul li::before { content: ''; position: absolute; left: 6px; top: 8px; width: 4px; height: 4px; border-radius: 50%; background: rgba(0,212,255,.4); }
+  .note-highlight { display: inline; background: linear-gradient(180deg, transparent 58%, rgba(0,212,255,.12) 58%); padding: 0 2px; font-weight: 600; color: var(--cyan); }
+
+  .feynman { margin-top: 16px; padding: 16px 18px; background: linear-gradient(135deg, rgba(52,211,153,.04), rgba(52,211,153,.01)); border-radius: var(--radius); border: 1px solid rgba(52,211,153,.1); border-left: 2px solid var(--green); position: relative; }
+  .feynman::before { content: '\2726'; position: absolute; right: 14px; top: 12px; font-size: 14px; color: var(--green); opacity: .5; }
+  .feynman-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--green); letter-spacing: .14em; margin-bottom: 6px; }
+  .feynman p { font-size: 12.5px; color: rgba(255,255,255,.7); line-height: 1.75; }
+  .feynman p strong { color: var(--green); }
+
+  .diagram { margin-top: 16px; padding: 16px 18px; background: rgba(255,255,255,.01); border-radius: var(--radius); border: 1px solid rgba(255,255,255,.04); overflow-x: auto; }
+  .diagram-label { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--purple); letter-spacing: .14em; margin-bottom: 12px; }
+
+  .flow-row { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; margin: 5px 0; }
+  .flow-box { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 8px 11px; font-size: 11.5px; font-weight: 500; color: rgba(255,255,255,.7); text-align: center; white-space: nowrap; }
+  .flow-box.accent { border-color: rgba(0,212,255,.2); background: rgba(0,212,255,.06); color: var(--cyan); font-weight: 700; box-shadow: 0 0 16px rgba(0,212,255,.08), inset 0 1px 0 rgba(255,255,255,.03); }
+  .flow-box.primary { border-color: rgba(77,124,255,.25); background: rgba(77,124,255,.08); color: var(--blue); font-weight: 700; }
+  .flow-box.warn { border-color: rgba(251,191,36,.25); background: rgba(251,191,36,.06); color: var(--amber); font-weight: 600; }
+  .flow-box.green { border-color: rgba(52,211,153,.25); background: rgba(52,211,153,.06); color: var(--green); font-weight: 600; }
+  .flow-box.rose { border-color: rgba(248,113,113,.25); background: rgba(248,113,113,.06); color: var(--rose); font-weight: 600; }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 24px; color: rgba(255,255,255,.15); font-size: 14px; flex-shrink: 0; }
+  .flow-v-arrow { display: flex; justify-content: center; color: rgba(255,255,255,.15); font-size: 14px; line-height: 1; margin: 3px 0; }
+
+  .compare-table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 8px 0; }
+  .compare-table thead th { background: rgba(255,255,255,.03); color: var(--text-secondary); font-weight: 600; text-align: left; padding: 8px 10px; font-size: 10px; font-family: var(--font-mono); letter-spacing: .06em; border-bottom: 1px solid rgba(0,212,255,.1); }
+  .compare-table thead th:first-child { border-radius: var(--radius) 0 0 0; } .compare-table thead th:last-child { border-radius: 0 var(--radius) 0 0; }
+  .compare-table tbody td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,.03); color: rgba(255,255,255,.75); font-size: 12px; line-height: 1.55; }
+  .compare-table tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius); } .compare-table tbody tr:last-child td:last-child { border-radius: 0 0 var(--radius) 0; }
+  .compare-table tbody tr:nth-child(even) td { background: rgba(255,255,255,.01); }
+
+  .card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin: 8px 0; }
+  .card { background: rgba(255,255,255,.02); border: 1px solid rgba(255,255,255,.06); border-radius: var(--radius); padding: 10px 12px; }
+  .card-badge { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 4px; background: rgba(77,124,255,.15); border: 1px solid rgba(77,124,255,.25); color: var(--blue); font-family: var(--font-mono); font-size: 10px; font-weight: 700; margin-bottom: 4px; }
+  .card-title { font-size: 12.5px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+  .card-list { list-style: none; } .card-list li { font-size: 11px; color: rgba(255,255,255,.65); line-height: 1.6; padding-left: 10px; position: relative; }
+  .card-list li::before { content: '\203A'; position: absolute; left: 0; color: var(--cyan); }
+
+  .hl-orange { color: var(--amber); background: linear-gradient(180deg, transparent 58%, rgba(251,191,36,.15) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-green { color: var(--green); background: linear-gradient(180deg, transparent 58%, rgba(52,211,153,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-purple { color: var(--purple); background: linear-gradient(180deg, transparent 58%, rgba(167,139,250,.12) 58%); padding: 0 2px; font-weight: 600; }
+  .hl-red { color: var(--rose); background: linear-gradient(180deg, transparent 58%, rgba(248,113,113,.12) 58%); padding: 0 2px; font-weight: 600; }
+
+  .cornell-summary { grid-area: summary; padding: 18px 44px 22px; background: linear-gradient(180deg, rgba(255,255,255,.01) 0%, transparent 100%); border-top: 1px solid rgba(255,255,255,.04); position: relative; }
+  .cornell-summary::before { content: ''; position: absolute; top: 0; left: 44px; right: 44px; height: 1px; background: linear-gradient(90deg, transparent, rgba(0,212,255,.12), var(--cyan), transparent); }
+  .cornell-summary h3 { font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--cyan); letter-spacing: .18em; margin-bottom: 8px; }
+  .cornell-summary .summary-text { font-size: 13.5px; font-weight: 600; color: var(--text-primary); line-height: 1.65; letter-spacing: .01em; padding-left: 14px; border-left: 2px solid var(--cyan); box-shadow: -4px 0 12px rgba(0,212,255,.06); }
+  .cornell-summary .summary-text strong { color: var(--cyan); text-shadow: 0 0 8px var(--cyan-glow); }
+  .cornell-summary .summary-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; }
+  .tag { font-size: 10px; padding: 3px 10px; border-radius: 3px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06); color: var(--text-secondary); font-weight: 500; font-family: var(--font-mono); letter-spacing: .03em; }
+  .tag.primary { background: rgba(0,212,255,.08); border-color: rgba(0,212,255,.15); color: var(--cyan); font-weight: 600; }
+
+  @media (max-width: 768px) {
+    .page { max-width: 100%; margin: 0; border-radius: 0; border: none; box-shadow: none; } .page::before { display: none; }
+    .header { padding: 20px 16px 16px; } .header-top { flex-direction: column; gap: 12px; } .header-title { font-size: 17px; }
+    .cornell { grid-template-columns: 1fr; grid-template-areas: "cue" "notes" "summary"; }
+    .cornell-cue { border-right: none; border-bottom: 1px solid rgba(0,212,255,.06); padding: 16px; }
+    .cornell-notes { padding: 16px; } .cornell-summary { padding: 16px; } .cornell-summary::before { left: 16px; right: 16px; }
+    .card-grid { grid-template-columns: 1fr; } .flow-arrow { width: 14px; }
+    .compare-table { font-size: 10px; display: block; overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand">
+        <div class="header-badge"><span class="header-badge-icon">心</span></div>
+      </div>
+      <div class="header-title-group">
+        <div class="header-kicker">康奈尔分析 / 写作心法 + 评分标准</div>
+        <div class="header-title">四大心得 + 评分标准（扣分/加分/不及格）</div>
+      </div>
+    </div>
+    <div class="header-meta">
+      <div class="meta-item"><span class="meta-dot"></span>2026-09-16</div>
+      <div class="meta-item"><span class="meta-dot"></span>架构直播8：论文-上 P12-P17 精华</div>
+      <div class="meta-item"><span class="meta-dot"></span>四大心得 · 评分规则</div>
+    </div>
+  </div>
+
+  <div class="cornell">
+    <div class="cornell-cue">
+      <div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span> 心得一：技术视野为什么必须前沿化？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 心得二：论文的灵魂是什么？如何体现？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 心得三：论述核心是技术罗列还是决策过程？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 心得四：量化成果如何写才令人信服？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 哪些情况扣5-10分 / 加分 / 直接不及格？</div>
+    </div>
+
+    <div class="cornell-notes">
+      <div class="notes-header">&#x25B8; 核心要点</div>
+
+      <!-- ===== 心得一 ===== -->
+      <div class="numbered-header"><span class="num">1</span>心得一：技术视野必须前沿化</div>
+      <div class="note-section">
+        <h4><span class="dot"></span>知识型 → 趋势型考核</h4>
+        <ul>
+          <li>过去：熟练掌握 SOA、SSH、层次架构等经典技术就能应对</li>
+          <li>现在：必须关注并理解<strong>云原生、数据智能、AI工程化</strong>的核心架构思想</li>
+          <li><span class="hl-green">建议1</span>：定期逛技术社区、读大厂技术博客，看他们在用什么</li>
+          <li><span class="hl-green">建议2</span>：围绕<strong>微服务治理、数据中台、AIGC应用、云原生</strong>构建知识图谱</li>
+        </ul>
+      </div>
+
+      <!-- ===== 心得二 ===== -->
+      <div class="numbered-header"><span class="num">2</span>心得二：论文灵魂在于真实性</div>
+      <div class="note-section">
+        <h4><span class="dot"></span>没有真实性，文章很难通过</h4>
+        <ul>
+          <li>过去：或许可以杜撰项目、堆砌理论概念拿及格</li>
+          <li>现在：考题要求深入细节（如事件驱动的消息可靠性、多模型数据库选型对比），无真实历练写不出有血有肉的内容</li>
+          <li><span class="hl-green">建议1</span>：深度复盘过去 2-3 年最复杂、最有挑战性的项目——为什么这么设计？遇到什么坑？现在重做用什么新架构？</li>
+          <li><span class="hl-green">建议2</span>：为 1-2 个核心项目准备素材库：背景、角色、选型对比表、架构演变图、典型问题及方案、可量化成果数据</li>
+        </ul>
+      </div>
+
+      <!-- ===== 心得三 ===== -->
+      <div class="numbered-header"><span class="num">3</span>心得三：核心是技术决策过程，不是罗列</div>
+      <div class="note-section">
+        <h4><span class="dot"></span>考官想看"为什么"，不想看"用了什么"</h4>
+        <ul>
+          <li>过去：列出"我用到了XXX技术"就可能得分</li>
+          <li>现在：考官想看<strong>为什么是Redis不是Memcached？为什么用Pub/Sub？缓存和数据库一致性怎么保证？集群方案怎么选？遇到什么坑？</strong></li>
+          <li><span class="hl-green">建议1</span>：每个技术点描述后，都必须跟上选择它的理由</li>
+          <li><span class="hl-green">建议2</span>：主动说明考虑过的其他方案及被否决原因（例：对比 Kafka 和 RabbitMQ，因吞吐量+日志回溯要求选 Kafka，尽管延迟不如 RabbitMQ 稳定）</li>
+        </ul>
+      </div>
+
+      <!-- ===== 心得四 ===== -->
+      <div class="numbered-header"><span class="num">4</span>心得四：价值靠量化成果，而非定性描述</div>
+      <div class="note-section">
+        <h4><span class="dot"></span>用数据说话，最高级的表达</h4>
+        <ul>
+          <li>过去："系统性能得到提升"就完事</li>
+          <li>现在：<span class="note-highlight">"引入XX负载均衡算法+缓存集群，TP99从500ms降到100ms，并发从1000QPS提升到5000QPS"</span> 才令人信服</li>
+          <li><span class="hl-green">挖掘数据</span>：性能指标（响应时间/QPS·TPS）；资源指标（CPU/内存降低百分比、服务器成本节约）；质量与效率指标（可用性99.9%→99.99%、部署频率提升、MTTR缩短）</li>
+          <li><span class="hl-green">突出展示</span>：论述完设计方案后，用单独小节"应用效果与分析"用数据证明成功</li>
+        </ul>
+      </div>
+
+      <!-- ===== 评分标准 ===== -->
+      <div class="numbered-header"><span class="num">5</span>评分标准（扣分 / 加分 / 不及格）</div>
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-badge">-</div>
+          <div class="card-title"><span class="hl-red">扣 5-10 分</span></div>
+          <ul class="card-list">
+            <li>没有摘要 / 摘要过于简略 / 摘要无实质内容</li>
+            <li>过分自我吹嘘夸大其词、内容有明显错误漏洞</li>
+            <li>内容仅为大学生/研究生实习性质、应用水平较低</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">+</div>
+          <div class="card-title"><span class="hl-green">可加 5-10 分</span></div>
+          <ul class="card-list">
+            <li>有独特见解、深入体会、非常突出的论文</li>
+            <li>起点高、符合信息系统发展新趋势并能应用，内容详实、体会中肯、思路清晰</li>
+            <li>项目难度高/质量优异/涉及国家重大信息系统工程且作者发挥重要作用</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-badge">✗</div>
+          <div class="card-title"><span class="hl-red">直接不及格</span></div>
+          <ul class="card-list">
+            <li>虚构情节、严重不真实或不可信的内容</li>
+            <li>无项目开发实际经验、通篇浅层纯理论</li>
+            <li>内容方法过于陈旧、项目水准非常低下</li>
+            <li>不切题意、内容空洞泛泛而谈、正文少于1000字</li>
+            <li>文理不通、错别字多、条理思路不清</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="feynman">
+        <div class="feynman-label">&#x25C6; 费曼</div>
+        <p><strong>写作心法就四句话：眼界要新、故事要真、决策要讲为什么、成果要用数据。</strong> 想想阅卷官面对几百篇论文，凭什么给你高分？一靠你用的技术是不是当下的主流（云原生/数据智能/AI）；二靠你的项目细节是不是编的（能写出"为什么选Kafka不选RabbitMQ"的人必有实战）；三靠你是不是在"做权衡"而非"报菜名"；四靠你有没有拿得出手的量化成绩单（TP99从500ms到100ms）。<strong>记住：不及格的最大雷区是"虚构+纯理论+跑题+正文字数<1000"。</strong></p>
+      </div>
+
+      <div class="diagram">
+        <div class="diagram-label">&#x25C6; 逻辑关系 — 高分论文四要素</div>
+        <div style="text-align:center;">
+          <div class="flow-row">
+            <div class="flow-box accent">眼界新<br><small>云原生/AI/数据智能</small></div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box primary">故事真<br><small>复盘真实项目细节</small></div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box green">讲决策<br><small>为什么/对比/取舍</small></div>
+            <div class="flow-arrow">|</div>
+            <div class="flow-box warn">用数据<br><small>TP99/QPS/可用性</small></div>
+          </div>
+          <div class="flow-v-arrow">&#x2193;</div>
+          <div class="flow-row">
+            <div class="flow-box">高分 = 加分项命中（新颖+深刻+贴合趋势），避开扣分项与不及格雷区</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">四大心得=<strong>技术视野前沿化（云原生/数据智能/AI工程化）、论文灵魂是真实性（复盘真实项目）、核心是技术决策过程（每技术点配"为什么"+对比取舍）、价值靠量化成果（TP99/QPS/可用性数据）</strong>；评分规则=无实质摘要/吹嘘/实习级扣5-10分，新颖深刻贴趋势加5-10分，虚构纯理论陈旧跑题正文<1000字直接不及格。</div>
+      <div class="summary-tags">
+        <span class="tag primary">四大心得</span>
+        <span class="tag">前沿化</span>
+        <span class="tag">真实性</span>
+        <span class="tag">决策过程</span>
+        <span class="tag">量化成果</span>
+        <span class="tag">评分标准</span>
+        <span class="tag">不及格雷区</span>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
