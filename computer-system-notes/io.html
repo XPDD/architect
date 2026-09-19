@@ -106,6 +106,7 @@
 <div class="cue-item"><span class="q-mark">?</span>DMA 在谁与谁之间建数据通路？</div>
 <div class="cue-item"><span class="q-mark">?</span>哪种方式下 CPU 与外设可并行工作？</div>
 <div class="cue-item"><span class="q-mark">?</span>IOP 的代价是什么？</div>
+<div class="cue-item"><span class="q-mark">?</span>中断处理中哪些由 OS 做、哪些由硬件做？</div>
     </div>
     <div class="cornell-notes">
       <div class="notes-header">&#x25B8; 核心要点</div>
@@ -128,6 +129,15 @@
         <ul>
           <li>DMA 在主存与<span class="hl-green">外设</span>之间直接建立数据通路（不是 CPU 与外设）。</li>
           <li><span class="note-highlight">中断方式和 DMA 方式下，CPU 与外设可并行工作</span>；程序查询方式则不能。</li>
+        </ul>
+      </div>
+
+      <div class="numbered-header"><span class="num">2.1</span>中断处理流程分工（易错）</div>
+      <div class="note-section">
+        <ul>
+          <li><span class="hl-red">中断响应与转入中断入口地址</span>（取得中断向量、跳转到处理程序）：由 <strong>CPU 硬件中断机制</strong>完成，<span class="note-highlight">通常不属于操作系统</span>的工作。</li>
+          <li><span class="hl-green">保存现场 / 恢复现场</span>、执行中断服务的<strong>调度控制</strong>：由<strong>操作系统</strong>（中断处理程序）完成。</li>
+          <li>口诀：<span class="note-highlight">硬件管「响应 + 跳入口」，OS 管「保现场 + 恢复 + 调度」。</span></li>
         </ul>
       </div>
 
