@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 分库分表（通俗版 · 含名词速查与流程）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:40px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;flex-wrap:wrap}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.75}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.78);line-height:1.65}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.75}.feynman p strong{color:var(--green)}
+  .diagram{margin:12px 0;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:7px 13px;font-size:12px;font-weight:500;color:rgba(255,255,255,.72);text-align:center;line-height:1.45}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-box.green{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06);color:var(--green);font-weight:700}
+  .flow-box.amber{border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.06);color:var(--amber);font-weight:700}
+  .flow-box.purple{border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.06);color:var(--purple);font-weight:700}
+  .flow-box.rose{border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.06);color:var(--rose);font-weight:700}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.2);font-size:14px;line-height:1;margin:3px 0}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.78);font-size:12px;line-height:1.55;vertical-align:top}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .hl-orange{color:var(--amber);font-weight:600}.hl-green{color:var(--green);font-weight:600}.hl-purple{color:var(--purple);font-weight:600}.hl-cyan{color:var(--cyan);font-weight:600}.hl-rose{color:var(--rose);font-weight:600}
+  .glossary{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .glossary td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+  .glossary td:first-child{white-space:nowrap;color:var(--cyan);font-weight:700;font-family:var(--font-mono);font-size:11.5px;width:130px}
+  .glossary td:last-child{color:rgba(255,255,255,.78);line-height:1.55}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:16px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.compare-table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">SH</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">架构直播9 · 案例分析模拟题五 / 数据库设计与优化</div>
+        <div class="header-title">分库分表 · 通俗笔记（名词速查 + 流程）</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-09</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · 案例分析</div><div class="meta-item"><span class="meta-dot"></span>零基础友好</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>8 亿行的单表为什么撑不住？</div>
+      <div class="cue-item"><span class="q-mark">?</span>分库分表是什么？分片键怎么选？</div>
+      <div class="cue-item"><span class="q-mark">?</span>分片后会冒出哪三个大麻烦？</div>
+      <div class="cue-item"><span class="q-mark">?</span>分布式 ID 三种方案怎么选？</div>
+      <div class="cue-item"><span class="q-mark">?</span>跨分片查询怎么避免"全分片广播"？</div>
+      <div class="cue-item"><span class="q-mark">?</span>数据越积越大怎么办（热/温/统计）？</div>
+      <div class="cue-item"><span class="q-mark">?</span>整套流程串起来是什么样？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>先把题目翻译成大白话</div>
+      <div class="note-section"><p>把订单库想象成一本<b>又厚又大的账本</b>：</p>
+        <ul>
+          <li><span class="hl-rose">单表 8 亿行</span>＝这本账有 8 亿条记录，翻一次很慢；</li>
+          <li><span class="hl-rose">日增 600 万行</span>＝每天还在往里加 600 万条，越来越厚；</li>
+          <li><span class="hl-rose">写入锁竞争</span>＝很多人同时要改账本，互相"抢笔"排队；</li>
+          <li><span class="hl-rose">CPU 飙高、查询超时</span>＝账本太重，翻页和写入都把机器累垮。</li>
+        </ul>
+        <p>结论：<b>一本账本扛不动了，得拆成很多本小账本</b>——这就是"分库分表"。为便于整理，先记住一个主线：<span class="note-highlight">拆开（分片）→ 分头找（路由/查询）→ 各自编号不重复（分布式 ID）→ 老数据搬走（归档/统计）</span>。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>名词速查（不懂的词看这里）</div>
+      <table class="glossary">
+        <tr><td>分库分表</td><td>把一张超大表 / 一个超大库，按规则切成很多小库、小表，把压力分摊开</td></tr>
+        <tr><td>分片</td><td>切出来的其中一个小库或小表（也叫 shard）</td></tr>
+        <tr><td>分片键</td><td>决定"一条数据该放哪个分片"的那个字段；本题选 <b>用户 ID</b></td></tr>
+        <tr><td>路由</td><td>根据分片键算出"这条数据该去哪个分片"的过程</td></tr>
+        <tr><td>全分片广播</td><td>一次查询把<b>所有</b>分片都问一遍，很慢（要尽量避免）</td></tr>
+        <tr><td>分布式 ID</td><td>分表后每张表自增主键会重复，需要一个<b>全局唯一、不重复</b>的编号</td></tr>
+        <tr><td>雪花算法</td><td>用"时间戳＋机器号＋序号"拼出一个全局唯一、且大致递增的 ID</td></tr>
+        <tr><td>号段模式</td><td>一次从数据库领一批 ID（如 1000 个）慢慢发，性能高但依赖发号中心</td></tr>
+        <tr><td>UUID</td><td>本地随机生成的长字符串，全局唯一但<b>无序</b>，做主键性能差</td></tr>
+        <tr><td>binlog</td><td>数据库的"变更流水日志"，记录每一次增、删、改</td></tr>
+        <tr><td>订阅同步</td><td>像订阅消息一样读 binlog，把数据实时"搬"到别处（如 ES）</td></tr>
+        <tr><td>宽表</td><td>把常用字段拼成一张很宽的大表，专门给查询/检索用</td></tr>
+        <tr><td>ES</td><td>Elasticsearch，专门做"搜索＋组合筛选＋排序分页"的搜索引擎</td></tr>
+        <tr><td>读写分离</td><td>主库负责写、从库负责读，分担压力</td></tr>
+        <tr><td>强一致 / 最终一致</td><td>强一致＝下单成功就一定落库、绝不丢；最终一致＝允许暂时不同步，过一会儿自动对齐（如同步到 ES）</td></tr>
+        <tr><td>热 / 温 / 冷数据</td><td>热＝最近常查的；温＝几个月前的；冷＝很久不动的</td></tr>
+        <tr><td>归档库</td><td>把老数据搬到便宜的存储里，给在线库"减负"</td></tr>
+        <tr><td>汇总层 / 数仓</td><td>预先算好的统计结果，专门给报表用</td></tr>
+      </table>
+
+      <div class="numbered-header"><span class="num">3</span>分库分表到底是什么（两种切法）</div>
+      <div class="note-section"><ul>
+        <li><span class="hl-cyan">垂直拆分</span>：按<b>业务/字段</b>分——把订单、用户、商品拆到不同库。像把一本大账分成"订单账、用户账、商品账"。</li>
+        <li><span class="hl-cyan">水平拆分</span>：按<b>行</b>分——同一张订单表，按规则拆成多张结构一样的小表。<b>本题做的就是水平拆分。</b></li>
+        <li><span class="hl-purple">分片键</span>：水平拆分按哪个字段切？本题选<b>用户 ID</b>。</li>
+      </ul></div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 水平拆分：一张大表 → 多个分片</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box rose">订单大表（8 亿行）</div></div>
+          <div class="flow-v-arrow">↓ 按 用户 ID 取模 / 范围切分</div>
+          <div class="flow-row">
+            <div class="flow-box accent">分片0<br><small>用户ID 尾号 0</small></div>
+            <div class="flow-box accent" style="margin-left:8px">分片1<br><small>尾号 1</small></div>
+            <div class="flow-box accent" style="margin-left:8px">分片2<br><small>尾号 2</small></div>
+            <div class="flow-box accent" style="margin-left:8px">… 分片N</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">4</span>分片键为什么选"用户 ID"？以及它带来的三个麻烦</div>
+      <div class="note-section">
+        <p><b>选用户 ID 的理由</b>：用户最常查的是"我的订单"，按用户 ID 分片后，<span class="hl-green">同一个用户的订单都落在同一个分片</span>，一查就命中，很快。</p>
+        <p><b>但商家侧会出问题</b>：商家要按"订单号 / 时间 / 状态"组合查，这些条件跟用户 ID 没直接关系，就<span class="hl-rose">找不到该查哪个分片，只能把所有分片都问一遍（全分片广播）</span>，又慢又乱。</p>
+        <p>分片后一共冒出<b>三个大麻烦</b>：</p>
+      </div>
+      <table class="compare-table">
+        <thead><tr><th>麻烦</th><th>通俗解释</th><th>应对方向</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-rose">① 跨分片查询</span></td><td>一条查询用不上分片键，就得翻遍所有分片</td><td>订单号带路由 / 建"订单号→用户ID"映射表 / 商家查询走 ES 宽表</td></tr>
+          <tr><td><span class="hl-rose">② 分布式 ID</span></td><td>每张分表都自增，会撞号（出现重复订单号）</td><td>用全局唯一的分布式 ID（见第 5 节）</td></tr>
+          <tr><td><span class="hl-rose">③ 路由与聚合</span></td><td>得知道去哪写、去哪读；真要聚合还得合并各分片结果</td><td>路由规则 + 并行查询 + 网关归并排序</td></tr>
+        </tbody>
+      </table>
+
+      <div class="numbered-header"><span class="num">5</span>分布式 ID：三种方案怎么选</div>
+      <table class="compare-table">
+        <thead><tr><th>方案</th><th>大白话</th><th>优点</th><th>缺点</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-cyan">数据库号段</span></td><td>一次从数据库领一批号（如 1000 个）慢慢发</td><td>性能高、趋势递增便于索引</td><td>依赖发号中心；多实例要协调</td></tr>
+          <tr><td><span class="hl-green">雪花算法</span></td><td>时间戳＋机器号＋序号 拼出来的号</td><td>无中心依赖、趋势递增、性能好</td><td>要处理"时钟回拨"和机器号分配</td></tr>
+          <tr><td><span class="hl-rose">UUID</span></td><td>本地随机生成的长字符串</td><td>完全本地、无中心</td><td>无序，主键索引性能差；太长</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p><b>本题选<u>雪花算法</u></b>，还可在订单号前缀里带上业务/分片信息，方便按订单号直接路由。</p></div>
+
+      <div class="numbered-header"><span class="num">6</span>跨分片查询怎么破（四条路，别硬广播）</div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 四条查询路径</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">① 按订单号查</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div><div class="flow-box">订单号自带分片号 → 直连对应分片</div></div>
+          <div class="flow-row" style="margin-top:6px"><div class="flow-box green">② 按用户查</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div><div class="flow-box">用户 ID 就是分片键 → 命中单个分片</div></div>
+          <div class="flow-row" style="margin-top:6px"><div class="flow-box purple">③ 商家组合查</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div><div class="flow-box">走 ES / 宽表搜索引擎（binlog 实时同步）</div></div>
+          <div class="flow-row" style="margin-top:6px"><div class="flow-box amber">④ 确实要跨片聚合</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div><div class="flow-box">各分片并行查 → 网关归并排序 → 游标翻页</div></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">7</span>数据越积越多：热 / 温 / 统计 三层</div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 实库 + 归档库 + 汇总层</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">热数据 · 近 3 个月订单<br><small>留在在线分库分表库，扛高频读写</small></div></div>
+          <div class="flow-v-arrow">↓ 凌晨低峰批量归档</div>
+          <div class="flow-row"><div class="flow-box primary">温数据 · 3～24 个月<br><small>搬到归档库 / 冷存储，低频按需查</small></div></div>
+          <div class="flow-v-arrow">↓ 每日/每月定时任务</div>
+          <div class="flow-row"><div class="flow-box green">统计数据 · 汇总层 / 数仓<br><small>StarRocks、ClickHouse 等，供运营报表</small></div></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">8</span>全景流程（把它串起来）</div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 下单 → 同步 → 查询 → 归档</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">① 下单（写）</div></div>
+          <div class="flow-v-arrow">↓ 雪花算法生成订单号 → 按用户ID路由 → 写入对应分片（强一致、事务保证不丢）</div>
+          <div class="flow-row"><div class="flow-box purple">② 变更日志 binlog</div></div>
+          <div class="flow-v-arrow">↓ 订阅同步（如 Canal）实时搬运</div>
+          <div class="flow-row"><div class="flow-box primary">③ 写入 ES / 宽表（供商家组合查、最终一致）</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box green">④ 查询分流：按订单号/用户直查分片；商家组合查走 ES</div></div>
+          <div class="flow-v-arrow">↓ 数据变老</div>
+          <div class="flow-row"><div class="flow-box amber">⑤ 归档到温/冷存储；统计任务汇总到数仓 → 报表</div></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">9</span>回到题目四小问（要点速记）</div>
+      <table class="compare-table">
+        <thead><tr><th>问题</th><th>要点</th></tr></thead>
+        <tbody>
+          <tr><td>问题1 分片键</td><td>选<b>用户 ID</b>（高频"我的订单"、局部性好）；商家按订单号/时间/状态查会全分片广播；解法：订单号嵌路由、映射表、另建 ES 宽表</td></tr>
+          <tr><td>问题2 分布式 ID</td><td>对比号段/雪花/UUID；本场景选<b>雪花算法</b>（可加业务前缀便于订单号路由）</td></tr>
+          <tr><td>问题3 全链路查询</td><td>订单号直查、用户命中单分片、商家组走 ES、跨片聚合用"并行查＋归并排序＋游标翻页"</td></tr>
+          <tr><td>问题4 分层报表</td><td>热（近3月，在线库）／温（3～24月，归档冷存）／统计（定时汇总到数仓 OLAP）</td></tr>
+        </tbody>
+      </table>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>分库分表说人话：</strong>一个图书馆只有<b>一本 8 亿页的目录</b>，找一本书要把整本翻完，写新书还得抢同一支笔——当然卡。于是把它拆成<b>好几本分册</b>（分片），按"借书人编号"决定去第几册找（分片键）。这样"我的借阅记录"总在同一册，很快。但麻烦也来了：管理人员要按"书名/日期"查，就不知道在哪一册，只能<b>翻遍所有册</b>（全分片广播），所以另做一本<b>搜索索引</b>（ES）专门给人组合查。拆开之后每册自己编号会撞号，于是统一用<b>雪花算法</b>发全球唯一的号。老记录越来越多，就把<b>旧的搬去仓库</b>（归档），报表数据<b>提前算好放汇总层</b>。一句话：<b>拆开提速，但要用"路由 + 全局ID + 搜索索引 + 归档"来收尾。</b></p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">单表太大 → <strong>水平分库分表</strong>（按<b>用户ID</b>分片）；分片带来三麻烦＝<strong>跨分片查询、分布式ID、路由聚合</strong>；跨分片别硬广播，用<strong>订单号嵌路由 + ES 宽表（binlog 同步）+ 并行归并</strong>；全局唯一 ID 选<strong>雪花算法</strong>；老数据按<strong>热（在线库）/温（归档）/统计（数仓）</strong>分层。主线：<strong>分片 → 路由/查询 → 全局ID → 归档统计</strong>。</div>
+      <div class="summary-tags"><span class="tag primary">分库分表</span><span class="tag">分片键</span><span class="tag">分布式ID</span><span class="tag">雪花算法</span><span class="tag">ES宽表</span><span class="tag">binlog同步</span><span class="tag">热温统计分层</span><span class="tag">数据库设计与优化</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;flex-wrap:wrap;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回数据库笔记索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="../question-bank/exam-2026-05-case.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 2026年5月案例分析（模拟题五）</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="distributed-nosql.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.3);padding-bottom:1px;">分布式数据库 &amp; NoSQL</a>
+</div>
+</body>
+</html>
