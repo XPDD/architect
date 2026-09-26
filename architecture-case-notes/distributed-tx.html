@@ -96,7 +96,9 @@
       <div class="cue-item"><span class="q-mark">?</span>XA（两阶段提交 2PC）是什么原理？</div>
       <div class="cue-item"><span class="q-mark">?</span>TCC 的 Try / Confirm / Cancel 各是什么？</div>
       <div class="cue-item"><span class="q-mark">?</span>XA 与 TCC 怎么对比、什么时候用哪个？</div>
-      <div class="cue-item"><span class="q-mark">?</span>Saga 的编排 / 协同模式区别？</div>
+      <div class="cue-item"><span class="q-mark">?</span>Saga 是什么、为什么需要它？</div>
+      <div class="cue-item"><span class="q-mark">?</span>Saga 编排 / 协同的流程长什么样？</div>
+      <div class="cue-item"><span class="q-mark">?</span>银行为何要防"无隔离"和"补偿不完备"？</div>
       <div class="cue-item"><span class="q-mark">?</span>本地消息表 + MQ 怎么做到"不丢不重"？</div>
       <div class="cue-item"><span class="q-mark">?</span>放款、还款该各选哪种方案？</div>
     </div>
@@ -194,15 +196,73 @@
       </table>
       <div class="note-section"><p><b>本题选型</b>："放款"是<b>资金核心、频率中等</b>，优先用 <span class="hl-purple">TCC</span> 保证资金强一致，再辅以<b>对账兜底</b>。（低频、对账类才考虑 XA。）</p></div>
 
-      <div class="numbered-header"><span class="num">6</span>Saga：长流程的补偿式事务</div>
+      <div class="numbered-header"><span class="num">6</span>Saga：长流程的补偿式事务（是什么 + 为什么 + 流程）</div>
+      <div class="note-section">
+        <p><b>是什么</b>：Saga 把一个"跨多个服务、步骤多、耗时长"的大事务，拆成<b>一串本地小事务 T1→T2→…→Tn</b>；每个 Ti 都是单个服务里又快又短的事务，做完<b>立刻提交</b>。只要某一步失败，就<b>反向执行"补偿操作" C</b>（撤回已完成的步骤），把整体效果抵消掉。</p>
+        <p><b>为什么要用</b>：XA 要锁资源、慢；而长流程又不能一直锁着不放。于是换个思路——<span class="note-highlight">不锁、先做、错了再补</span>。注意它是"<b>补偿</b>"而不是数据库的"回滚"：扣款错了不是 rollback，而是业务上<b>再转一笔钱回来</b>，所以补偿必须"业务上可定义、且可重复执行（幂等）"。</p>
+        <p><b>生活类比</b>：出门旅行依次订"机票 → 酒店 → 租车"；若租车失败，就依次<b>退酒店、退机票</b>——每一步都有对应的"退"。</p>
+      </div>
+
+      <div class="note-section" style="margin-top:12px"><p style="font-size:13.5px;font-weight:700;color:var(--text-primary)">6.1 编排模式（Orchestration）—— 有"总指挥"</p></div>
+      <div class="note-section"><p>由一个<b>编排服务</b>当总指挥，按顺序调用各服务、记录每步状态；失败就按<b>相反顺序</b>调用补偿。集中可控、状态清晰、便于审计，<b>银行资金场景常用</b>。</p></div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 编排模式流程（以"发放贷款"为例）</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box primary">编排服务 Orchestrator<br><small>总指挥 · 记录每步状态</small></div></div>
+          <div class="flow-v-arrow">↓ 依次调用（成功就继续）</div>
+          <div class="flow-row">
+            <div class="flow-box green">T1 账户扣款 ✓</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div>
+            <div class="flow-box green">T2 生成借据 ✓</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div>
+            <div class="flow-box rose">T3 记录风控 ✗ 失败</div>
+          </div>
+          <div class="flow-v-arrow">↓ 某步失败 → 按相反顺序执行补偿</div>
+          <div class="flow-row">
+            <div class="flow-box amber">C2 作废借据</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div>
+            <div class="flow-box amber">C1 退回扣款</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="note-section" style="margin-top:12px"><p style="font-size:13.5px;font-weight:700;color:var(--text-primary)">6.2 协同模式（Choreography）—— 靠"事件接力"</p></div>
+      <div class="note-section"><p>没有总指挥，各服务做完自己那步就<b>发一个事件</b>，别的服务订阅事件、自己决定下一步；失败则发失败事件，相关服务各自执行补偿。去中心化、松耦合，但<b>链路长、整体状态难追踪</b>。</p></div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 协同模式流程（事件驱动）</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box green">账户服务<br><small>T1 扣款完成</small></div></div>
+          <div class="flow-v-arrow">↓ 发布事件「贷款专户已扣款」</div>
+          <div class="flow-row"><div class="flow-box green">放款服务（订阅到该事件）<br><small>T2 生成借据</small></div></div>
+          <div class="flow-v-arrow">↓ 发布事件「借据已生成」</div>
+          <div class="flow-row"><div class="flow-box rose">风控服务（订阅到该事件）<br><small>T3 记录快照 ✗ 失败</small></div></div>
+          <div class="flow-v-arrow">↓ 发布失败事件「快照记录失败」</div>
+          <div class="flow-row"><div class="flow-box amber">放款 / 账户 各自订阅 → 分别执行补偿</div></div>
+        </div>
+      </div>
+
+      <div class="note-section" style="margin-top:12px"><p style="font-size:13.5px;font-weight:700;color:var(--text-primary)">6.3 两种模式对比</p></div>
       <table class="compare-table">
-        <thead><tr><th>模式</th><th>怎么做</th><th>优缺点</th></tr></thead>
+        <thead><tr><th>维度</th><th>编排模式（Orchestration）</th><th>协同模式（Choreography）</th></tr></thead>
         <tbody>
-          <tr><td><span class="hl-cyan">编排模式<br>Orchestration</span></td><td>有一个"总指挥"服务按顺序调用各服务、跟踪状态，失败就反向补偿</td><td>集中可控、利于审计；但编排者易成单点/复杂</td></tr>
-          <tr><td><span class="hl-purple">协同模式<br>Choreography</span></td><td>没有总指挥，各服务靠"事件"自发驱动下一步</td><td>去中心化、松耦合；但整体状态难追踪</td></tr>
+          <tr><td>控制方式</td><td>中心编排器统一调度</td><td>各服务靠事件自发驱动下一步</td></tr>
+          <tr><td>耦合度</td><td>服务只与编排器交互，<b>较低</b></td><td>服务彼此订阅事件，事件耦合</td></tr>
+          <tr><td>状态可追踪</td><td>编排器集中记录，<b>清晰</b>、利于审计</td><td>分散在各服务，<b>难追踪</b></td></tr>
+          <tr><td>主要风险</td><td>编排器逻辑集中、可能成单点</td><td>链路长、易"事件风暴"</td></tr>
+          <tr><td>适用</td><td>流程复杂、需审计（<b>银行资金</b>）</td><td>步骤少、简单、追求松耦合</td></tr>
         </tbody>
       </table>
-      <div class="note-section"><p><b>银行资金场景用 Saga 必须注意两点</b>：① Saga <b>没有隔离性</b>，中间状态对别人可见，资金场景要避免读到"未提交的中间态"，必要时做<b>资源预留</b>；② <b>补偿必须完备且可幂等重试</b>，否则会造成资金不一致。</p></div>
+
+      <div class="note-section" style="margin-top:12px"><p style="font-size:13.5px;font-weight:700;color:var(--text-primary)">6.4 银行资金场景必须注意的两个约束（含为什么）</p></div>
+      <div class="note-section"><ul>
+        <li><span class="hl-rose">① Saga 没有隔离性</span>：各步提交后<b>立刻对别人可见</b>，会暴露"中间状态"（如"已扣款、借据未生成"），资金场景若被读到，可能误判或重复操作。<br><b>为什么</b>：Saga 是"先提交、失败再补"，不像数据库事务能锁住中间态。<br><span class="hl-green">应对</span>：语义锁 / 资源预留（先冻结、确认后再扣）、用状态标记（"处理中"不对外可操作）、避免读中间态。</li>
+        <li><span class="hl-rose">② 补偿必须完备且可幂等重试</span>：每个正向操作都要有能抵消它的补偿，且补偿本身可能失败、需要重试，否则会资金不一致。<br><b>为什么</b>：补偿也是网络调用，会失败；重试又可能重复执行。<br><span class="hl-green">应对</span>：正/逆向操作成对设计、补偿表登记状态、幂等键去重、失败重试 + 死信 + 人工兜底，并防"空补偿 / 悬挂"。</li>
+      </ul></div>
+
+      <div class="note-section" style="margin-top:12px"><p style="font-size:13.5px;font-weight:700;color:var(--text-primary)">6.5 补偿怎么设计（落地要点）</p></div>
+      <div class="note-section"><ul>
+        <li><b>成对设计</b>：正向 <code>Ti</code> 与逆向 <code>Ci</code> 一一对应（扣款↔退款、生成借据↔作废借据）。</li>
+        <li><b>补偿幂等</b>：同一补偿执行多次只生效一次（用幂等键 / 唯一索引 / 状态判断）。</li>
+        <li><b>补偿可重试</b>：补偿失败要能重试，超限进死信并转人工处理。</li>
+        <li><b>记录状态</b>：用状态机 / 补偿表记录每步是否完成、是否已补偿，防止漏补或重复补。</li>
+        <li><b>防悬挂</b>：避免"补偿先于正向执行"（如超时重试导致正向操作迟到），用状态校验拦住。</li>
+      </ul></div>
+      <div class="note-section"><p><b>Saga vs TCC</b>：两者都是"预留/补偿"思路，但 <span class="hl-purple">TCC</span> 有 Try <b>预留资源（准隔离）</b>、要写三个方法、侵入大；<span class="hl-orange">Saga</span> <b>无隔离</b>、只需"正向 + 补偿"，更适合<b>长流程</b>。资金核心要强一致 → 优先 TCC；长流程能容忍中间态 → 用 Saga。</p></div>
 
       <div class="numbered-header"><span class="num">7</span>本地消息表 + MQ：允许异步时用（还款→征信报送）</div>
       <div class="note-section"><p>征信报送"允许异步、最终一致、不可漏报"，就没必要用重量级的强一致方案，用<b>可靠消息</b>即可：</p>

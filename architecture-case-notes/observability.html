@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 可观测性 · 监控告警与持续提升可用性（通俗版）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:40px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;flex-wrap:wrap}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.75}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.78);line-height:1.65}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .note-section code{font-family:var(--font-mono);background:rgba(0,0,0,.35);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11.5px}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.75}.feynman p strong{color:var(--green)}
+  .diagram{margin:12px 0;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:7px 13px;font-size:12px;font-weight:500;color:rgba(255,255,255,.72);text-align:center;line-height:1.45}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-box.green{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06);color:var(--green);font-weight:700}
+  .flow-box.amber{border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.06);color:var(--amber);font-weight:700}
+  .flow-box.purple{border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.06);color:var(--purple);font-weight:700}
+  .flow-box.rose{border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.06);color:var(--rose);font-weight:700}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.2);font-size:14px;line-height:1;margin:3px 0}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.78);font-size:12px;line-height:1.55;vertical-align:top}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .hl-orange{color:var(--amber);font-weight:600}.hl-green{color:var(--green);font-weight:600}.hl-purple{color:var(--purple);font-weight:600}.hl-cyan{color:var(--cyan);font-weight:600}.hl-rose{color:var(--rose);font-weight:600}
+  .glossary{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .glossary td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+  .glossary td:first-child{white-space:nowrap;color:var(--cyan);font-weight:700;font-family:var(--font-mono);font-size:11.5px;width:150px}
+  .glossary td:last-child{color:rgba(255,255,255,.78);line-height:1.55}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:16px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-title{font-size:12px;font-weight:700;margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.68);line-height:1.5;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.compare-table{font-size:10px;display:block;overflow-x:auto}.card-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">OB</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">架构直播9 · 案例分析模拟题七 问题4 / 可观测性</div>
+        <div class="header-title">可观测性 · 监控告警与持续提升可用性</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-09</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · 案例分析</div><div class="meta-item"><span class="meta-dot"></span>零基础友好</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>什么是"故障可观测"？</div>
+      <div class="cue-item"><span class="q-mark">?</span>可观测性三支柱是哪三根？各用什么组件？</div>
+      <div class="cue-item"><span class="q-mark">?</span>监控指标看哪几个（四黄金信号 / RED / USE）？</div>
+      <div class="cue-item"><span class="q-mark">?</span>告警体系怎么设计（分级/值班/升级）？</div>
+      <div class="cue-item"><span class="q-mark">?</span>职责怎么分工？演练怎么做？</div>
+      <div class="cue-item"><span class="q-mark">?</span>SLI / SLO / 错误预算是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>如何持续提升可用性？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>先把题目翻译成大白话</div>
+      <div class="note-section"><p>题目要"设计一套面向<b>故障可观测</b>的监控体系"，并说明怎么持续提升可用性。翻译一下：<span class="note-highlight">系统出问题时，能不能快速"看见它、定位它、修好它、防止再犯"</span>。分四块：<b>指标</b>（看什么）→ <b>告警</b>（怎么通知）→ <b>职责</b>（谁来管）→ <b>演练</b>（怎么验证与进步）。</p>
+        <p><b>可观测性</b>＝不靠猜，通过系统的<b>日志、指标、调用链</b>等外部输出，就能推断系统内部"正在发生什么"。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>名词速查（不懂的词看这里）</div>
+      <table class="glossary">
+        <tr><td>可观测性</td><td>通过日志/指标/链路等外部数据，推断系统内部状态的能力</td></tr>
+        <tr><td>三支柱</td><td>Metrics 指标 + Logging 日志 + Tracing 链路追踪</td></tr>
+        <tr><td>Metrics 指标</td><td>可聚合的数字（QPS、延迟、错误率），用于看趋势和告警</td></tr>
+        <tr><td>Logging 日志</td><td>离散的事件记录，用于查"到底发生了什么"</td></tr>
+        <tr><td>Tracing 链路</td><td>一次请求经过哪些服务、每段耗时，用于定位慢在哪</td></tr>
+        <tr><td>四黄金信号</td><td>延迟、流量、错误、饱和度（Google SRE 的核心指标）</td></tr>
+        <tr><td>RED 方法</td><td>面向请求：Rate 请求率、Errors 错误率、Duration 耗时</td></tr>
+        <tr><td>USE 方法</td><td>面向资源：Utilization 使用率、Saturation 饱和、Errors 错误</td></tr>
+        <tr><td>告警分级</td><td>按严重程度分 P1~P4，级别不同、响应方式不同</td></tr>
+        <tr><td>MTTR / MTBF</td><td>平均修复时间 / 平均无故障时间</td></tr>
+        <tr><td>SLI / SLO / SLA</td><td>指标（如成功率）/ 内部目标（如 99.95%）/ 对外承诺</td></tr>
+        <tr><td>错误预算</td><td>1 − SLO 的余量；没花完可放心发版，花完就冻结发布保稳定</td></tr>
+        <tr><td>混沌工程</td><td>主动注入故障（宕机、延迟）来验证系统韧性的做法</td></tr>
+      </table>
+
+      <div class="numbered-header"><span class="num">3</span>可观测性三支柱（看什么）</div>
+      <div class="card-grid">
+        <div class="card"><div class="card-title" style="color:var(--cyan)">Metrics 指标</div><div class="card-list"><li>看趋势、做告警</li><li>如：<b>Prometheus</b> 采集请求量/错误率/P95 延迟，<b>Grafana</b> 出图</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--green)">Logging 日志</div><div class="card-list"><li>查"发生了什么"</li><li>如：<b>Loki</b> 聚合结构化日志，按 <code>requestId</code> 串联同一请求</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--purple)">Tracing 链路</div><div class="card-list"><li>定位"慢在哪个服务"</li><li>如：<b>Tempo / Jaeger</b> 存调用链，采样率如 20%</li></div></div>
+      </div>
+      <div class="note-section"><p><b>三者配合</b>：指标发现"哪里有异常" → 链路定位"卡在哪一跳" → 日志查"具体报了什么错"。缺一不可。</p></div>
+
+      <div class="numbered-header"><span class="num">4</span>指标方法论（看哪几个数）</div>
+      <table class="compare-table">
+        <thead><tr><th>方法</th><th>四个 / 三个关键项</th><th>用途</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-cyan">四黄金信号</span></td><td>延迟、流量、错误、饱和度</td><td>面向服务的通用监控起点（SRE 推荐）</td></tr>
+          <tr><td><span class="hl-green">RED 方法</span></td><td>Rate 请求率、Errors 错误率、Duration 耗时</td><td>面向"请求/接口"的监控</td></tr>
+          <tr><td><span class="hl-purple">USE 方法</span></td><td>Utilization 使用率、Saturation 饱和、Errors 错误</td><td>面向"资源"（CPU/内存/磁盘/网络）的监控</td></tr>
+        </tbody>
+      </table>
+
+      <div class="numbered-header"><span class="num">5</span>告警体系（怎么通知）</div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 从"发现异常"到"有人处理"</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">指标越阈值 / 探针失败</div></div>
+          <div class="flow-v-arrow">↓ 触发告警规则</div>
+          <div class="flow-row"><div class="flow-box amber">按严重度分级 P1～P4</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div><div class="flow-box primary">值班轮值 · 通知到人</div></div>
+          <div class="flow-v-arrow">↓ 未响应则升级</div>
+          <div class="flow-row"><div class="flow-box green">看板 + 链路追踪辅助定位</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div><div class="flow-box rose">超时升级 / 拉群 / 复盘</div></div>
+        </div>
+      </div>
+      <div class="note-section"><ul>
+        <li><b>分级</b>：P1（致命，立即处理）～ P4（提示），不同级别不同响应时限。</li>
+        <li><b>值班</b>：轮值 + 明确 first responder；配合<b>自动升级</b>（超时没人接就往上找）。</li>
+        <li><b>降噪</b>：合并同类告警、抑制级联告警，避免"告警风暴"淹没真问题。</li>
+        <li><b>可定位</b>：告警要能一键跳到对应看板 / 链路，缩短 MTTR。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">6</span>职责与演练（谁来管、怎么验证）</div>
+      <div class="note-section"><ul>
+        <li><span class="hl-cyan">职责（责任矩阵）</span>：明确 <b>SRE / 运维 / 开发</b> 各自负责什么（谁值守、谁修、谁改代码），避免"三不管"。</li>
+        <li><span class="hl-cyan">复盘闭环</span>：重大故障做<b>无指责复盘（Postmortem）</b>——定位根因、产出改进项、跟踪落地，防止再犯。</li>
+        <li><span class="hl-green">演练</span>：定期做<b>混沌工程 / 故障演练</b>——主动注入"主机宕机、依赖超时、网络分区"，检验监控能不能发现、系统能不能自愈。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">7</span>如何"持续"提升可用性：SLI / SLO / 错误预算 + 闭环</div>
+      <div class="note-section"><ul>
+        <li><b>度量（SLI）</b>：选定能代表用户体验的指标，如"请求成功率、P99 延迟"。</li>
+        <li><b>定目标（SLO）</b>：如"成功率 99.95% / 年"；对外的正式承诺叫 SLA。</li>
+        <li><b>错误预算</b>：<code>1 − SLO</code> 是允许出错的"额度"。额度没用完 → 可放心快速发版；额度用完 → <b>冻结发布，优先补稳定性</b>。</li>
+        <li><b>闭环</b>：度量 → 监控告警 → 复盘改进 → 演练验证 → 再度量，循环迭代；并把可用性纳入 <b>OKR</b> 持续改进。</li>
+      </ul></div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 持续提升可用性的闭环</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">① 度量 SLI/SLO</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box primary">② 监控告警（黄金信号）</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box amber">③ 故障复盘 · 改进项落地</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box green">④ 混沌演练验证</div></div>
+          <div class="flow-v-arrow">↺ 回到①，持续迭代</div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">8</span>回到题目（问题 4 怎么答）</div>
+      <table class="compare-table">
+        <thead><tr><th>作答维度</th><th>要点</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-cyan">指标</span></td><td>三支柱（Metrics/Logging/Tracing，Prometheus+Loki+Tempo）＋ 四黄金信号（延迟/流量/错误/饱和度），补充核心业务可用性指标</td></tr>
+          <tr><td><span class="hl-amber">告警</span></td><td>分级告警 P1~P4 ＋ 值班轮值 ＋ 超时升级 ＋ 看板与链路追踪；注意降噪</td></tr>
+          <tr><td><span class="hl-purple">职责</span></td><td>SRE / 运维 / 开发责任矩阵，重大故障复盘闭环</td></tr>
+          <tr><td><span class="hl-green">演练</span></td><td>定期混沌工程 / 故障演练，检验韧性；把可用性纳入 OKR 持续改进</td></tr>
+          <tr><td><span class="hl-rose">持续提升</span></td><td>SLI/SLO/错误预算驱动：额度没用完可快发，用完就冻结发布补稳定</td></tr>
+        </tbody>
+      </table>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>可观测性说人话：</strong>想让系统"出问题也能一眼看明白"，就得有三只眼睛——<b>指标</b>（体检报告：血压心跳正不正常）、<b>日志</b>（监控录像：当时到底干了啥）、<b>链路</b>（行程单：这一单卡在哪一站）。看指标记住<b>四黄金信号</b>（延迟/流量/错误/饱和度）。有问题要<b>分级告警、通知到人、超时升级</b>，别一股脑儿刷屏（告警风暴）。出了大事要<b>无指责复盘</b>找根因、改到位。平时还得主动"搞破坏"做<b>混沌演练</b>，看能不能扛住。最后用 <b>SLI/SLO/错误预算</b> 定规矩：稳定性"额度"没用完就大胆发版，用完了就停下来修稳定——这就是"持续提升可用性"。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">故障可观测＝用<b>三支柱（Metrics/Logging/Tracing：Prometheus+Loki+Tempo）</b>看见系统内部；指标看<b>四黄金信号（延迟/流量/错误/饱和度）</b>，可用 RED（请求）/USE（资源）细分；告警<b>分级 P1~P4 + 值班 + 超时升级 + 看板链路定位</b>；职责明确 <b>SRE/运维/开发责任矩阵 + 无指责复盘</b>；用<b>混沌工程演练</b>验证韧性；持续提升靠 <b>SLI/SLO/错误预算</b> 闭环（额度用完冻结发布保稳定），并纳入 <b>OKR</b>。一句话：<strong>看得见 → 叫得动 → 修得好 → 不再犯</strong>。</div>
+      <div class="summary-tags"><span class="tag primary">可观测性</span><span class="tag">三支柱</span><span class="tag">四黄金信号</span><span class="tag">RED/USE</span><span class="tag">分级告警</span><span class="tag">责任矩阵/复盘</span><span class="tag">混沌工程</span><span class="tag">SLI/SLO/错误预算</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;flex-wrap:wrap;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回案例笔记索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="../question-bank/exam-2026-05-case.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 2026年5月案例分析（模拟题七）</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="reliability.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.3);padding-bottom:1px;">系统可用性保障笔记</a>
+</div>
+</body>
+</html>

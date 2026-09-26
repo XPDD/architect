@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 系统可用性保障（冗余 / 心跳 / 隔离 · 通俗版）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:40px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;flex-wrap:wrap}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.75}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.78);line-height:1.65}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .note-section code{font-family:var(--font-mono);background:rgba(0,0,0,.35);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11.5px}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.75}.feynman p strong{color:var(--green)}
+  .diagram{margin:12px 0;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:7px 13px;font-size:12px;font-weight:500;color:rgba(255,255,255,.72);text-align:center;line-height:1.45}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-box.green{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06);color:var(--green);font-weight:700}
+  .flow-box.amber{border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.06);color:var(--amber);font-weight:700}
+  .flow-box.purple{border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.06);color:var(--purple);font-weight:700}
+  .flow-box.rose{border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.06);color:var(--rose);font-weight:700}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.2);font-size:14px;line-height:1;margin:3px 0}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.78);font-size:12px;line-height:1.55;vertical-align:top}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .hl-orange{color:var(--amber);font-weight:600}.hl-green{color:var(--green);font-weight:600}.hl-purple{color:var(--purple);font-weight:600}.hl-cyan{color:var(--cyan);font-weight:600}.hl-rose{color:var(--rose);font-weight:600}
+  .glossary{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .glossary td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+  .glossary td:first-child{white-space:nowrap;color:var(--cyan);font-weight:700;font-family:var(--font-mono);font-size:11.5px;width:138px}
+  .glossary td:last-child{color:rgba(255,255,255,.78);line-height:1.55}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:16px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:4px;background:rgba(0,212,255,.15);border:1px solid rgba(0,212,255,.25);color:var(--cyan);font-family:var(--font-mono);font-size:10px;font-weight:700;margin-bottom:4px}
+  .card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.68);line-height:1.5;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.compare-table{font-size:10px;display:block;overflow-x:auto}.card-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">HA</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">架构直播9 · 案例分析模拟题七 / 信息安全 · 系统可靠性</div>
+        <div class="header-title">系统可用性保障 · 通俗笔记（冗余 / 心跳 / 隔离）</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-09</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · 案例分析</div><div class="meta-item"><span class="meta-dot"></span>零基础友好</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>冗余、心跳、隔离各起的什么作用？</div>
+      <div class="cue-item"><span class="q-mark">?</span>至少三种冗余部署方式是哪些？</div>
+      <div class="cue-item"><span class="q-mark">?</span>限流、熔断、降级的区别与关系？</div>
+      <div class="cue-item"><span class="q-mark">?</span>RTO / RPO 是什么？怎么达标？</div>
+      <div class="cue-item"><span class="q-mark">?</span>数据库高可用与容灾怎么做？</div>
+      <div class="cue-item"><span class="q-mark">?</span>可观测监控体系包含什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>可用性和可靠性怎么区分？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>先把题目翻译成大白话</div>
+      <div class="note-section"><p>某市政务平台日均 800 万请求，已经出过三次事故：<b>核心数据库挂了 3 小时</b>、<b>某接口被高并发压垮</b>、<b>缓存单点故障引发雪崩</b>。政府要求：<span class="hl-cyan">年度可用性 ≥ 99.95%</span>、<span class="hl-cyan">RTO ≤ 30 分钟</span>、<span class="hl-cyan">RPO ≤ 5 分钟</span>。</p>
+        <p>翻译一下就是：<b>尽量别挂</b>（冗余/心跳/隔离）、<b>被压也不崩</b>（限流/熔断/降级）、<b>挂了要能快速恢复且少丢数据</b>（容灾/备份）、<b>出问题能看得见</b>（监控）。主线：<span class="note-highlight">不挂 → 抗压 → 快恢复 → 可观测</span>。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>名词速查（不懂的词看这里）</div>
+      <table class="glossary">
+        <tr><td>可用性</td><td>系统在需要时能正常服务的时间比例（如 99.95%）。"病了多久能好"</td></tr>
+        <tr><td>可靠性</td><td>系统一段时间内不出故障的能力。"从不生病"</td></tr>
+        <tr><td>单点故障 SPOF</td><td>某个组件一挂、整个系统就挂</td></tr>
+        <tr><td>冗余</td><td>多准备几份/几个，坏一个还有备份顶上，消除单点</td></tr>
+        <tr><td>故障转移 failover</td><td>主挂了，自动切到备</td></tr>
+        <tr><td>心跳检测</td><td>节点之间定期"报平安"，超时没报就认为它挂了</td></tr>
+        <tr><td>隔离</td><td>把故障关在局部，不让它扩散（舱壁思想）</td></tr>
+        <tr><td>雪崩</td><td>一个地方出问题，导致整个系统连锁崩盘</td></tr>
+        <tr><td>限流</td><td>限制进入的流量，保护自己不被冲垮</td></tr>
+        <tr><td>熔断</td><td>下游坏了先"跳闸"，不再请求它，给它恢复时间</td></tr>
+        <tr><td>降级</td><td>压力大/故障时，主动关掉非核心功能，保核心</td></tr>
+        <tr><td>RTO</td><td>故障后<b>多久能恢复</b>（恢复时间目标）</td></tr>
+        <tr><td>RPO</td><td>能容忍<b>丢多少数据</b>（数据丢失目标）</td></tr>
+        <tr><td>容灾</td><td>同城双活 / 异地灾备等"备用场地"方案</td></tr>
+        <tr><td>黄金信号</td><td>延迟、流量、错误、饱和度（监控四项核心指标）</td></tr>
+      </table>
+
+      <div class="numbered-header"><span class="num">3</span>作用一：冗余（消除单点）</div>
+      <div class="note-section"><p><b>作用</b>：通过<b>多副本 / 多节点</b>消除单点故障，某个节点坏了还有别的顶上，做到<b>故障时自动切换、服务不中断</b>。</p>
+        <p><b>生活类比</b>：家里备一把备用钥匙；一盏灯坏了，另一盏还亮着。</p>
+      </div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 单点故障 vs 冗余</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box rose">一个实例（单点）→ 挂了就全挂</div></div>
+          <div class="flow-v-arrow">↓ 加冗余</div>
+          <div class="flow-row"><div class="flow-box green">实例A ✓</div><div class="flow-box green" style="margin-left:8px">实例B ✓（备份）</div><div class="flow-box green" style="margin-left:8px">实例C ✓（备份）</div></div>
+          <div class="flow-row" style="margin-top:6px"><div class="flow-box accent">前面的"负载均衡"自动把流量分给还活着的实例</div></div>
+        </div>
+      </div>
+      <div class="note-section"><p><b>本平台至少三种冗余部署方式（记住这 6 种）</b>：</p></div>
+      <div class="card-grid">
+        <div class="card"><div class="card-badge">1</div><div class="card-title">应用多实例 + 负载均衡</div><div class="card-list"><li>Web/服务多开几个，前面挂 LB 分流</li></div></div>
+        <div class="card"><div class="card-badge">2</div><div class="card-title">数据库主从 / 多副本</div><div class="card-list"><li>一主多从，主挂了从顶上</li></div></div>
+        <div class="card"><div class="card-badge">3</div><div class="card-title">Redis 哨兵 / 集群</div><div class="card-list"><li>缓存多节点，避免缓存单点</li></div></div>
+        <div class="card"><div class="card-badge">4</div><div class="card-title">消息队列集群</div><div class="card-list"><li>MQ 多副本，防止消息服务单点</li></div></div>
+        <div class="card"><div class="card-badge">5</div><div class="card-title">存储多副本</div><div class="card-list"><li>文件/对象存储多副本保存</li></div></div>
+        <div class="card"><div class="card-badge">6</div><div class="card-title">跨机房 / 跨可用区部署</div><div class="card-list"><li>机房级容灾，一个机房挂了还有别的</li></div></div>
+      </div>
+
+      <div class="numbered-header"><span class="num">4</span>作用二：心跳检测（发现故障、驱动切换）</div>
+      <div class="note-section"><p><b>作用</b>：节点之间<b>周期性发送心跳</b>判断对方是否存活；一旦超时没心跳，就判定它故障，<b>驱动故障转移并剔除坏节点</b>。它是"冗余"能自动生效的<b>眼睛</b>——没有心跳，冗余只是摆设，不知道谁挂了。</p>
+      </div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 心跳驱动的故障转移流程</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">主节点每隔几秒发一次"心跳"（我还活着）</div></div>
+          <div class="flow-v-arrow">↓ 备节点 / 监控持续监听</div>
+          <div class="flow-row"><div class="flow-box rose">连续超时未收到心跳 → 判定主节点故障</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box green">触发故障转移：从备节点选出新主</div><div style="color:rgba(255,255,255,.3);padding:0 8px">→</div><div class="flow-box amber">摘除故障节点 + 告警</div></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">5</span>作用三：隔离（把故障关起来，防雪崩）</div>
+      <div class="note-section"><p><b>作用</b>：把故障<b>限定在局部</b>，防止"单点故障 → 连锁反应 → 整个系统雪崩"。核心思想是"<b>舱壁</b>"：船底破一个舱，水进不到别的舱，船就不沉。</p>
+        <p><b>三种常见隔离</b>：</p>
+        <ul>
+          <li><span class="hl-cyan">舱壁 / 线程池隔离</span>：给每个下游服务<b>分配独立线程池</b>；某个下游变慢，只占满它自己的池，不会拖垮所有请求。</li>
+          <li><span class="hl-cyan">服务隔离</span>：核心服务与非核心服务分开部署/分资源，非核心出事不影响核心。</li>
+          <li><span class="hl-cyan">超时隔离</span>：给每个调用设<b>超时</b>，慢就快速失败，不无限等待把资源耗光。</li>
+        </ul>
+      </div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 没有隔离 vs 有隔离</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box rose">没有隔离：下游C变慢 → 线程全被占满 → 整个服务卡死（雪崩）</div></div>
+          <div class="flow-v-arrow">↓ 加隔离</div>
+          <div class="flow-row"><div class="flow-box green">下游A 独立池</div><div class="flow-box green" style="margin-left:8px">下游B 独立池</div><div class="flow-box rose" style="margin-left:8px">下游C 慢（只占自己的池）</div></div>
+          <div class="flow-row" style="margin-top:6px"><div class="flow-box accent">C 慢也只影响 C，A/B 正常，系统整体不崩</div></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">6</span>被压也不崩：限流 / 熔断 / 降级</div>
+      <table class="compare-table">
+        <thead><tr><th>机制</th><th>白话</th><th>适用 / 实现要点</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-cyan">限流</span></td><td>限制进入的流量，保护自己不被冲垮</td><td>有明确容量上限时；令牌桶 / 滑动窗口；建议<b>网关 + 接口两级</b>限流</td></tr>
+          <tr><td><span class="hl-amber">熔断</span></td><td>下游坏了就"跳闸"，先别再请求它</td><td>错误率超阈值打开断路器，快速失败，给下游恢复时间，防故障扩散</td></tr>
+          <tr><td><span class="hl-green">降级</span></td><td>压力大时主动关非核心功能，保核心</td><td>返回兜底数据/降级文案，保证核心链路可用</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p><b>三者关系</b>：<span class="note-highlight">入口限流 → 中间熔断 → 末端降级</span>——分层保护，从外到内逐级兜底。</p></div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 分层保护</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">① 限流：挡住超额流量（入口）</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box amber">② 熔断：保护下游健康（中间）</div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box green">③ 降级：保核心体验（末端）</div></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">7</span>快恢复 + 少丢数据：RTO / RPO 与数据库容灾</div>
+      <div class="note-section">
+        <p><b>RTO</b>（恢复时间目标）＝"多久能恢复"；<b>RPO</b>（恢复点目标）＝"最多丢多少数据"。目标越小，要求的方案越强。</p>
+      </div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; RTO / RPO 含义</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box primary">故障发生</div><div style="color:rgba(255,255,255,.3);padding:0 10px">—— RPO（可丢的数据时段）——▶</div><div class="flow-box green">恢复完成</div></div>
+          <div class="flow-row" style="margin-top:6px"><div class="flow-box accent" style="width:100%">◀————— RTO（停机时长，≤30min）—————▶</div></div>
+        </div>
+      </div>
+      <table class="compare-table">
+        <thead><tr><th>层</th><th>做法</th><th>对应目标</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-cyan">高可用</span></td><td>数据库一主多从 / 高可用集群，主库故障自动切换（MHA / Orchestrator），读写分离分摊压力</td><td>保证 RTO（自动切换 ≤30min）</td></tr>
+          <tr><td><span class="hl-cyan">容灾</span></td><td>同城双活 / 异地灾备，用 WAL 日志或同步复制保证数据不丢</td><td>满足 RPO（≤5min）</td></tr>
+          <tr><td><span class="hl-cyan">备份</span></td><td>全量备份（每日）+ 增量 / 归档日志（实时），并定期异机备份</td><td>兜底恢复能力</td></tr>
+          <tr><td><span class="hl-cyan">演练</span></td><td>季度/半年做一次 RTO / RPO 演练，验证主备切换时长与数据完整性，形成恢复手册并定责到人</td><td>验证目标真的能达成</td></tr>
+        </tbody>
+      </table>
+
+      <div class="numbered-header"><span class="num">8</span>看得见故障：可观测监控体系</div>
+      <div class="note-section"><ul>
+        <li><span class="hl-cyan">指标</span>：采用 Google SRE 的<b>四个黄金信号</b>——延迟、流量、错误、饱和度；再补充核心业务链路的可用性指标。RED / USE 方法可作细分参考。</li>
+        <li><span class="hl-amber">告警</span>：分级告警（P1～P4）+ 值班轮值 + 超时升级；配合可视化看板与链路追踪辅助定位。</li>
+        <li><span class="hl-purple">职责</span>：明确 SRE / 运维 / 开发的责任矩阵，重大故障复盘闭环。</li>
+        <li><span class="hl-green">演练</span>：定期做混沌工程 / 故障演练（注入主机宕机、依赖故障），检验架构韧性，把可用性纳入 OKR 持续改进。</li>
+      </ul>
+      <p style="font-size:12px;margin-top:8px;">&#x2192; 本话题有独立专篇：<a href="observability.html" style="color:var(--cyan);font-weight:600;">可观测性 · 监控告警与持续提升可用性</a>（三支柱 / 四黄金信号 / SLI·SLO·错误预算 / 完整闭环）</p></div>
+
+      <div class="numbered-header"><span class="num">9</span>回到题目四小问（要点速记）</div>
+      <table class="compare-table">
+        <thead><tr><th>问题</th><th>要点</th></tr></thead>
+        <tbody>
+          <tr><td>问题1</td><td>冗余＝多副本消除单点、自动切换；心跳＝判断存活、驱动故障转移；隔离＝把故障限局部、防雪崩。冗余方式至少三种：应用多实例+LB / 数据库主从 / Redis 哨兵集群 / 消息集群 / 存储多副本 / 跨机房</td></tr>
+          <tr><td>问题2</td><td>限流保护自身、熔断保护下游、降级保核心；关系"入口限流→中间熔断→末端降级"</td></tr>
+          <tr><td>问题3</td><td>一主多从/集群自动切换 + 同城双活/异地灾备 + 全量&增量备份 + RTO/RPO 演练（对应 ≤30min / ≤5min）</td></tr>
+          <tr><td>问题4</td><td>四黄金信号 + 分级告警 + 责任矩阵 + 混沌演练，纳入 OKR 持续提升</td></tr>
+        </tbody>
+      </table>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>可用性保障说人话：</strong>想让系统"打不死"，就四招。<b>冗余</b>＝多请几个替补，主力倒了替补上（应用多开、数据库主备、Redis 集群、跨机房）；<b>心跳</b>＝队友定期喊一声"我还在"，谁不吭声就当它倒了，赶紧换人；<b>隔离</b>＝把每个下游关进单独的小房间（线程池/超时），一个房间失火不会烧到全船；<b>限流熔断降级</b>＝门口限人数、下游坏了先别打电话、忙不过来先丢掉不重要的功能。真挂了怎么办？靠<b>容灾备份</b>，并且用 <b>RTO</b>（多久恢复）和 <b>RPO</b>（最多丢多少）来定标准；最后用<b>监控四黄金信号</b>把问题"看得见"，再靠演练不断变强。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text"><strong>冗余</strong>＝多副本消除单点、自动切换（至少记：应用多实例+LB、数据库主从、Redis 哨兵/集群、消息集群、存储多副本、跨机房）；<strong>心跳</strong>＝周期探测存活、驱动故障转移与剔除；<strong>隔离</strong>＝线程池/服务/超时隔离，把故障关在局部防雪崩；<strong>限流→熔断→降级</strong>＝入口/中间/末端分层保护；恢复靠<strong>容灾（同城双活/异地灾备）+ 备份 + 演练</strong>，用 <strong>RTO/RPO</strong> 定标准；监控用<strong>四黄金信号（延迟/流量/错误/饱和度）</strong>+ 分级告警 + 责任矩阵 + 混沌演练。</div>
+      <div class="summary-tags"><span class="tag primary">可用性保障</span><span class="tag">冗余</span><span class="tag">心跳检测</span><span class="tag">隔离防雪崩</span><span class="tag">限流熔断降级</span><span class="tag">RTO/RPO</span><span class="tag">容灾备份</span><span class="tag">四黄金信号</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;flex-wrap:wrap;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回案例笔记索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="../question-bank/exam-2026-05-case.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 2026年5月案例分析（模拟题七）</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="../软件可靠性/index.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.3);padding-bottom:1px;">软件可靠性笔记</a>
+</div>
+</body>
+</html>
