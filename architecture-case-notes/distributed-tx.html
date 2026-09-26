@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — 分布式事务（XA / TCC / Saga / 本地消息表·通俗版）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(77,124,255,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(77,124,255,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--blue),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:40px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(77,124,255,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:13px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;flex-wrap:wrap}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.8);line-height:1.75}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.78);line-height:1.65}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.72);line-height:1.75}.feynman p strong{color:var(--green)}
+  .diagram{margin:12px 0;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:7px 13px;font-size:12px;font-weight:500;color:rgba(255,255,255,.72);text-align:center;line-height:1.45}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-box.green{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06);color:var(--green);font-weight:700}
+  .flow-box.amber{border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.06);color:var(--amber);font-weight:700}
+  .flow-box.purple{border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.06);color:var(--purple);font-weight:700}
+  .flow-box.rose{border-color:rgba(248,113,113,.25);background:rgba(248,113,113,.06);color:var(--rose);font-weight:700}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.2);font-size:14px;line-height:1;margin:3px 0}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.78);font-size:12px;line-height:1.55;vertical-align:top}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .hl-orange{color:var(--amber);font-weight:600}.hl-green{color:var(--green);font-weight:600}.hl-purple{color:var(--purple);font-weight:600}.hl-cyan{color:var(--cyan);font-weight:600}.hl-rose{color:var(--rose);font-weight:600}
+  .glossary{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .glossary td{padding:7px 10px;border-bottom:1px solid rgba(255,255,255,.04);vertical-align:top}
+  .glossary td:first-child{white-space:nowrap;color:var(--cyan);font-weight:700;font-family:var(--font-mono);font-size:11.5px;width:140px}
+  .glossary td:last-child{color:rgba(255,255,255,.78);line-height:1.55}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:16px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .vs-block{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin:10px 0}
+  .vs-col{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:12px 14px}
+  .vs-col.vs-a{border-color:rgba(0,212,255,.25);background:rgba(0,212,255,.04)}
+  .vs-col.vs-b{border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.04)}
+  .vs-title{font-size:12.5px;font-weight:700;margin-bottom:8px}.vs-a .vs-title{color:var(--cyan)}.vs-b .vs-title{color:var(--purple)}
+  .vs-col ul{list-style:none}.vs-col ul li{font-size:11.5px;color:rgba(255,255,255,.75);line-height:1.6;padding-left:8px;position:relative}
+  .vs-col ul li::before{content:'\00B7';position:absolute;left:0;color:var(--text-muted)}
+  .vs-arrow{display:flex;align-items:center;color:var(--text-muted);font-size:16px}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.compare-table{font-size:10px;display:block;overflow-x:auto}.vs-block{grid-template-columns:1fr;gap:8px}.vs-arrow{justify-content:center;transform:rotate(90deg)}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">DT</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">架构直播9 · 案例分析模拟题六 / 分布式系统</div>
+        <div class="header-title">分布式事务 · 通俗笔记（XA / TCC 重点）</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-09</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · 案例分析</div><div class="meta-item"><span class="meta-dot"></span>零基础友好</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>为什么单库事务不够，要"分布式事务"？</div>
+      <div class="cue-item"><span class="q-mark">?</span>XA（两阶段提交 2PC）是什么原理？</div>
+      <div class="cue-item"><span class="q-mark">?</span>TCC 的 Try / Confirm / Cancel 各是什么？</div>
+      <div class="cue-item"><span class="q-mark">?</span>XA 与 TCC 怎么对比、什么时候用哪个？</div>
+      <div class="cue-item"><span class="q-mark">?</span>Saga 的编排 / 协同模式区别？</div>
+      <div class="cue-item"><span class="q-mark">?</span>本地消息表 + MQ 怎么做到"不丢不重"？</div>
+      <div class="cue-item"><span class="q-mark">?</span>放款、还款该各选哪种方案？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>先把题目翻译成大白话</div>
+      <div class="note-section"><p>银行把系统拆成了 7 个微服务，各自有自己的数据库。一次"<b>放款</b>"要同时做三件事：账户服务扣钱、放款服务开借据、风控服务记快照——<b>分属三个服务、三个库</b>。问题来了：数据库自带的事务（ACID）只能管<b>同一个库</b>，跨服务管不了。</p>
+        <p>如果第二、三步失败了，第一步的钱却扣了 → <span class="hl-rose">就"错账"了（钱少了/多了）</span>。所以要一个能在<b>多个服务之间</b>保证一致的机制，这就是"<b>分布式事务</b>"。</p>
+        <p>一句话：<span class="note-highlight">单库事务管一个库；分布式事务管多个服务/库。</span>主线：<b>先看要不要强一致 → 强一致选 XA 或 TCC → 允许异步最终一致就用本地消息表+MQ → 长流程可补偿用 Saga</b>。</p>
+      </div>
+
+      <div class="numbered-header"><span class="num">2</span>名词速查（不懂的词看这里）</div>
+      <table class="glossary">
+        <tr><td>事务 / ACID</td><td>一组操作"要么全成功、要么全失败"，中途失败会回滚</td></tr>
+        <tr><td>分布式事务</td><td>一次操作跨多个服务/多个数据库，也要保证一致</td></tr>
+        <tr><td>2PC（两阶段提交）</td><td>先"准备"、再"提交"两个阶段——大家都准备好，我才说提交</td></tr>
+        <tr><td>XA</td><td>X/Open 定义的 2PC 标准接口，由<b>数据库层面</b>支持、事务管理器统一协调</td></tr>
+        <tr><td>TM / RM</td><td>TM＝事务管理器（协调者）；RM＝资源管理器（各数据库）</td></tr>
+        <tr><td>TCC</td><td>Try-Confirm-Cancel：在<b>业务层面</b>把操作拆成"预留 / 确认 / 取消"三步</td></tr>
+        <tr><td>补偿</td><td>撤销已经做过的操作（做一个"反向"操作把钱/库存退回来）</td></tr>
+        <tr><td>幂等</td><td>同一操作执行一次或多次，结果都一样（防止重复扣款/重复发送）</td></tr>
+        <tr><td>空回滚</td><td>Try 还没执行，却先收到了 Cancel（要能安全忽略）</td></tr>
+        <tr><td>悬挂</td><td>Cancel 比 Try 先到，之后 Try 又来了（要防止"回滚后又被执行"）</td></tr>
+        <tr><td>强一致 / 最终一致</td><td>强一致＝任何时候都一致；最终一致＝允许暂时不一致，过一会儿会自动对齐</td></tr>
+        <tr><td>Saga</td><td>把长事务拆成一串本地小事务，失败就按相反顺序补偿</td></tr>
+        <tr><td>编排 / 协同</td><td>编排＝有"总指挥"按顺序调度；协同＝各服务靠事件自己接力</td></tr>
+        <tr><td>本地消息表 + MQ</td><td>业务和"待发消息"写进同一个库同一个事务，再异步可靠地发到消息队列</td></tr>
+      </table>
+
+      <div class="numbered-header"><span class="num">3</span>XA（两阶段提交 2PC）——数据库层面</div>
+      <div class="note-section"><p><b>原理</b>：一个"总协调者"（TM）管着几个数据库（RM），分两步走：</p>
+        <ul>
+          <li><span class="hl-cyan">阶段一 prepare（准备）</span>：协调者让每个数据库都"把事务做完但先别提交"，<b>并锁住相关资源</b>，等大家报告"我准备好了"。</li>
+          <li><span class="hl-cyan">阶段二 commit / rollback</span>：所有人都 OK → 全部提交；只要有一个失败 → 全部回滚。</li>
+        </ul>
+        <p><b>生活类比</b>：几个人吃饭 AA 付钱，收银员说"<b>大家先把钱备好举手（prepare）</b>"，都举手了才"一起付（commit）"；有人没备好就都别付。备好到付款期间，这笔钱是<b>被冻住的</b>（资源被锁）。</p>
+      </div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; XA 两阶段提交流程</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box primary">事务管理器 TM（协调者）</div></div>
+          <div class="flow-v-arrow">↓ 阶段一：PREPARE</div>
+          <div class="flow-row"><div class="flow-box">账户库 RM<br><small>做完但未提交·锁资源</small></div><div class="flow-box" style="margin-left:8px">放款库 RM<br><small>做完但未提交·锁资源</small></div><div class="flow-box" style="margin-left:8px">风控库 RM<br><small>做完但未提交·锁资源</small></div></div>
+          <div class="flow-v-arrow">↓ 都返回"就绪" → 阶段二：COMMIT（有失败则全部 ROLLBACK）</div>
+          <div class="flow-row"><div class="flow-box green">全部提交 → 全局一致</div><div class="flow-box rose" style="margin-left:8px">任一失败 → 全部回滚</div></div>
+        </div>
+      </div>
+      <table class="compare-table">
+        <thead><tr><th>XA 的特点</th><th>说明</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-green">一致性</span></td><td>强隔离、<b>强一致</b>（全局事务）</td></tr>
+          <tr><td><span class="hl-rose">性能</span></td><td>资源锁定时间长、<b>性能差</b>；协调者是单点</td></tr>
+          <tr><td><span class="hl-cyan">侵入性</span></td><td><b>低</b>，靠数据库支持，对业务代码基本无侵入</td></tr>
+          <tr><td><span class="hl-orange">适用</span></td><td><b>低频、强一致</b>的场景：对账、批量处理</td></tr>
+        </tbody>
+      </table>
+
+      <div class="numbered-header"><span class="num">4</span>TCC（Try-Confirm-Cancel）——业务层面</div>
+      <div class="note-section"><p><b>原理</b>：不依赖数据库的锁，而是在<b>每个服务的业务代码里</b>把一个操作拆成三个方法：</p>
+        <ul>
+          <li><span class="hl-cyan">Try（预留）</span>：先"占住"资源，但<b>不真正完成</b>。如：冻结额度、锁定库存。</li>
+          <li><span class="hl-green">Confirm（确认）</span>：所有服务的 Try 都成功后，真正执行。如：真正扣款、正式开借据。</li>
+          <li><span class="hl-rose">Cancel（取消）</span>：只要有一步 Try 失败，就调用所有已 Try 成功服务的 Cancel，把预留释放掉。</li>
+        </ul>
+        <p><b>生活类比</b>：订酒店"<b>先锁房（Try）</b>"，到店入住才算"<b>确认（Confirm）</b>"；不去了就"<b>取消（Cancel）</b>"退掉。房间只要被锁住，就不怕被别人抢——这就是 TCC 用"预留"替代"数据库锁"的思路。</p>
+        <p><span class="hl-orange">注意</span>：TCC 的三个操作都必须是<b>幂等</b>的，还要处理<b>空回滚</b>和<b>悬挂</b>两个坑。</p>
+      </div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; TCC 三阶段</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">① Try 预留<br><small>冻结额度 / 锁库存 / 预生成借据</small></div></div>
+          <div class="flow-v-arrow">↓ 全部 Try 成功</div>
+          <div class="flow-row"><div class="flow-box green">② Confirm 确认<br><small>真正扣减 / 正式入账（幂等）</small></div></div>
+          <div class="flow-v-arrow">↓ 任一步 Try 失败</div>
+          <div class="flow-row"><div class="flow-box rose">③ Cancel 取消<br><small>释放预留（幂等）</small></div></div>
+        </div>
+      </div>
+
+      <div class="numbered-header"><span class="num">5</span>XA vs TCC（题目问题 1 的核心对比）</div>
+      <div class="vs-block">
+        <div class="vs-col vs-a"><div class="vs-title">XA 两阶段提交</div><ul>
+          <li>一致性：强隔离、强一致</li><li>性能：锁资源重、性能差、协调者单点</li><li>侵入性：低（靠数据库）</li><li>适用：低频、强一致（对账、批量）</li>
+        </ul></div>
+        <div class="vs-arrow">VS</div>
+        <div class="vs-col vs-b"><div class="vs-title">TCC 补偿事务</div><ul>
+          <li>一致性：最终一致，靠业务保证</li><li>性能：无长事务锁、性能较好</li><li>侵入性：高（要实现 Try/Confirm/Cancel）</li><li>适用：资金类核心链路、可自定义补偿</li>
+        </ul></div>
+      </div>
+      <table class="compare-table">
+        <thead><tr><th>维度</th><th>XA 两阶段提交</th><th>TCC 补偿事务</th></tr></thead>
+        <tbody>
+          <tr><td>一致性强度</td><td>强隔离、强一致（全局事务）</td><td>最终一致，靠业务层面保证</td></tr>
+          <tr><td>性能</td><td>资源锁定重、性能差；协调者单点</td><td>无长事务锁、性能较好</td></tr>
+          <tr><td>侵入性</td><td>低，对业务基本无侵入</td><td>高，需实现 Try / Confirm / Cancel 三个方法</td></tr>
+          <tr><td>适用场景</td><td>低频、强一致的场景（对账、批量）</td><td>资金类核心链路，可自定义补偿</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p><b>本题选型</b>："放款"是<b>资金核心、频率中等</b>，优先用 <span class="hl-purple">TCC</span> 保证资金强一致，再辅以<b>对账兜底</b>。（低频、对账类才考虑 XA。）</p></div>
+
+      <div class="numbered-header"><span class="num">6</span>Saga：长流程的补偿式事务</div>
+      <table class="compare-table">
+        <thead><tr><th>模式</th><th>怎么做</th><th>优缺点</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-cyan">编排模式<br>Orchestration</span></td><td>有一个"总指挥"服务按顺序调用各服务、跟踪状态，失败就反向补偿</td><td>集中可控、利于审计；但编排者易成单点/复杂</td></tr>
+          <tr><td><span class="hl-purple">协同模式<br>Choreography</span></td><td>没有总指挥，各服务靠"事件"自发驱动下一步</td><td>去中心化、松耦合；但整体状态难追踪</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p><b>银行资金场景用 Saga 必须注意两点</b>：① Saga <b>没有隔离性</b>，中间状态对别人可见，资金场景要避免读到"未提交的中间态"，必要时做<b>资源预留</b>；② <b>补偿必须完备且可幂等重试</b>，否则会造成资金不一致。</p></div>
+
+      <div class="numbered-header"><span class="num">7</span>本地消息表 + MQ：允许异步时用（还款→征信报送）</div>
+      <div class="note-section"><p>征信报送"允许异步、最终一致、不可漏报"，就没必要用重量级的强一致方案，用<b>可靠消息</b>即可：</p>
+        <ul>
+          <li>① 业务表与"待发消息表"<b>同一个库、同一个事务</b>写入 → 保证"业务 + 消息"原子性。</li>
+          <li>② 独立任务扫描消息表，把待发消息投递到 MQ。</li>
+          <li>③ 消费端处理成功后，回改消息状态。</li>
+          <li>④ MQ "至少一次"投递，消费端按<b>业务唯一键（还款流水号）</b>做幂等。</li>
+        </ul>
+      </div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 可靠消息最终一致</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box accent">还款业务 + 消息表<br><small>同库同事务写入</small></div></div>
+          <div class="flow-v-arrow">↓ 扫描消息表</div>
+          <div class="flow-row"><div class="flow-box primary">投递到 MQ<br><small>失败重试·超时进死信队列</small></div></div>
+          <div class="flow-v-arrow">↓ 至少一次投递</div>
+          <div class="flow-row"><div class="flow-box green">征信报送服务消费<br><small>按唯一键幂等落库 → 回改消息状态</small></div></div>
+        </div>
+      </div>
+      <table class="compare-table">
+        <thead><tr><th>要解决的</th><th>办法</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-rose">消息不丢</span></td><td>投递失败重试 + 消息表状态机推进；长时间未送达进死信队列</td></tr>
+          <tr><td><span class="hl-rose">不重复消费</span></td><td>消费端以业务唯一键（还款流水号）做幂等（唯一索引 / 去重表）</td></tr>
+        </tbody>
+      </table>
+
+      <div class="numbered-header"><span class="num">8</span>选型总览（一眼选对）</div>
+      <table class="compare-table">
+        <thead><tr><th>场景</th><th>方案</th><th>为什么</th></tr></thead>
+        <tbody>
+          <tr><td>资金核心、要强一致（<b>放款</b>）</td><td><span class="hl-purple">TCC</span>（+对账兜底）</td><td>无长锁、性能好、可自定义补偿</td></tr>
+          <tr><td>低频、跨库强一致（对账/批量）</td><td><span class="hl-cyan">XA</span></td><td>靠数据库 2PC，简单但慢</td></tr>
+          <tr><td>允许异步、最终一致（<b>征信报送</b>）</td><td><span class="hl-green">本地消息表 + MQ</span></td><td>轻量、可靠、不丢不重</td></tr>
+          <tr><td>长流程、多步、可补偿</td><td><span class="hl-orange">Saga</span></td><td>拆成小事务、反向补偿</td></tr>
+        </tbody>
+      </table>
+
+      <div class="numbered-header"><span class="num">9</span>回到题目四小问（要点速记）</div>
+      <table class="compare-table">
+        <thead><tr><th>问题</th><th>要点</th></tr></thead>
+        <tbody>
+          <tr><td>问题1</td><td>对比 XA / TCC 的一致性、性能、侵入性、适用；"放款"选 <b>TCC + 对账兜底</b></td></tr>
+          <tr><td>问题2</td><td>本地消息表 + MQ：同库同事务写、扫描投递、幂等消费；不丢＝重试+死信，不重＝唯一键幂等</td></tr>
+          <tr><td>问题3</td><td>Saga 编排（总指挥、可控）vs 协同（事件驱动、难追踪）；两个约束＝无隔离性、补偿要完备可幂等</td></tr>
+          <tr><td>问题4</td><td>全局事务 ID + 事务状态中心监控；每日资金对账；幂等键统一去重；统一事务框架（如 Seata AT/TCC）</td></tr>
+        </tbody>
+      </table>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>分布式事务说人话：</strong>一群人要一起办成一件事，怕有人办一半，就得有"约定"。<b>XA</b> 是最"死板"的约定：<b>所有人都先把事做好但先别交（prepare），我说交才一起交（commit）</b>——期间占着资源，慢但绝对不会错，靠数据库实现。<b>TCC</b> 更"灵活"：<b>先占坑（Try）、再拍板（Confirm）、出事就撤（Cancel）</b>——快、适合钱多的核心链路，但每个服务都得自己写好"占坑/拍板/撤坑"三件事。<b>Saga</b> 是"走一步看一步，错了就按原路退回去"。如果只是"允许晚点同步、但不能漏"，那就用最省事的 <b>本地消息表 + MQ</b>：把"要发的消息"和业务记在同一个账本里，保证消息一定发得出去，收的人自己去重就行。</p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">跨服务没法用单库事务，才需要<strong>分布式事务</strong>。<strong>XA＝数据库层两阶段提交</strong>（prepare→commit，强一致、慢、无侵入、适低频）；<strong>TCC＝业务层 Try/Confirm/Cancel</strong>（预留→确认→取消，最终一致、快、侵入大、适资金核心，需幂等/防空回滚与悬挂）；长流程用 <strong>Saga</strong>（编排 vs 协同，注意无隔离+补偿完备）；允许异步用<strong>本地消息表 + MQ</strong>（同库同事务写入，不丢靠重试+死信，不重靠唯一键幂等）。放款选 TCC，征信报送选本地消息表+MQ。</div>
+      <div class="summary-tags"><span class="tag primary">分布式事务</span><span class="tag">XA/2PC</span><span class="tag">TCC</span><span class="tag">Saga</span><span class="tag">本地消息表+MQ</span><span class="tag">幂等/补偿</span><span class="tag">强一致vs最终一致</span><span class="tag">分布式系统</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;flex-wrap:wrap;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回案例笔记索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="../question-bank/exam-2026-05-case.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 2026年5月案例分析（模拟题六）</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="microservices.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.3);padding-bottom:1px;">微服务架构专题</a>
+</div>
+</body>
+</html>
