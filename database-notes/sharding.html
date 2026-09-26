@@ -33,6 +33,7 @@
   .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.78);line-height:1.65}
   .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
   .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .note-section code{font-family:var(--font-mono);background:rgba(0,0,0,.35);padding:1px 5px;border-radius:3px;color:var(--amber);font-size:11.5px}
   .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
   .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
   .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
@@ -153,13 +154,44 @@
         <p>分片后一共冒出<b>三个大麻烦</b>：</p>
       </div>
       <table class="compare-table">
-        <thead><tr><th>麻烦</th><th>通俗解释</th><th>应对方向</th></tr></thead>
+        <thead><tr><th>麻烦</th><th>通俗解释</th><th>应对方向（一句话）</th></tr></thead>
         <tbody>
-          <tr><td><span class="hl-rose">① 跨分片查询</span></td><td>一条查询用不上分片键，就得翻遍所有分片</td><td>订单号带路由 / 建"订单号→用户ID"映射表 / 商家查询走 ES 宽表</td></tr>
-          <tr><td><span class="hl-rose">② 分布式 ID</span></td><td>每张分表都自增，会撞号（出现重复订单号）</td><td>用全局唯一的分布式 ID（见第 5 节）</td></tr>
-          <tr><td><span class="hl-rose">③ 路由与聚合</span></td><td>得知道去哪写、去哪读；真要聚合还得合并各分片结果</td><td>路由规则 + 并行查询 + 网关归并排序</td></tr>
+          <tr><td><span class="hl-rose">① 跨分片查询</span></td><td>一条查询用不上分片键，就得翻遍所有分片</td><td>让查询能"算出"分片：订单号嵌分片号 / 路由映射表 / 商家查询走 ES 异构索引</td></tr>
+          <tr><td><span class="hl-rose">② 分布式 ID</span></td><td>每张分表都自增，会撞号（出现重复订单号）</td><td>用全局唯一的分布式 ID（号段 / 雪花 / UUID，本题选雪花）</td></tr>
+          <tr><td><span class="hl-rose">③ 路由与聚合</span></td><td>得知道去哪写、去哪读；真要聚合还得合并各分片结果</td><td>分片算法定路由 + 跨片并行查询 + 归并排序/游标翻页</td></tr>
         </tbody>
       </table>
+
+      <div class="note-section" style="margin-top:14px"><p><b>▸ 具体怎么做（展开，含落地细节）</b></p></div>
+
+      <div class="note-section"><p><span class="hl-rose">① 跨分片查询 —— 让查询"找到"该查哪个分片（四招，可组合）</span></p>
+        <ul>
+          <li><span class="hl-cyan">订单号里嵌分片号（推荐）</span>：生成订单号时就把分片信息编进去，如 <code>订单号 = 分片号(2位) + 雪花序列</code>；查询先解析订单号 → 得到分片号 → <b>直连该分片</b>，绝不广播。</li>
+          <li><span class="hl-cyan">建路由映射表（索引表）</span>：单独小表 <code>order_route(order_no, buyer_id, shard_id)</code>，与订单<b>同事务</b>写入；查询先查映射表拿 <code>shard_id</code>，再查目标分片；热点映射可缓存在 Redis。</li>
+          <li><span class="hl-cyan">商家查询走 ES / 宽表（异构索引）</span>：用 binlog 订阅（Canal / Debezium）把订单实时同步到 ES；商家按"订单号 / 时间 / 状态"任意组合查全部走 ES，排序分页也在 ES 完成，<b>彻底不碰订单实表</b>。</li>
+          <li><span class="hl-purple">冗余双分片（可选）</span>：同时按用户 ID、商家 ID 各存一份（空间换时间），按各自维度查询命中；用异步同步维护两份，一致性成本高，慎用。</li>
+        </ul>
+      </div>
+
+      <div class="note-section"><p><span class="hl-rose">② 分布式 ID —— 怎么保证全局不撞号</span></p>
+        <ul>
+          <li><span class="hl-cyan">号段模式</span>：一张表 <code>leaf_alloc(biz_tag, max_id, step)</code>，每次领一段（如 1000 个）：<code>UPDATE ... SET max_id = max_id + step</code>，把该段缓存在内存里发；用<b>双 buffer</b> 在当前段用到 ~10% 时异步预取下一段，避免性能毛刺。趋势递增、性能高；缺点：依赖发号 DB、重启会跳号（可接受）。</li>
+          <li><span class="hl-cyan">雪花算法（Snowflake）</span>：64 位 = 1 符号位 + 41 位毫秒时间戳 + 10 位机器号 + 12 位序列号 → 单机每毫秒 4096 个，全局唯一且趋势递增。要解决两个坑：<b>时钟回拨</b>（等待 / 报错 / 借用未来时间）和<b>机器号分配</b>（用 ZooKeeper / Redis / 配置中心统一发）。</li>
+          <li><span class="hl-rose">UUID</span>：本地生成、无序，只适合当业务唯一键，<b>不要当数据库主键</b>（无序会让 B+ 树频繁"页分裂"、写放大）。</li>
+          <li>本题选<b>雪花算法</b>，并把分片信息放进订单号高位，兼顾"全局唯一"和"可按订单号路由"。</li>
+        </ul>
+      </div>
+
+      <div class="note-section"><p><span class="hl-rose">③ 路由与聚合 —— 怎么知道去哪写/读，怎么合并结果</span></p>
+        <ul>
+          <li><span class="hl-cyan">分片算法（决定路由）</span>：取模 <code>hash(key) % N</code>（简单，但扩容要重分布）、范围分片（扩容方便，但可能热点）、一致性哈希（扩容只影响相邻分片）。</li>
+          <li><span class="hl-cyan">两级路由</span>：先定位库（如 <code>buyer_id % 4</code>），再定位表（如 <code>buyer_id % 8</code>）。</li>
+          <li><span class="hl-cyan">落地方式</span>：客户端中间件（ShardingSphere-JDBC）、代理层（MyCat / ShardingSphere-Proxy），或应用内自算路由。</li>
+          <li><span class="hl-purple">跨片聚合</span>：一条 SQL <b>并行发</b>到各相关分片（线程池）→ 结果<b>归并</b>：排序用"多路归并"取前 N；<code>SUM/COUNT</code> 各片算完再二次汇总（<code>AVG</code> 拆成 <code>SUM/COUNT</code>）。</li>
+          <li><span class="hl-purple">分页别用大 OFFSET</span>：用<b>游标翻页</b>——记住上一页最后一条的排序键，下一页用 <code>WHERE key &lt; 上页最后值 LIMIT N</code>；或直接走 ES 分页，绕开深度分页开销。</li>
+          <li><span class="hl-green">从设计上消灭跨片</span>：<b>全局表</b>（字典 / 配置类小表在每个分片各放一份，避免跨片 join）；<b>ER 分片</b>（订单与订单明细用<b>同一分片键</b>，让关联数据落到同一分片）。</li>
+        </ul>
+      </div>
 
       <div class="numbered-header"><span class="num">5</span>分布式 ID：三种方案怎么选</div>
       <table class="compare-table">
