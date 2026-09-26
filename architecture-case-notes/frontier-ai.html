@@ -103,6 +103,7 @@
       <div class="cue-item"><span class="q-mark">?</span>完整架构图的 6 层是什么？</div>
       <div class="cue-item"><span class="q-mark">?</span>RAG 原理与工作流程？</div>
       <div class="cue-item"><span class="q-mark">?</span>知识图谱中本体 Ontology 的作用？</div>
+      <div class="cue-item"><span class="q-mark">?</span>本体在法学域怎么用？（律师培训实例）</div>
     </div>
     <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
 
@@ -206,12 +207,81 @@
         <div class="tip" style="font-size:12px;color:rgba(255,255,255,.6);">&#x26A0; 一句话：<strong>本体是"规则/骨架"，实例是"数据/血肉"</strong>——本体给出语义框架，实例按框架填充。</div>
       </div>
 
+      <div class="numbered-header" id="kg-law"><span class="num">8</span>本体应用实例：法学知识图谱</div>
+      <div class="note-section"><p>法学是<strong>天然的图谱域</strong>：法律本身就是"概念 + 关系 + 规则"的体系。把<span class="hl-purple">法条 / 法律概念 / 构成要件 / 案件 / 证据 / 判例</span>建成<strong>类</strong>，用<span class="note-highlight">规定 / 包含 / 证明 / 适用 / 参照</span>建<strong>关系</strong>，再加效力层级等<strong>约束</strong>，就得到<strong>法学本体</strong>；具体法条与判例事实即<strong>实例</strong>。</p></div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 法学知识图谱：本体（模式层）＋ 实例（数据层）</div>
+        <svg viewBox="0 0 800 440" xmlns="http://www.w3.org/2000/svg" font-family="Inter, PingFang SC, Microsoft YaHei, sans-serif" style="width:100%;height:auto;display:block">
+          <defs><marker id="kgArrow" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="rgba(255,255,255,.42)"/></marker></defs>
+          <text x="20" y="50" fill="#a78bfa" font-size="12.5" font-weight="700">本体（模式层 · 类与关系）</text>
+          <rect x="80" y="64" width="110" height="36" rx="8" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.55)" stroke-dasharray="4 3"/>
+          <text x="135" y="87" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">法条</text>
+          <rect x="290" y="64" width="110" height="36" rx="8" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.55)" stroke-dasharray="4 3"/>
+          <text x="345" y="87" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">法律概念</text>
+          <rect x="520" y="64" width="110" height="36" rx="8" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.55)" stroke-dasharray="4 3"/>
+          <text x="575" y="87" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">构成要件</text>
+          <rect x="80" y="140" width="110" height="36" rx="8" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.55)" stroke-dasharray="4 3"/>
+          <text x="135" y="163" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">案件</text>
+          <rect x="520" y="140" width="110" height="36" rx="8" fill="rgba(167,139,250,.08)" stroke="rgba(167,139,250,.55)" stroke-dasharray="4 3"/>
+          <text x="575" y="163" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">证据</text>
+          <line x1="190" y1="82" x2="290" y2="82" stroke="rgba(255,255,255,.35)" marker-end="url(#kgArrow)"/>
+          <text x="240" y="76" fill="rgba(255,255,255,.5)" font-size="10" text-anchor="middle">规定</text>
+          <line x1="400" y1="82" x2="520" y2="82" stroke="rgba(255,255,255,.35)" marker-end="url(#kgArrow)"/>
+          <text x="460" y="76" fill="rgba(255,255,255,.5)" font-size="10" text-anchor="middle">包含</text>
+          <line x1="135" y1="140" x2="135" y2="102" stroke="rgba(255,255,255,.35)" marker-end="url(#kgArrow)"/>
+          <text x="150" y="124" fill="rgba(255,255,255,.5)" font-size="10">适用</text>
+          <line x1="575" y1="140" x2="575" y2="102" stroke="rgba(255,255,255,.35)" marker-end="url(#kgArrow)"/>
+          <text x="590" y="124" fill="rgba(255,255,255,.5)" font-size="10">证明</text>
+
+          <line x1="20" y1="205" x2="780" y2="205" stroke="rgba(255,255,255,.1)" stroke-dasharray="5 5"/>
+          <text x="20" y="238" fill="#00d4ff" font-size="12.5" font-weight="700">实例（数据层 · 具体事实）</text>
+          <rect x="70" y="250" width="150" height="36" rx="8" fill="rgba(0,212,255,.08)" stroke="rgba(0,212,255,.45)"/>
+          <text x="145" y="273" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">民法典第1165条</text>
+          <rect x="290" y="250" width="120" height="36" rx="8" fill="rgba(52,211,153,.08)" stroke="rgba(52,211,153,.45)"/>
+          <text x="350" y="273" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">过错侵权</text>
+          <rect x="520" y="250" width="110" height="36" rx="8" fill="rgba(0,212,255,.08)" stroke="rgba(0,212,255,.45)"/>
+          <text x="575" y="273" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">因果关系</text>
+          <rect x="70" y="340" width="130" height="36" rx="8" fill="rgba(0,212,255,.08)" stroke="rgba(0,212,255,.45)"/>
+          <text x="135" y="363" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">高空抛物案</text>
+          <rect x="290" y="340" width="150" height="36" rx="8" fill="rgba(0,212,255,.08)" stroke="rgba(0,212,255,.45)"/>
+          <text x="365" y="363" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">民法典第1254条</text>
+          <rect x="520" y="340" width="110" height="36" rx="8" fill="rgba(0,212,255,.08)" stroke="rgba(0,212,255,.45)"/>
+          <text x="575" y="363" fill="rgba(255,255,255,.88)" font-size="12.5" text-anchor="middle">举证责任</text>
+          <line x1="220" y1="268" x2="290" y2="268" stroke="rgba(255,255,255,.35)" marker-end="url(#kgArrow)"/>
+          <text x="255" y="262" fill="rgba(255,255,255,.5)" font-size="10" text-anchor="middle">规定</text>
+          <line x1="410" y1="268" x2="520" y2="268" stroke="rgba(255,255,255,.35)" marker-end="url(#kgArrow)"/>
+          <text x="465" y="262" fill="rgba(255,255,255,.5)" font-size="10" text-anchor="middle">要件</text>
+          <line x1="200" y1="358" x2="290" y2="358" stroke="rgba(255,255,255,.35)" marker-end="url(#kgArrow)"/>
+          <text x="245" y="352" fill="rgba(255,255,255,.5)" font-size="10" text-anchor="middle">适用</text>
+          <line x1="575" y1="340" x2="575" y2="288" stroke="rgba(255,255,255,.35)" marker-end="url(#kgArrow)"/>
+          <text x="590" y="320" fill="rgba(255,255,255,.5)" font-size="10">证明</text>
+        </svg>
+        <div style="font-size:11px;color:var(--text-muted);font-family:var(--font-mono);margin-top:8px;text-align:center;">虚线＝本体（类/关系，模式层）；实线＝实例（具体数据，数据层）</div>
+      </div>
+      <table class="compare-table">
+        <thead><tr><th>层</th><th>法学对应</th><th>例子</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-purple">本体 · 类</span></td><td>法条、法律概念、构成要件、案件、证据、判例</td><td>过错侵权、因果关系</td></tr>
+          <tr><td><span class="hl-purple">本体 · 关系</span></td><td>规定、包含、证明、适用、参照</td><td>案件 —适用→ 法条</td></tr>
+          <tr><td><span class="hl-orange">本体 · 约束</span></td><td>效力层级、特别法优于一般法、新法优于旧法</td><td>宪法 &gt; 法律 &gt; 行政法规</td></tr>
+          <tr><td><span class="hl-green">实例 · 数据</span></td><td>具体法条、要件、判例事实</td><td>(民法典第1165条, 规定, 过错侵权)</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p><strong>律师培训怎么用（4 点）：</strong></p>
+        <ul>
+          <li><span class="hl-green">要件涵摄训练</span>：沿「事实 → 要件 → 法条」路径匹配，系统提示缺哪个要件、该补哪份证据。</li>
+          <li><span class="hl-cyan">找法 / 法条推荐</span>：由案情要素沿 <code>构成要件→规定→法条</code> 检索，自动推荐可适用法条。</li>
+          <li><span class="hl-purple">类案与指导性案例检索</span>：沿 <code>参照 / 类似</code> 边找可参照的判例，练"同案同判"。</li>
+          <li><span class="hl-orange">学习路径 + 法律 AI</span>：用 <code>先修</code> 边自动排学习路径；用 <strong>KG + RAG</strong> 让模型检索真实法条再作答，防幻觉。</li>
+        </ul>
+        <div class="tip" style="font-size:12px;color:rgba(255,255,255,.6);">&#x26A0; 一句话：<strong>法学知识图谱＝法律人的"导航地图"</strong>；律师培训就是训练学员在这张图上做「<strong>事实 → 要件 → 法条</strong>」的路径推理。</div>
+      </div>
+
       <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>前沿技术说人话：</strong><b>大模型</b>就是「参数巨大的深度学习模型」，按输入分<b>语言（NLP）、视觉（CV）、多模态</b>三大类；麻烦的是<b>数据安全、成本贵、会编造内容、成本难控</b>。架构图记得两版：<b>基础版 5 层</b>（基础→数据→模型→平台→表现），<b>完整版 6 层</b>（基础设施→云原生→框架→模型→能力→模型服务）。<b>RAG</b> 就是「<b>先检索再生成</b>」——拿用户问题先去知识库搜相关文档，拼成增强上下文喂给 LLM，这样回答更准、不会瞎编。<b>本体</b>则像知识图谱的"<b>schema/字典</b>"：先规定好有哪些概念、关系和规则（骨架），实例数据再按这个骨架往里填。</p></div>
     </div>
     <div class="cornell-summary">
       <h3>&#x25B8; 总结</h3>
       <div class="summary-text">前沿技术是<strong>命题大势</strong>：大模型定义（大规模参数/深度网络/强泛化）、特点（规模大/大数据/强算力/预训练迁移/自监督/多域融合/自动化）、分类（<strong>语言/视觉/多模态</strong>）、四大挑战（数据安全/成本高/内容不可信/成本难控）；架构图记 <strong>基础 5 层</strong>与<strong>完整 6 层</strong>；<strong>RAG</strong>＝检索（双塔向量化）＋生成（T5/BART），流程「query→检索→增强上下文→Prompt→LLM→回答」，能提升知识密集任务的回答准确性；<strong>知识图谱</strong>用三元组表示知识，<strong>本体 Ontology＝模式层</strong>，定义概念/属性/关系/约束。</div>
-      <div class="summary-tags"><span class="tag primary">前沿技术</span><span class="tag">AI大模型</span><span class="tag">语言/视觉/多模态</span><span class="tag">架构图</span><span class="tag">RAG</span><span class="tag">知识图谱</span><span class="tag">本体Ontology</span><span class="tag">命题大势</span></div>
+      <div class="summary-tags"><span class="tag primary">前沿技术</span><span class="tag">AI大模型</span><span class="tag">语言/视觉/多模态</span><span class="tag">架构图</span><span class="tag">RAG</span><span class="tag">知识图谱</span><span class="tag">本体Ontology</span><span class="tag">本体实例·法学</span></div>
     </div>
   </div>
 </div>

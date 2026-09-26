@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>康奈尔笔记 — AIoT 与云边协同（边缘计算架构）</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg-deep:#0a0e17;--bg-card:#111620;--bg-elevated:#1a2030;--bg-cue:#0d1320;--border-default:rgba(255,255,255,.06);--text-primary:rgba(255,255,255,.92);--text-secondary:rgba(255,255,255,.55);--text-muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:6px;--radius-lg:10px;--font-sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;--font-mono:'JetBrains Mono','SF Mono','Cascadia Code','Fira Code',monospace}
+  body{font-family:var(--font-sans);color:var(--text-primary);background:#05080e;background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.03)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(52,211,153,.03)0%,transparent 50%);line-height:1.6;min-height:100vh}
+  .page{max-width:840px;margin:36px auto;background:var(--bg-card);border:1px solid var(--border-default);border-radius:var(--radius-lg);overflow:hidden;box-shadow:0 0 0 1px rgba(0,212,255,.04),0 4px 32px rgba(0,0,0,.4),0 24px 80px rgba(0,0,0,.3);position:relative}
+  .page::before{content:'';position:absolute;inset:-1px;border-radius:var(--radius-lg);padding:1px;background:linear-gradient(135deg,rgba(0,212,255,.15),transparent 30%,transparent 70%,rgba(52,211,153,.1));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;z-index:0}
+  .header{background:linear-gradient(180deg,rgba(0,212,255,.04)0%,transparent 100%),var(--bg-elevated);padding:30px 44px 26px;border-bottom:1px solid var(--border-default);z-index:1;position:relative}
+  .header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--cyan),var(--green),transparent)}
+  .header-top{display:flex;align-items:flex-start;gap:16px}.header-brand{display:flex;align-items:center;gap:10px;flex-shrink:0}
+  .header-badge{width:40px;height:36px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(52,211,153,.1));border:1px solid rgba(0,212,255,.2);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+  .header-badge::after{content:'';position:absolute;inset:2px;border-radius:4px;border:1px solid rgba(0,212,255,.1)}
+  .header-badge-icon{font-family:var(--font-mono);font-size:12px;font-weight:700;color:var(--cyan);text-shadow:0 0 12px rgba(0,212,255,.25);position:relative;z-index:1}
+  .header-title-group{flex:1}.header-kicker{font-family:var(--font-mono);font-size:9px;font-weight:600;color:var(--cyan);letter-spacing:.2em;margin-bottom:4px}
+  .header-title{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.3}
+  .header-meta{display:flex;gap:20px;margin-top:14px;font-size:12px;color:var(--text-muted);font-family:var(--font-mono);letter-spacing:.04em;flex-wrap:wrap}
+  .header-meta .meta-item{display:flex;align-items:center;gap:8px}.header-meta .meta-dot{width:5px;height:5px;background:var(--cyan);border-radius:50%;box-shadow:0 0 6px rgba(0,212,255,.25)}
+  .cornell{display:grid;grid-template-columns:240px 1fr;grid-template-rows:auto auto;grid-template-areas:"cue notes" "summary summary";gap:0;position:relative;z-index:1}
+  .cornell-cue{grid-area:cue;background:linear-gradient(180deg,rgba(0,212,255,.02),transparent 80%),var(--bg-cue);padding:24px 18px;border-right:1px solid rgba(0,212,255,.06)}
+  .cue-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid rgba(0,212,255,.08)}
+  .cue-item{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.5;padding:9px 10px;margin-bottom:6px;border-radius:var(--radius);background:rgba(255,255,255,.02);border:1px solid transparent;font-weight:500}
+  .cue-item .q-mark{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:4px;background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.15);color:var(--cyan);font-family:var(--font-mono);font-size:11px;font-weight:700;margin-right:8px;flex-shrink:0}
+  .cornell-notes{grid-area:notes;padding:24px 32px 20px}
+  .notes-header{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--blue);letter-spacing:.18em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(77,124,255,.08)}
+  .note-section{margin-bottom:10px}
+  .note-section h4{font-size:13px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:10px}
+  .note-section h4 .dot{width:6px;height:6px;border-radius:1px;background:var(--cyan);box-shadow:0 0 8px rgba(0,212,255,.25);flex-shrink:0}
+  .note-section>p{font-size:13px;color:rgba(255,255,255,.78);line-height:1.7}
+  .note-section ul{list-style:none;padding-left:0}.note-section ul li{font-size:12.5px;padding:1px 0 1px 20px;position:relative;color:rgba(255,255,255,.75);line-height:1.6}
+  .note-section ul li::before{content:'';position:absolute;left:6px;top:8px;width:4px;height:4px;border-radius:50%;background:rgba(0,212,255,.4)}
+  .note-highlight{display:inline;background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600;color:var(--cyan)}
+  .feynman{margin-top:14px;padding:14px 16px;background:linear-gradient(135deg,rgba(52,211,153,.04),rgba(52,211,153,.01));border-radius:var(--radius);border:1px solid rgba(52,211,153,.1);border-left:2px solid var(--green);position:relative}
+  .feynman::before{content:'\2726';position:absolute;right:14px;top:10px;font-size:14px;color:var(--green);opacity:.5}
+  .feynman-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--green);letter-spacing:.14em;margin-bottom:4px}
+  .feynman p{font-size:12.5px;color:rgba(255,255,255,.7);line-height:1.7}.feynman p strong{color:var(--green)}
+  .diagram{margin-top:14px;padding:14px 16px;background:rgba(255,255,255,.01);border-radius:var(--radius);border:1px solid rgba(255,255,255,.04);overflow-x:auto}
+  .diagram-label{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--purple);letter-spacing:.14em;margin-bottom:10px}
+  .flow-row{display:flex;align-items:center;justify-content:center;gap:0;flex-wrap:wrap;margin:4px 0}
+  .flow-box{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:8px 14px;font-size:12px;font-weight:500;color:rgba(255,255,255,.7);text-align:center}
+  .flow-box.accent{border-color:rgba(0,212,255,.2);background:rgba(0,212,255,.06);color:var(--cyan);font-weight:700}
+  .flow-box.primary{border-color:rgba(77,124,255,.25);background:rgba(77,124,255,.08);color:var(--blue);font-weight:700}
+  .flow-box.green{border-color:rgba(52,211,153,.25);background:rgba(52,211,153,.06);color:var(--green);font-weight:700}
+  .flow-box.amber{border-color:rgba(251,191,36,.25);background:rgba(251,191,36,.06);color:var(--amber);font-weight:700}
+  .flow-box.purple{border-color:rgba(167,139,250,.25);background:rgba(167,139,250,.06);color:var(--purple);font-weight:700}
+  .flow-v-arrow{display:flex;justify-content:center;color:rgba(255,255,255,.15);font-size:14px;line-height:1;margin:4px 0}
+  .compare-table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}
+  .compare-table thead th{background:rgba(255,255,255,.03);color:var(--text-secondary);font-weight:600;text-align:left;padding:8px 10px;font-size:10px;font-family:var(--font-mono);letter-spacing:.06em;border-bottom:1px solid rgba(0,212,255,.1)}
+  .compare-table tbody td{padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.03);color:rgba(255,255,255,.75);font-size:12px;line-height:1.5}
+  .compare-table tbody tr:nth-child(even) td{background:rgba(255,255,255,.01)}
+  .card-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:6px 0}
+  .card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);padding:10px 12px}
+  .card-badge{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:4px;background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.25);color:var(--rose);font-family:var(--font-mono);font-size:10px;font-weight:700;margin-bottom:4px}
+  .card-title{font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px}
+  .card-list{list-style:none}.card-list li{font-size:11px;color:rgba(255,255,255,.65);line-height:1.5;padding-left:10px;position:relative}
+  .card-list li::before{content:'\203A';position:absolute;left:0;color:var(--cyan)}
+  .hl-orange{color:var(--amber);background:linear-gradient(180deg,transparent 58%,rgba(251,191,36,.15)58%);padding:0 2px;font-weight:600}
+  .hl-cyan{color:var(--cyan);background:linear-gradient(180deg,transparent 58%,rgba(0,212,255,.12)58%);padding:0 2px;font-weight:600}
+  .hl-green{color:var(--green);background:linear-gradient(180deg,transparent 58%,rgba(52,211,153,.12)58%);padding:0 2px;font-weight:600}
+  .hl-purple{color:var(--purple);background:linear-gradient(180deg,transparent 58%,rgba(167,139,250,.12)58%);padding:0 2px;font-weight:600}
+  .hl-rose{color:var(--rose);background:linear-gradient(180deg,transparent 58%,rgba(248,113,113,.12)58%);padding:0 2px;font-weight:600}
+  .numbered-header{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:700;color:var(--text-primary);margin:14px 0 8px}
+  .numbered-header .num{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:24px;padding:0 6px;background:linear-gradient(135deg,var(--cyan),var(--blue));color:#fff;font-family:var(--font-mono);font-size:12px;font-weight:700;border-radius:4px;box-shadow:0 0 12px rgba(0,212,255,.25)}
+  .cornell-summary{grid-area:summary;padding:18px 44px 22px;background:linear-gradient(180deg,rgba(255,255,255,.01)0%,transparent 100%);border-top:1px solid rgba(255,255,255,.04);position:relative}
+  .cornell-summary::before{content:'';position:absolute;top:0;left:44px;right:44px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,255,.12),var(--cyan),transparent)}
+  .cornell-summary h3{font-family:var(--font-mono);font-size:9px;font-weight:700;color:var(--cyan);letter-spacing:.18em;margin-bottom:8px}
+  .cornell-summary .summary-text{font-size:14px;font-weight:600;color:var(--text-primary);line-height:1.65;padding-left:14px;border-left:2px solid var(--cyan);box-shadow:-4px 0 12px rgba(0,212,255,.06)}
+  .cornell-summary .summary-text strong{color:var(--cyan)}
+  .cornell-summary .summary-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:10px;padding:3px 10px;border-radius:3px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:var(--text-secondary);font-weight:500;font-family:var(--font-mono);letter-spacing:.03em}
+  .tag.primary{background:rgba(0,212,255,.08);border-color:rgba(0,212,255,.15);color:var(--cyan);font-weight:600}
+  @media(max-width:768px){.page{max-width:100%;margin:0;border-radius:0;border:none;box-shadow:none}.page::before{display:none}.cornell{grid-template-columns:1fr;grid-template-areas:"cue""notes""summary"}.cornell-cue{border-right:none;border-bottom:1px solid rgba(0,212,255,.06);padding:16px}.cornell-notes{padding:16px}.cornell-summary{padding:16px}.card-grid{grid-template-columns:1fr}.compare-table{font-size:10px;display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="header">
+    <div class="header-top">
+      <div class="header-brand"><div class="header-badge"><span class="header-badge-icon">AIoT</span></div></div>
+      <div class="header-title-group">
+        <div class="header-kicker">架构直播9 · 2026年5月真题 / 边缘计算</div>
+        <div class="header-title">AIoT 与云边协同 · 边缘计算架构</div>
+      </div>
+    </div>
+    <div class="header-meta"><div class="meta-item"><span class="meta-dot"></span>2026-09</div><div class="meta-item"><span class="meta-dot"></span>软考高级架构师 · 案例分析</div><div class="meta-item"><span class="meta-dot"></span>真题试题三 · 高频考点</div></div>
+  </div>
+  <div class="cornell">
+    <div class="cornell-cue"><div class="cue-header">&#x25B8; 线索</div>
+      <div class="cue-item"><span class="q-mark">?</span>边缘计算的定义是什么？落地形态有哪三种？</div>
+      <div class="cue-item"><span class="q-mark">?</span>云边协同的六大协同是哪六个？</div>
+      <div class="cue-item"><span class="q-mark">?</span>云边协同有哪些主要特点？</div>
+      <div class="cue-item"><span class="q-mark">?</span>四层架构（感知/边缘/AI 决策/应用）各层职责与构件？</div>
+      <div class="cue-item"><span class="q-mark">?</span>为什么要用云边协同？（优势）</div>
+      <div class="cue-item"><span class="q-mark">?</span>四层架构的 5 个主要缺点？分别源于哪个特点？</div>
+      <div class="cue-item"><span class="q-mark">?</span>边缘计算 vs 雾计算怎么区分？</div>
+    </div>
+    <div class="cornell-notes"><div class="notes-header">&#x25B8; 核心要点</div>
+
+      <div class="numbered-header"><span class="num">1</span>边缘计算是什么</div>
+      <div class="note-section"><p><span class="note-highlight">边缘计算</span>：在<strong>靠近数据源或用户</strong>的网络边缘侧，融合网络、计算、存储、应用核心能力的开放平台。把原本集中在云端的计算任务<strong>下沉</strong>到距数据产生地更近的位置执行，就近提供实时处理与本地自治服务。</p>
+        <ul>
+          <li>核心思想：<span class="hl-green">计算跟着数据走</span>（而不是数据上传到计算）。</li>
+          <li>落地形态：<span class="hl-purple">云边缘、边缘云、云化网关</span>三类。</li>
+          <li>核心能力：<span class="hl-orange">边云协同 + 边缘智能</span>。</li>
+          <li>主要价值：<strong>缓解带宽压力、降低时延、减少数据外传</strong>。</li>
+        </ul></div>
+
+      <div class="numbered-header"><span class="num">2</span>云边协同的六大协同</div>
+      <table class="compare-table">
+        <thead><tr><th>协同</th><th>含义</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-green">资源协同</span></td><td>云与边算力/存储/网络资源统一调度、弹性互补</td></tr>
+          <tr><td><span class="hl-cyan note-highlight">数据协同</span></td><td>边缘采集/预处理，云端汇聚/治理；按需上传而非全量回传</td></tr>
+          <tr><td><span class="hl-purple">智能协同</span></td><td>云端训练模型、边缘推理执行；模型下发与联邦/增量学习</td></tr>
+          <tr><td><span class="hl-orange">应用管理协同</span></td><td>应用在云边统一编排、部署、升级（含 OTA）</td></tr>
+          <tr><td><span class="hl-green">业务管理协同</span></td><td>跨云边的业务流程编排与本地联动决策</td></tr>
+          <tr><td><span class="hl-purple">服务协同</span></td><td>服务发现、统一接口、云边服务互相调用与能力开放</td></tr>
+        </tbody>
+      </table>
+
+      <div class="numbered-header"><span class="num">3</span>云边协同的主要特点</div>
+      <div class="card-grid">
+        <div class="card"><div class="card-title" style="color:var(--cyan)">① 就近处理 · 低时延</div><div class="card-list"><li>计算下沉到边缘，靠近数据源，响应毫秒～秒级</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--cyan)">② 数据第一入口 · 海量接入</div><div class="card-list"><li>边缘是数据的第一入口，承担采集与预处理</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--green)">③ 带宽优化</div><div class="card-list"><li>只在边缘上传特征/疑似异常，显著减少回传流量</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--green)">④ 断网自治 · 连续性</div><div class="card-list"><li>云端链路中断时边缘仍可本地检测与告警</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--purple)">⑤ 云边分工协同</div><div class="card-list"><li>云管全局训练/治理/决策，边管实时推理/执行</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--amber)">⑥ 分布 · 异构 · 受限</div><div class="card-list"><li>节点分散、设备异构、边缘算力/存储受限</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--amber)">⑦ 安全与合规边界</div><div class="card-list"><li>原始敏感数据不出本地，降低外泄面</li></div></div>
+        <div class="card"><div class="card-title" style="color:var(--cyan)">⑧ 弹性与可扩展</div><div class="card-list"><li>按产线/区域就近扩容，支撑大规模测点接入</li></div></div>
+      </div>
+
+      <div class="numbered-header"><span class="num">4</span>云边协同四层架构（职责 + 构件）</div>
+      <div class="diagram"><div class="diagram-label">&#x25C6; 云边协同四层架构（以 AIoT 智能安防为例）</div>
+        <div style="text-align:center;">
+          <div class="flow-row"><div class="flow-box green">应用层<br><small>业务应用 · 可视化展示 · 告警处置 · 外部系统对接　｜　移动端应用 · 第三方系统集成</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box purple">AI 决策层（云端）<br><small>多源融合 · 模型训练与推送 · 事件分析 · 综合研判　｜　融合认知引擎 · 模型训练和 OTA · 事件中心</small></div></div>
+          <div class="flow-v-arrow">↓　<span style="font-size:10px;color:var(--cyan)">云边协同：模型下发 ▽　数据上报 △</span>　↓</div>
+          <div class="flow-row"><div class="flow-box accent">边缘层（边缘侧）<br><small>本地实时计算 · 视频预处理 · 快速联动 · 断网自治　｜　边缘计算网关 · 视觉分析引擎</small></div></div>
+          <div class="flow-v-arrow">↓</div>
+          <div class="flow-row"><div class="flow-box amber">感知层（边缘侧）<br><small>门禁/视频/周界采集 · 基础身份识别 · 设备接入　｜　智能门禁控制器 · 生物识别 · 身份凭证 · 周界保护</small></div></div>
+        </div>
+      </div>
+      <table class="compare-table">
+        <thead><tr><th>层级</th><th>主要职责</th><th>典型构件</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-green">应用层</span></td><td>业务应用、可视化、告警处置、外部系统对接</td><td>移动端应用、第三方系统集成</td></tr>
+          <tr><td><span class="hl-purple">AI 决策层</span></td><td>多源数据融合、模型训练与推送、事件分析研判（全局智能）</td><td>融合认知引擎、模型训练和 OTA、事件中心</td></tr>
+          <tr><td><span class="hl-cyan">边缘层</span></td><td>本地实时计算、视频预处理、快速联动、断网自治（近实时）</td><td>边缘计算网关、视觉分析引擎</td></tr>
+          <tr><td><span class="hl-orange">感知层</span></td><td>现场数据采集、基础身份识别、设备接入</td><td>智能门禁控制器、生物识别、身份凭证、周界保护</td></tr>
+        </tbody>
+      </table>
+      <div class="note-section"><p><strong>分层判据（易错）：</strong>看职责是「<span class="hl-cyan">就近实时处理</span>」还是「<span class="hl-purple">全局融合研判</span>」——<strong>视觉分析引擎</strong>处理视频、时延敏感、须本地推理 → 边缘层；<strong>事件中心</strong>汇聚多节点多源事件、关联研判、统一联动 → AI 决策层。名字带"AI/事件"不代表所在层级，看<strong>数据范围与部署位置</strong>。</p></div>
+
+      <div class="numbered-header"><span class="num">5</span>为什么要用云边协同（优势）</div>
+      <div class="note-section"><ul>
+        <li><span class="hl-green">低时延实时响应</span>：本地推理不往返云端，从分钟级降到毫秒～秒级。</li>
+        <li><span class="hl-green">带宽减压</span>：原始高频数据在边缘压缩/特征提取后再上传，工业环网占用大幅下降。</li>
+        <li><span class="hl-green">断网自治</span>：链路中断仍能本地监测与告警，消除安全盲区。</li>
+        <li><span class="hl-cyan">降本</span>：仅上传特征与疑似异常片段，云端存储/算力成本下降。</li>
+        <li><span class="hl-cyan">数据合规</span>：原始数据不出场区/本地，减少敏感数据外泄面。</li>
+        <li><span class="hl-purple">全局智能 + 本地执行</span>：云端训练、边缘推理，兼顾全局最优与就近执行。</li>
+      </ul></div>
+
+      <div class="numbered-header"><span class="num">6</span>四层架构的 5 个主要缺点（特点 → 缺点）</div>
+      <div class="card-grid">
+        <div class="card"><div class="card-badge">1</div><div class="card-title">算力受限 · 复杂模型难下沉</div><div class="card-list"><li>源于<span class="hl-orange">约束性</span>：边缘设备算力/显存有限，大模型难以直接部署，需量化/裁剪</li></div></div>
+        <div class="card"><div class="card-badge">2</div><div class="card-title">模型同步与版本管理复杂</div><div class="card-list"><li>源于<span class="hl-cyan">分布 + 协同</span>：OTA 更新存在一致性风险，易出现版本漂移</li></div></div>
+        <div class="card"><div class="card-badge">3</div><div class="card-title">攻击面更大</div><div class="card-list"><li>源于<span class="hl-cyan">分布性</span>：边缘节点分散，物理与网络暴露面大，易被攻击</li></div></div>
+        <div class="card"><div class="card-badge">4</div><div class="card-title">统一运维与监控难</div><div class="card-list"><li>源于<span class="hl-amber">异构性</span>：异构边缘设备数量多、协议杂，纳管成本高</li></div></div>
+        <div class="card"><div class="card-badge">5</div><div class="card-title">数据分散 · 隐私合规复杂</div><div class="card-list"><li>源于<span class="hl-amber">数据分散</span>：数据横跨边缘与云端，隐私治理与合规管理更复杂</li></div></div>
+      </div>
+      <div class="note-section"><p><span class="note-highlight">答题套路</span>：先点云边协同的特点（分布性、异构性、约束性、数据分散、双向协同），再把每个特点"翻成"一条缺点——<strong>分布 → 攻击面大/运维难；约束 → 算力受限；异构 → 纳管难；协同 → 版本一致性风险；数据分散 → 隐私合规复杂</strong>。</p></div>
+
+      <div class="numbered-header"><span class="num">7</span>易混辨析</div>
+      <table class="compare-table">
+        <thead><tr><th>概念</th><th>定位</th><th>关键区别</th></tr></thead>
+        <tbody>
+          <tr><td><span class="hl-cyan">边缘计算</span></td><td>靠近数据源的边缘侧</td><td>强调<strong>就近计算</strong>，节点更靠近设备（网关/终端）</td></tr>
+          <tr><td><span class="hl-purple">雾计算</span></td><td>云与端之间的雾层</td><td>层级介于云与边之间，强调<strong>中间层协调</strong>（边缘更靠近物）</td></tr>
+          <tr><td><span class="hl-green">云边协同</span></td><td>云 + 边整体</td><td>强调云与边<strong>分工协作</strong>（云训练、边推理），不是二选一</td></tr>
+        </tbody>
+      </table>
+
+      <div class="feynman"><div class="feynman-label">&#x25C6; 费曼</div><p><strong>云边协同说人话：</strong>过去什么都传到云端算，像"所有快递都寄到总部再拆"——又慢又费带宽，还怕断网。云边协同就是「<b>在家门口先办一半</b>」：<b>边缘</b>（小区门口的快递柜）负责即时、本地的活（看视频抓坏人、先过滤数据）；<b>云端</b>（总部）负责需要全局视野的活（训练模型、汇总所有小区的数据做研判）。好处是<b>快、省、断了网也能用、数据不外泄</b>。坏处是——<b>小区柜子算不动大模型（算力弱）、几百个小区的柜子版本要统一（难同步）、柜子太多容易被撬（攻击面大）、牌子五花八门难统一管理（异构）、数据一半在家一半在总部（合规麻烦）</b>。一句话：<b>分布式带来的灵活，也是有代价的。</b></p></div>
+    </div>
+    <div class="cornell-summary">
+      <h3>&#x25B8; 总结</h3>
+      <div class="summary-text">边缘计算＝把计算<strong>下沉到靠近数据源</strong>的边缘侧（落地形态：云边缘/边缘云/云化网关），核心能力是<strong>边云协同 + 边缘智能</strong>；云边协同有<strong>六大协同</strong>（资源/数据/智能/应用管理/业务管理/服务）；四层架构＝<strong>感知层→边缘层→AI 决策层→应用层</strong>（云训练、边推理）；选层看职责——"就近实时"往下、"全局研判"往上；<strong>5 个缺点</strong>＝算力受限、模型版本同步难、攻击面大、异构运维难、数据分散合规复杂，正好对应云边协同的<strong>约束/协同/分布/异构/数据分散</strong>五个特点。</div>
+      <div class="summary-tags"><span class="tag primary">边缘计算</span><span class="tag">AIoT</span><span class="tag">云边协同</span><span class="tag">四层架构</span><span class="tag">六大协同</span><span class="tag">断网自治</span><span class="tag">模型OTA</span><span class="tag">隐私合规</span></div>
+    </div>
+  </div>
+</div>
+
+<div style="max-width:840px;margin:0 auto 36px;display:flex;gap:14px;justify-content:center;align-items:center;font-family:var(--font-mono);font-size:12px;flex-wrap:wrap;">
+  <a href="index.html" style="color:var(--cyan);text-decoration:none;border-bottom:1px solid rgba(0,212,255,.2);padding-bottom:1px;">&#x2190; 返回案例笔记索引</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="../question-bank/exam-2026-05-case.html" style="color:var(--green);text-decoration:none;border-bottom:1px solid rgba(52,211,153,.3);padding-bottom:1px;font-weight:700;">&#x25B6; 2026年5月案例分析（真题三）</a>
+  <span style="color:var(--text-muted);">·</span>
+  <a href="frontier-ai.html" style="color:var(--purple);text-decoration:none;border-bottom:1px solid rgba(167,139,250,.3);padding-bottom:1px;">前沿技术 AI 大模型</a>
+</div>
+</body>
+</html>
