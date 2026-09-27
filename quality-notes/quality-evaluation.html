@@ -562,7 +562,8 @@
       <div class="cue-item"><span class="q-mark">?</span> 开发期和运行期质量属性各有哪些？核心区别是什么？</div>
       <div class="cue-item"><span class="q-mark">?</span> 可靠性和可用性有什么区别？各自的设计策略是什么？</div>
       <div class="cue-item"><span class="q-mark">?</span> 质量属性场景由哪6个部分组成？如何描述？</div>
-      <div class="cue-item"><span class="q-mark">?</span> 敏感点、权衡点、风险点分别是什么含义？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 敏感点、权衡点、风险点、非风险点分别是什么含义？关系如何？</div>
+      <div class="cue-item"><span class="q-mark">?</span> 什么是系统架构评估？何时做、谁参与、产出什么？</div>
       <div class="cue-item"><span class="q-mark">?</span> 三种架构评估方式（问卷/度量/场景）各有什么特点？</div>
       <div class="cue-item"><span class="q-mark">?</span> SAAM、ATAM、CBAM 三种评估方法的核心区别？</div>
       <div class="cue-item"><span class="q-mark">?</span> ATAM 的四个阶段分别做什么？产出什么？</div>
@@ -702,43 +703,88 @@
 
       <div class="numbered-header"><span class="num">4</span>系统架构评估 — 核心概念</div>
 
+      <div class="note-section">
+        <p><span class="note-highlight">什么是系统架构评估</span>：在系统<b>大规模编码之前</b>，对系统架构进行分析与评价，判断其能否满足<b>性能、可用性、安全性、可修改性</b>等质量属性需求，并识别出架构中的<strong>敏感点、权衡点、风险点</strong>，为架构决策提供依据。它不是"打分验收"，而是"<b>风险发现 + 取舍论证</b>"。</p>
+        <ul>
+          <li><b>评估时机</b>：架构设计基本成形、写大量代码之前；或每次重大架构变更、新增高风险模块时。</li>
+          <li><b>参与者</b>：评估小组（内部/外部资深架构师）、项目决策者、架构设计师、项目干系人（客户、业务、运维、安全）。</li>
+          <li><b>核心产出</b>：质量属性场景清单、效用树、敏感点/权衡点/风险点清单、评估报告与后续行动项。</li>
+        </ul>
+      </div>
+
       <div class="card-grid">
         <div class="card">
           <div class="card-badge">S</div>
-          <div class="card-title"><span class="note-highlight">敏感点</span></div>
+          <div class="card-title"><span class="note-highlight">敏感点（Sensitivity Point）</span></div>
           <ul class="card-list">
-            <li>对<strong>单一</strong>质量属性敏感的特性</li>
-            <li>调整后某质量属性显著变化</li>
-            <li>例：缓存大小 → 影响性能</li>
+            <li><strong>精确定义</strong>：一个或多个构件（或构件间关系）的<b>特性</b>，对实现某个<b>特定质量属性</b>有重大影响，是达成该属性的"关键位置"。</li>
+            <li><strong>判定</strong>：改变这个特性 → 对应质量属性发生显著变化（变好或变坏都可能）。</li>
+            <li><strong>特点</strong>：只关联<b>单一</b>质量属性，性质是中性的（敏感≠有风险）。</li>
+            <li><strong>例</strong>：缓存容量→性能；数据库连接池大小→吞吐；副本数→可用性。</li>
+            <li><strong>作用</strong>：让架构师知道"实现某属性时最该盯住哪个位置"。</li>
           </ul>
         </div>
         <div class="card">
           <div class="card-badge">T</div>
-          <div class="card-title"><span class="hl-orange">权衡点</span></div>
+          <div class="card-title"><span class="hl-orange">权衡点（Tradeoff Point）</span></div>
           <ul class="card-list">
-            <li>影响<strong>多个</strong>质量属性的特性</li>
-            <li>多质量属性此消彼长</li>
-            <li>例：加密级别↑ → 安全性↑ 性能↓</li>
+            <li><strong>精确定义</strong>：<b>同时影响多个质量属性</b>的特性/决策，至少对一个属性有利、对另一个不利，是多属性之间的折中。</li>
+            <li><strong>判定</strong>：改它 → 一个属性↑、另一个↓（此消彼长）。</li>
+            <li><strong>特点</strong>：权衡点是<b>一种特殊的敏感点</b>（关联多个属性）。</li>
+            <li><strong>例</strong>：加密级别↑→安全↑性能↓；数据冗余↑→可用↑存储成本↑；微服务拆分→可修改↑运维复杂度↑。</li>
+            <li><strong>作用</strong>：把"一利一弊"的决策摆上桌，由决策者拍板取舍。</li>
           </ul>
         </div>
         <div class="card">
           <div class="card-badge">R</div>
-          <div class="card-title"><span class="hl-red">风险点</span></div>
+          <div class="card-title"><span class="hl-red">风险点（Risk）</span></div>
           <ul class="card-list">
-            <li>潜在隐患、不确定性</li>
-            <li>可能导致需求不达标</li>
-            <li>例：新技术选型无验证</li>
+            <li><strong>精确定义</strong>：<b>已有的、可能带来负面后果</b>的架构决策，即潜在隐患、不确定性。</li>
+            <li><strong>判定</strong>：该决策未经验证/不确定，可能导致需求不达标或事故。</li>
+            <li><strong>特点</strong>：风险点通常是"<b>敏感点 + 潜在负面后果</b>"；可能与多个属性有关。</li>
+            <li><strong>例</strong>：关键路径依赖单一供应商组件且无降级方案；未压测就承诺性能目标；新技术选型缺验证。</li>
+            <li><strong>作用</strong>：进入风险清单，作为开发硬性任务优先修复。</li>
           </ul>
         </div>
         <div class="card">
           <div class="card-badge">N</div>
-          <div class="card-title"><span class="hl-green">非风险点</span></div>
+          <div class="card-title"><span class="hl-green">非风险点（Non-Risk）</span></div>
           <ul class="card-list">
-            <li>设计成熟、低不确定性</li>
-            <li>技术验证充分、符合标准</li>
-            <li>例：成熟框架的标准用法</li>
+            <li><strong>精确定义</strong>：<b>已有的、被证实安全</b>的架构决策，即设计成熟、低不确定性的部分。</li>
+            <li><strong>判定</strong>：技术验证充分、符合标准、有成熟实践。</li>
+            <li><strong>特点</strong>：是"风险点"的对立面，评估时明确"这个不用怕"。</li>
+            <li><strong>例</strong>：成熟框架的标准用法、已验证的技术栈、常规备份策略。</li>
+            <li><strong>作用</strong>：缩小评估关注范围，把精力集中在真正的风险上。</li>
           </ul>
         </div>
+      </div>
+
+      <div class="note-section">
+        <p><span class="note-highlight">四者关系（一句话）</span>：<strong>权衡点是特殊的敏感点</strong>（敏感点只管一个属性，权衡点同时管多个）；<strong>风险点 = 敏感点 + 潜在负面后果</strong>；<strong>非风险点 = 已被证实安全的决策</strong>。判别口诀：<b>敏感点问"影响大不大"，权衡点问"是否顾此失彼"，风险点问"会不会出事"。</b></p>
+      </div>
+
+      <table class="compare-table">
+        <thead><tr><th>概念</th><th>英文</th><th>关联属性</th><th>性质</th><th>判定关键词</th><th>典型例子</th></tr></thead>
+        <tbody>
+          <tr><td><span class="note-highlight">敏感点</span></td><td>Sensitivity Point</td><td>单一属性</td><td>中性（关键位置）</td><td>改它 → 该属性显著变化</td><td>Kafka 分区数/副本因子 → 吞吐与丢失率</td></tr>
+          <tr><td><span class="hl-orange">权衡点</span></td><td>Tradeoff Point</td><td>多属性</td><td>折中（一利一弊）</td><td>改它 → 甲升乙降</td><td>国密加密 → 安全↑ 时延↑</td></tr>
+          <tr><td><span class="hl-red">风险点</span></td><td>Risk</td><td>可能多属性</td><td>负面（隐患）</td><td>未验证 / 不确定 / 可能不达标</td><td>单一云厂商中间件且无降级</td></tr>
+          <tr><td><span class="hl-green">非风险点</span></td><td>Non-Risk</td><td>—</td><td>正面（安全）</td><td>已验证 / 成熟 / 低风险</td><td>成熟框架的标准用法</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note-section">
+        <p><span class="note-highlight">场景优先级（H / M / L）</span>：ATAM 里每个场景按<b>两个维度</b>分级——<b>重要性</b>（对业务成功的重要程度）× <b>难易程度</b>（架构师实现该场景的难易）。用 (H/M/L, H/M/L) 标记：<code>(H,H)</code>=高重要且难实现（重点攻坚）、<code>(H,L)</code>=高重要且易实现（快赢）、<code>(L,L)</code>=低优先（可延后）。评估时<b>修剪效用树</b>，只保留重要场景继续分析。</p>
+      </div>
+
+      <div class="note-section">
+        <p><span class="note-highlight">一个例子串起四个概念（银行信贷平台）</span>：</p>
+        <ul>
+          <li><b>敏感点</b>：Kafka 集群的分区数与副本因子配置，直接决定事务/告警消息的处理吞吐与丢失率（性能、可用性的关键位置）。</li>
+          <li><b>权衡点</b>：端到端启用国密加密，安全性提升但时延增加、损害性能。</li>
+          <li><b>风险点</b>：依赖单一云厂商的消息中间件且不设降级方案，云侧故障将造成大面积告警失效。</li>
+          <li><b>非风险点</b>：成熟的 PostgreSQL 主从复制 + 常规备份策略。</li>
+        </ul>
       </div>
 
       <div class="numbered-header"><span class="num">5</span>三种架构评估方式</div>
