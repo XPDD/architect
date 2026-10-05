@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>错题回顾卷 · 16 题 · 系统架构设计师</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  :root{--bg:#05080e;--card:#111620;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.55);--muted:rgba(255,255,255,.28);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+  body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(0,212,255,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(167,139,250,.04)0%,transparent 50%);line-height:1.6;min-height:100vh;padding:32px 16px}
+  .wrap{max-width:900px;margin:0 auto}
+  .back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+  .hero{text-align:center;padding:34px 20px 26px;background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:20px}
+  .hero-badge{font-family:var(--mono);font-size:11px;color:var(--purple);letter-spacing:.2em;margin-bottom:8px}
+  .hero h1{font-size:26px;font-weight:800}.hero h1 .accent{color:var(--purple)}
+  .hero-sub{font-size:13px;color:var(--muted);margin-top:8px}
+  .toolbar{position:sticky;top:12px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:rgba(17,22,32,.92);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:20px;z-index:10}
+  .timer{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--cyan);text-shadow:0 0 10px rgba(0,212,255,.4)}
+  .toolbar .spacer{flex:1}
+  .btn{background:none;border:1px solid rgba(0,212,255,.35);color:var(--cyan);border-radius:6px;padding:7px 16px;font-size:13px;cursor:pointer;font-family:var(--mono);transition:.15s}
+  .btn:hover{background:rgba(0,212,255,.08)}
+  .btn.warn{border-color:rgba(251,191,36,.4);color:var(--amber)}
+  .btn.warn:hover{background:rgba(251,191,36,.08)}
+  .btn.ok{border-color:rgba(52,211,153,.4);color:var(--green)}
+  .btn.ok:hover{background:rgba(52,211,153,.08)}
+  .progress{height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;margin-bottom:20px}
+  .progress .bar{height:100%;width:0;background:linear-gradient(90deg,var(--purple),var(--cyan));transition:width .2s}
+  .q-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:20px 22px;margin-bottom:14px}
+  .q-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .q-num{font-family:var(--mono);font-size:11px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--purple),var(--blue));padding:2px 9px;border-radius:4px}
+  .q-tag{font-size:10px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+  .q-stem{font-size:15px;font-weight:600;line-height:1.7;margin-bottom:12px;white-space:pre-line}
+  .opts{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px}
+  .opt{font-size:13.5px;color:var(--text2);line-height:1.5;padding:8px 12px;border:1px solid transparent;border-radius:6px;cursor:pointer;transition:border-color .15s,background .15s,color .15s}
+  .opt:hover{border-color:rgba(0,212,255,.35);background:rgba(0,212,255,.05);color:var(--text)}
+  .opt b{color:var(--cyan);font-family:var(--mono)}
+  .opt.picked{border-color:rgba(77,124,255,.6);background:rgba(77,124,255,.1);color:var(--text)}
+  .q-card .correct .opt.correct{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1);color:var(--text)}.q-card .correct .opt.correct b{color:var(--green)}
+  .q-card .wrong .opt.correct{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1)}.q-card .wrong .opt.correct b{color:var(--green)}
+  .q-card .wrong .opt.wrong{border-color:rgba(248,113,113,.6);background:rgba(248,113,113,.1)}.q-card .wrong .opt.wrong b{color:var(--rose)}
+  .review{display:none;margin-top:12px;padding:12px 14px;border-left:3px solid var(--green);background:rgba(52,211,153,.05);border-radius:4px;font-size:13px;color:var(--text2);line-height:1.7}
+  .review.show{display:block}
+  .review .ans{color:var(--green);font-weight:700;font-family:var(--mono)}
+  .score-panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:24px;text-align:center;margin-bottom:20px;display:none}
+  .score-panel.show{display:block}
+  .score-num{font-family:var(--mono);font-size:46px;font-weight:800;color:var(--purple);text-shadow:0 0 24px rgba(167,139,250,.4)}
+  .score-sub{font-size:13px;color:var(--text2);margin-top:6px}
+  .score-detail{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:14px}
+  .score-detail .d{text-align:center}.score-detail .d strong{font-size:20px;font-family:var(--mono)}.score-detail .d.ok strong{color:var(--green)}.score-detail .d.bad strong{color:var(--rose)}.score-detail .d .lbl{font-size:10px;color:var(--muted)}
+  .footer{text-align:center;padding:20px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+  @media(max-width:640px){.opts{grid-template-columns:1fr}}.locked{pointer-events:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回题库索引</a>
+  <div class="hero">
+    <div class="hero-badge">MOCK EXAM · 跨章节综合</div>
+    <h1>系统架构设计师 <span class="accent">错题回顾卷 · 16 题</span></h1>
+    <div class="hero-sub">16 道错题重做 · 限时 20 分钟 · 每题标注原题号与类别 · 自动计时判分</div>
+  </div>
+
+  <div class="toolbar">
+    <span class="timer" id="timer">30:00</span>
+    <span class="spacer"></span>
+    <span id="answered" style="font-family:var(--mono);font-size:12px;color:var(--text2)">已答 0 / 16</span>
+    <button class="btn ok" id="gradeBtn">提交判分</button>
+    <button class="btn warn" id="resetBtn">重新开始</button>
+  </div>
+  <div class="progress"><div class="bar" id="bar"></div></div>
+
+  <div class="score-panel" id="scorePanel">
+    <div class="score-num" id="scoreNum">0</div>
+    <div class="score-sub" id="scoreSub"></div>
+    <div class="score-detail">
+      <div class="d ok"><strong id="scRight">0</strong><div class="lbl">答对</div></div>
+      <div class="d bad"><strong id="scWrong">0</strong><div class="lbl">答错</div></div>
+      <div class="d"><strong id="scBlank">0</strong><div class="lbl">未答</div></div>
+    </div>
+  </div>
+
+  <div id="questions"></div>
+
+  <div class="footer">错题回顾卷 · 16 题 · 来自 75 题模拟卷错题 · 2026</div>
+</div>
+<script>
+var QUESTIONS = [
+ {
+  "ch": "原题 19 · 软件架构设计 · 分布式系统",
+  "q": "CQRS 将读写分离后，最常见的副作用或代价是（ ）。",
+  "opts": [
+   "强一致性更容易保证",
+   "写入性能一定下降为零",
+   "数据一致性处理更复杂",
+   "数据库设计必然更简单"
+  ],
+  "ans": "C",
+  "why": "CQRS（命令查询职责分离）把写模型（命令）与读模型（查询）彻底拆开，各自独立建模、独立存储，带来的一大代价就是两个模型之间的数据同步与最终一致性处理变得复杂，而不是变简单。A项错误，读写分离往往引入最终一致性问题；B项夸张失真，写性能并非必然极差；C项正确，读模型与写模型同步会增加一致性复杂度；D项通常相反，系统复杂度会提高。故选 C。"
+ },
+ {
+  "ch": "原题 21 · 软件工程 · 面向对象分析与设计",
+  "q": "关于装饰器模式的说法，错误的是（ ）。",
+  "opts": [
+   "属于结构型模式",
+   "可在运行期间动态添加职责",
+   "只能用于具体类，不能基于抽象构件工作",
+   "比静态继承更灵活"
+  ],
+  "ans": "C",
+  "why": "装饰器模式（Decorator）属于结构型模式，它通过持有一个与自身相同类型的抽象构件引用，在运行期层层包装对象、动态叠加职责，比静态继承更灵活。它恰恰是基于抽象构件（Component）接口工作的，因此 C 的说法错误。A项正确，装饰器属于结构型模式；B项正确，其价值就在于动态增强对象功能；C项错误，装饰器通常基于抽象构件接口实现包装；D项正确，它相较继承更符合开闭原则。故选 C。"
+ },
+ {
+  "ch": "原题 23 · 信息安全 · 系统可靠性分析",
+  "q": "在 DO-178B 软件等级中，表示显著降低航空器或机组应对不利运行条件能力的等级通常为（ ）。",
+  "opts": [
+   "A级",
+   "B级",
+   "C级",
+   "E级"
+  ],
+  "ans": "C",
+  "why": "DO-178B 按失效后果由重到轻分为 A~E 级：A 级为灾难性、B 级为危险/严重、C 级为重大（显著降低航空器或机组应对不利运行条件的能力）、D 级为较小、E 级为无安全影响。A项表示灾难性后果，最严重；B项表示危险或严重后果；C项正确，对应重大但未达灾难级的影响；D项表示无安全影响，明显不符。故选 C。"
+ },
+ {
+  "ch": "原题 24 · 软件工程 · 软件过程管理",
+  "q": "关于 DO-178 与 CMMI 的比较，下列说法正确的是（ ）。",
+  "opts": [
+   "DO-178 的适用范围比 CMMI 更广",
+   "CMMI 比 DO-178 更聚焦航空软件合规细节",
+   "DO-178 比 CMMI 更具体，目标更清晰",
+   "两者完全等价，只是名称不同"
+  ],
+  "ans": "C",
+  "why": "DO-178 是航空领域的软件适航标准，针对性强、对开发与验证过程的要求更具体、目标更清晰；CMMI 是通用的软件过程能力成熟度模型，适用范围广、偏重组织级过程改进。两者定位不同，不能互相替代。A项错误，CMMI 适用范围更广泛；B项错误，航空软件合规细节正是 DO-178 强项；C项正确，DO-178 对航空软件开发与验证要求更具体；D项错误，两者定位和用途并不相同。故选 C。"
+ },
+ {
+  "ch": "原题 32 · 数据库 · 数据库模式与关系模型",
+  "q": "关系 R(A,B) 有 5 个元组，S(B,C) 有 10 个元组，且 B 是 R 的主键，则 R 与 S 按属性 B 进行自然连接后，结果元组数的取值范围是（ ）。",
+  "opts": [
+   "[0,5]",
+   "[0,10]",
+   "[5,10]",
+   "[0,50]"
+  ],
+  "ans": "B",
+  "why": "自然连接按公共属性 B 做等值匹配。下界：若 R 与 S 的 B 值没有交集，结果可为 0 个元组；上界：B 是 R 的主键，R 中每个 B 值唯一，所以 S 的 10 个元组各自最多只能匹配到 1 个 R 元组，最多 10 个。故取值范围是 [0,10]。A项上界偏小，S 中 10 个元组都可能各自匹配到 R 中不同 B；B项正确，下界可为 0，上界因 R 的 B 为主键，每个 S 元组最多匹配一个 R 元组，故最多 10；C项下界不一定至少为 5；D项是笛卡尔积上界。故选 B。"
+ },
+ {
+  "ch": "原题 36 · 软件实现与测试 · 测试方法",
+  "q": "黑盒测试中，特别适合分析多个输入条件组合及其因果关系的方法是（ ）。",
+  "opts": [
+   "因果图法",
+   "边界值分析法",
+   "等价类划分法",
+   "错误推测法"
+  ],
+  "ans": "A",
+  "why": "因果图法专门用于分析多个输入条件之间的组合关系及其因果约束（与、或、非、互斥等），再转换为判定表来设计测试用例，最擅长处理输入条件组合爆炸的场景。A项正确，因果图法擅长处理条件组合和逻辑约束；B项主要关注边界附近输入；C项用于把输入划分为若干代表性集合；D项依赖经验，不擅长系统化表达组合关系。故选 A。"
+ },
+ {
+  "ch": "原题 37 · 企业信息化 · 相关法律法规",
+  "q": "关于专利制度的说法，正确的是（ ）。",
+  "opts": [
+   "申请权和专利权可以依法转让",
+   "科学发现可以直接获得发明专利",
+   "专利侵权诉讼时效固定从授权公告日起算",
+   "实用新型仅适用于文学艺术作品"
+  ],
+  "ans": "A",
+  "why": "申请权与专利权均可依法转让（A 正确）；科学发现本身不授予专利权（B 错）；侵权诉讼时效应自权利人知道或应当知道权利被侵害之日起计算，而非授权公告日（C 错）；实用新型保护产品的形状、构造等技术方案，不适用于文学艺术作品（D 错）。"
+ },
+ {
+  "ch": "原题 39 · 数据库 · 数据库设计与优化",
+  "q": "某业务规则规定一个学生必须且只能属于一个班级；每个班级至少 10 人，至多 50 人。则学生实体参与该联系的基数应表示为（ ）。",
+  "opts": [
+   "(10,50)",
+   "(0,10)",
+   "(0,50)",
+   "(1,1)"
+  ],
+  "ans": "D",
+  "why": "题目问的是“学生”这一侧参与联系的基数。一名学生必须且只能属于一个班级，因此取值为 (1,1)。选项中的 (10,50) 是“班级”一侧对班级内学生人数的约束。A项描述的是班级一侧可能人数范围；B项允许学生不属于任何班级，错误；C项同样不满足必须且只能；D项正确，学生必须且仅能关联一个班级。故选 D。"
+ },
+ {
+  "ch": "原题 42 · 系统规划与分析 · 可行性分析",
+  "q": "由 Thomas L. Saaty 提出的将定性问题与定量分析结合起来的决策方法是（ ）。",
+  "opts": [
+   "SAAM",
+   "ATAM",
+   "AHP",
+   "CBAM"
+  ],
+  "ans": "C",
+  "why": "AHP（层次分析法）由 Thomas L. Saaty 提出，通过构造判断矩阵把定性判断转化为定量计算，用于多准则决策；SAAM、ATAM、CBAM都是软件架构评估方法。A项和 B项都是架构评估方法；C项正确，AHP 即层次分析法，由 Saaty 提出；D项是成本收益分析法，不是该学者提出的通用决策模型。故选 C。"
+ },
+ {
+  "ch": "原题 46 · 扩展：新技术 · 人工智能",
+  "q": "以下属于典型规则系统的是（ ）。",
+  "opts": [
+   "专家系统",
+   "编译系统",
+   "操作系统",
+   "数据库缓冲池"
+  ],
+  "ans": "A",
+  "why": "专家系统以知识库 + 推理机为核心，通过 IF-THEN 产生式规则进行推理，是典型的规则系统；编译系统负责语言翻译，操作系统负责资源管理，数据库缓冲池是性能机制，都不是以规则推理为核心。A项正确，专家系统常通过 IF-THEN 规则进行推理；B项主要进行语言翻译；C项负责资源管理；D项是数据库性能机制，都不是以规则推理为核心。故选 A。"
+ },
+ {
+  "ch": "原题 50 · 计算机基础 · 操作系统",
+  "q": "在中断处理过程中，下列通常不属于操作系统完成的工作是（ ）。",
+  "opts": [
+   "保存现场",
+   "恢复现场",
+   "中断响应与转入入口地址",
+   "执行中断服务的调度控制"
+  ],
+  "ans": "C",
+  "why": "中断响应和转入中断入口地址（取得中断向量、跳转）是由 CPU 的硬件中断机制完成的，不属于操作系统的中断处理程序职责。保存现场、恢复现场以及中断服务中的调度控制才由操作系统完成。A项与 B项通常由操作系统中断处理程序参与完成；C项正确，中断响应和跳转入口主要由 CPU 硬件机制完成；D项属于系统软件在中断服务中的控制职责。故选 C。"
+ },
+ {
+  "ch": "原题 53 · 系统设计 · 结构化分析与设计",
+  "q": "在结构化分析方法中，用于描述系统行为模型的工具是（ ）。",
+  "opts": [
+   "数据流图",
+   "E-R 图",
+   "状态转换图",
+   "甘特图"
+  ],
+  "ans": "C",
+  "why": "结构化分析方法用数据流图（DFD）描述功能与数据流动，用数据字典描述数据，用状态转换图（STD）描述系统的行为模型（状态及状态迁移）；E-R 图是数据建模工具，甘特图是项目进度工具。A项主要描述数据流与处理过程；B项主要描述数据实体及联系；C项正确，状态转换图反映状态及其迁移行为；D项是项目进度工具，不是结构化分析模型。故选 C。"
+ },
+ {
+  "ch": "原题 58 · 软件架构设计 · 软件架构质量属性",
+  "q": "关于软件架构评估的说法，错误的是（ ）。",
+  "opts": [
+   "最终用户或其代表应该参与主流架构评估活动",
+   "敏感点一定只影响一个构件的特性",
+   "系统购买者不一定需要参与架构评估",
+   "架构评估关注质量属性场景与权衡分析"
+  ],
+  "ans": "B",
+  "why": "主流架构评估方法（如 ATAM、SAAM）需要各类干系人共同参与评估。敏感点指会影响系统质量属性的构件特性，敏感点可影响一个或多个构件。题干 B 选项描述 “一定只影响一个构件的特性” 表述错误。A 项正确，最终用户或其代表作为关键干系人，应该参与主流架构评估活动；C项正确，系统购买者属于干系人，但并非强制参与；D 项正确，架构评估围绕质量属性场景开展，并进行权衡分析。故选 B。"
+ },
+ {
+  "ch": "原题 60 · 企业信息化 · 相关法律法规",
+  "q": "以有线或无线方式向公众提供作品，使公众可以在其个人选定的时间和地点获得该作品，这属于著作权中的（ ）。",
+  "opts": [
+   "发表权",
+   "发行权",
+   "信息网络传播权",
+   "署名权"
+  ],
+  "ans": "C",
+  "why": "信息网络传播权是指以有线或无线方式向公众提供作品，使公众可以在其个人选定的时间和地点获得该作品。发表权是决定是否将作品公之于众，发行权是向公众提供原件或复制件，署名权是表明作者身份。A项是决定是否公之于众的权利；B项强调向公众提供原件或复制件的实体交付；C项正确，关键词就是有线或无线选定时间和地点获得；D项是表明作者身份的权利。故选 C。"
+ },
+ {
+  "ch": "原题 64 · 软件架构设计 · 分布式系统",
+  "q": "A 微服务调用 B 微服务时，若 B 的接口只是偶尔出现响应延迟，为避免调用线程长时间阻塞，最直接合适的措施是（ ）。",
+  "opts": [
+   "熔断",
+   "限流",
+   "服务降级",
+   "设置超时时间"
+  ],
+  "ans": "D",
+  "why": "B 微服务只是“偶尔”出现响应延迟，并非持续失败，用熔断、限流、服务降级都过重。最直接合适的做法是给调用设置合理的超时时间，超时即快速失败并释放线程，避免调用线程被长期阻塞。A项更适合持续失败或大面积异常场景；B项用于控制请求速率，不直接解决单次等待过久；C项属于兜底策略，通常在超时或熔断后触发；D项正确，可直接限制等待时间，避免资源被长期占用。故选 D。"
+ },
+ {
+  "ch": "原题 65 · 计算机基础 · 操作系统",
+  "q": "文件存储空间分配方式中，既支持可变长度文件，又支持随机访问的是（ ）。",
+  "opts": [
+   "连续分配",
+   "链接分配",
+   "索引分配",
+   "哈希分配"
+  ],
+  "ans": "C",
+  "why": "连续分配随机访问方便，但不适应文件长度频繁变化；链接分配支持可变长度文件，却只能顺序访问、不利于随机定位；索引分配用索引表记录各数据块的地址，既支持可变长度文件，又能实现随机访问。A项随机访问方便，但不适合文件长度频繁变化；B项支持可变长度，却不利于高效随机访问；C项正确，索引表能同时支持可变长度与随机定位；D项不是文件分配的标准教材分类。故选 C。"
+ }
+];
+
+var idx; var timerInt; var elapsed=0; var TOTAL=QUESTIONS.length; var SUBTIME=1200; var graded=false;
+function rpad(n){return (n<10?'0':'')+n;}
+function fmt(t){var m=Math.floor(t/60),s=t%60;return rpad(m)+':'+rpad(s);}
+function renderAll(){
+  var host=document.getElementById('questions'); var h='';
+  QUESTIONS.forEach(function(q,i){
+    h+='<div class="q-card" data-i="'+i+'"><div class="q-head"><span class="q-num">第 '+(i+1)+' 题</span><span class="q-tag">'+q.ch+'</span></div><div class="q-stem">'+q.q+'</div>';
+    h+='<div class="opts">';
+    q.opts.forEach(function(o,oi){var L='ABCD'[oi]; h+='<div class="opt" data-l="'+L+'"><b>'+L+'.</b> '+o+'</div>';});
+    h+='</div><div class="review" id="rv'+i+'"></div></div>';
+  });
+  host.innerHTML=h;
+  host.querySelectorAll('.opt').forEach(function(o){
+    o.addEventListener('click',function(){
+      if(graded)return;
+      var card=o.closest('.q-card'); var L=o.getAttribute('data-l');
+      card.querySelectorAll('.opt').forEach(function(x){x.classList.remove('picked');});
+      o.classList.add('picked'); updateAnswered();
+    });
+  });
+}
+function updateAnswered(){
+  var n=0; document.querySelectorAll('.q-card').forEach(function(c){ if(c.querySelector('.opt.picked'))n++; });
+  document.getElementById('answered').textContent='已答 '+n+' / '+TOTAL;
+  document.getElementById('bar').style.width=(n/TOTAL*100)+'%';
+}
+function grade(){
+  graded=true; var right=0,wrong=0,blank=0;
+  document.querySelectorAll('.q-card').forEach(function(c){
+    var i=+c.getAttribute('data-i'); var q=QUESTIONS[i];
+    var picked=c.querySelector('.opt.picked'); var L=picked?picked.getAttribute('data-l'):null;
+    var rv=c.getElementById?null:document.getElementById('rv'+i);
+    c.querySelectorAll('.opt').forEach(function(x){x.classList.add('locked');});
+    var review=document.getElementById('rv'+i);
+    if(L===q.ans){right++; c.classList.add('correct'); review.innerHTML='<span class="ans">✓ 正确</span> — '+q.why;}
+    else if(L){wrong++; c.classList.add('wrong'); review.innerHTML='<span class="ans">✗ 你的答案：'+L+' · 正确答案：'+q.ans+'</span> — '+q.why;}
+    else {blank++; c.classList.add('wrong'); review.innerHTML='<span class="ans">未答 · 正确答案：'+q.ans+'</span> — '+q.why;}
+    review.classList.add('show');
+  });
+  clearInterval(timerInt);
+  var score=Math.round(right/TOTAL*100);
+  document.getElementById('scoreNum').textContent=score;
+  document.getElementById('scoreSub').textContent='答对 '+right+' / '+TOTAL+' 题 · 用时 '+fmt(elapsed);
+  document.getElementById('scRight').textContent=right; document.getElementById('scWrong').textContent=wrong; document.getElementById('scBlank').textContent=blank;
+  document.getElementById('scorePanel').classList.add('show');
+  document.getElementById('scorePanel').scrollIntoView({behavior:'smooth'});
+}
+function reset(){
+  graded=false; elapsed=0; renderAll(); updateAnswered();
+  document.getElementById('scorePanel').classList.remove('show');
+  document.getElementById('bar').style.width='0';
+  clearInterval(timerInt); startTimer();
+}
+function startTimer(){
+  clearInterval(timerInt);
+  timerInt=setInterval(function(){ elapsed++; var t=SUBTIME-elapsed; if(t<0)t=0; document.getElementById('timer').textContent=fmt(t); if(t<=0){grade();} },1000);
+}
+document.getElementById('gradeBtn').onclick=grade;
+document.getElementById('resetBtn').onclick=reset;
+renderAll(); updateAnswered(); startTimer();
+</script>
+</body>
+</html>

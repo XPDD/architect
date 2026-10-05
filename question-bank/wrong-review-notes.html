@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>错题补漏要点 · 系统架构设计师</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#05080e;--card:#111620;--elev:#161c28;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.62);--muted:rgba(255,255,255,.3);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(248,113,113,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(251,191,36,.04)0%,transparent 50%);line-height:1.65;min-height:100vh;padding:32px 16px}
+.wrap{max-width:920px;margin:0 auto}
+.back{display:inline-block;color:var(--amber);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+.hero{text-align:center;padding:38px 20px 28px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:0;left:22%;right:22%;height:1px;background:linear-gradient(90deg,transparent,var(--rose),var(--amber),transparent)}
+.hero-badge{font-family:var(--mono);font-size:11px;color:var(--rose);letter-spacing:.2em;margin-bottom:8px}
+.hero h1{font-size:26px;font-weight:800}.hero h1 .accent{color:var(--rose)}
+.hero-sub{font-size:13px;color:var(--muted);margin-top:9px}
+.hero-stats{display:flex;justify-content:center;gap:16px;margin-top:15px;flex-wrap:wrap}
+.hero-stat{padding:5px 14px;border-radius:4px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--text2)}
+.hero-stat strong{color:var(--rose)}
+.cta{display:inline-block;margin-top:16px;font-family:var(--mono);font-size:12px;text-decoration:none;color:var(--green);border:1px solid rgba(52,211,153,.35);border-radius:6px;padding:8px 18px}
+.cta:hover{background:rgba(52,211,153,.08)}
+.sec-head{display:flex;align-items:center;gap:12px;margin:26px 0 12px}
+.sec-tag{font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;letter-spacing:.05em;color:var(--rose);background:rgba(248,113,113,.1);border:1px solid rgba(248,113,113,.25)}
+.sec-head h2{font-size:16px;font-weight:700}
+.sec-head .rule{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.12),transparent)}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:6px}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text2)}
+.tbl th{background:rgba(255,255,255,.03);color:var(--text);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td b{color:var(--text)}
+.tbl .low{color:var(--rose);font-weight:700}
+.point{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:10px}
+.point-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.point-no{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--amber);background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.25);border-radius:4px;padding:2px 8px}
+.point-cat{font-size:14px;font-weight:700}
+.point-row{font-size:13.5px;color:var(--text2);margin:5px 0;padding-left:14px;position:relative}
+.point-row::before{content:'';position:absolute;left:2px;top:9px;width:5px;height:5px;border-radius:50%;background:rgba(52,211,153,.5)}
+.point-row.warn::before{background:rgba(248,113,113,.6)}
+.point-row b{color:var(--text)}
+.point-row.warn b{color:var(--rose)}
+.point-row .k{color:var(--amber);font-weight:600}
+.footer{text-align:center;padding:26px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+@media(max-width:640px){.tbl{display:block;overflow-x:auto;white-space:nowrap}.hero h1{font-size:21px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回题库索引</a>
+
+  <div class="hero">
+    <div class="hero-badge">WRONG-ANSWER REVIEW · 错题补漏</div>
+    <h1>错题<span class="accent">补漏要点</span></h1>
+    <div class="hero-sub">来自 75 题综合知识模拟卷（真题 70 + 模拟 5）· 16 道错题</div>
+    <div class="hero-stats">
+      <div class="hero-stat">成绩 <strong>59 / 75</strong></div>
+      <div class="hero-stat">正确率 <strong>78.7%</strong></div>
+      <div class="hero-stat">错题 <strong>16</strong> 道</div>
+    </div>
+    <a class="cta" href="exam-wrong-review.html">▶ 错题重做卷（16 题 · 可作答）</a>
+  </div>
+
+  <div class="sec-head"><span class="sec-tag">总览</span><h2>薄弱模块排行</h2><span class="rule"></span></div>
+  <table class="tbl">
+    <thead><tr><th>模块</th><th>错 / 总</th><th>正确率</th><th>原题号</th></tr></thead>
+    <tbody>
+      <tr><td><b>系统分析与设计</b></td><td>2 / 2</td><td class="low">0%</td><td>42、53</td></tr>
+      <tr><td><b>分布式系统</b></td><td>2 / 3</td><td class="low">33%</td><td>19、64</td></tr>
+      <tr><td><b>企业信息化 · 法律法规</b></td><td>2 / 3</td><td class="low">33%</td><td>37、60</td></tr>
+      <tr><td><b>操作系统</b></td><td>2 / 5</td><td>60%</td><td>50、65</td></tr>
+      <tr><td><b>数据库</b></td><td>2 / 5</td><td>60%</td><td>32、39</td></tr>
+      <tr><td><b>软件工程</b></td><td>2 / 5</td><td>60%</td><td>21、24</td></tr>
+      <tr><td><b>软件测试方法</b></td><td>1 / 2</td><td>50%</td><td>36</td></tr>
+      <tr><td><b>系统可靠性分析</b></td><td>1 / 1</td><td class="low">0%</td><td>23</td></tr>
+      <tr><td><b>软件架构质量属性</b></td><td>1 / 7</td><td>86%</td><td>58</td></tr>
+      <tr><td><b>扩展 · 人工智能</b></td><td>1 / 6</td><td>83%</td><td>46</td></tr>
+    </tbody>
+  </table>
+
+  <!-- 一、分布式系统 -->
+  <div class="sec-head"><span class="sec-tag">01</span><h2>分布式系统</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 19</span><span class="point-cat">CQRS</span></div>
+    <div class="point-row"><b>考点：</b>CQRS 把命令（写）模型与查询（读）模型彻底拆开，各自独立建模与存储。</div>
+    <div class="point-row warn"><b>易错：</b>最大代价是两模型间数据同步与最终一致性处理<b>更复杂</b>，不是更简单；读写分离引入的是最终一致而非强一致。</div>
+  </div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 64</span><span class="point-cat">微服务调用容错</span></div>
+    <div class="point-row"><b>考点：</b>对方<b>偶尔</b>延迟 → 最直接的是<b>设置超时时间</b>，超时快速失败并释放线程。</div>
+    <div class="point-row warn"><b>易错：</b>熔断（持续失败才用）、限流（控速率）、降级（兜底）都过重。</div>
+  </div>
+
+  <!-- 二、法律法规 -->
+  <div class="sec-head"><span class="sec-tag">02</span><h2>企业信息化 · 法律法规</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 37</span><span class="point-cat">专利制度</span></div>
+    <div class="point-row"><b>考点：</b><b>申请权与专利权均可依法转让</b>。</div>
+    <div class="point-row warn"><b>易错：</b>科学发现不授专利权；侵权诉讼时效自<b>知道 / 应当知道被侵害之日</b>起算（非授权公告日）；实用新型保护产品形状构造，不保护文学艺术作品。</div>
+  </div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 60</span><span class="point-cat">信息网络传播权</span></div>
+    <div class="point-row"><b>考点：</b><b>信息网络传播权</b> = 以有线 / 无线方式向公众提供作品，使其可在<b>个人选定的时间和地点</b>获得。</div>
+    <div class="point-row warn"><b>易错：</b>发表权 = 是否公之于众；发行权 = 提供原件 / 复制件；署名权 = 表明作者身份。</div>
+  </div>
+
+  <!-- 三、操作系统 -->
+  <div class="sec-head"><span class="sec-tag">03</span><h2>操作系统</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 50</span><span class="point-cat">中断处理</span></div>
+    <div class="point-row"><b>考点：</b>中断响应、取中断向量、转入入口地址由 <b>CPU 硬件</b>完成；<b>保存 / 恢复现场、调度控制</b>才是 OS 中断处理程序的职责。</div>
+    <div class="point-row warn"><b>易错：</b>把"中断响应与转入入口"当成 OS 的工作 → 错。</div>
+  </div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 65</span><span class="point-cat">文件分配方式</span></div>
+    <div class="point-row"><b>考点：</b><b>索引分配</b>用索引表记录数据块地址，<b>既支持变长文件又支持随机访问</b>。</div>
+    <div class="point-row warn"><b>易错：</b>连续分配随机访问好但不适变长；链接分配支持变长但只能顺序访问。</div>
+  </div>
+
+  <!-- 四、数据库 -->
+  <div class="sec-head"><span class="sec-tag">04</span><h2>数据库</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 32</span><span class="point-cat">自然连接元组数</span></div>
+    <div class="point-row"><b>考点：</b>自然连接按公共属性等值匹配；若某侧连接属性是<b>主键（值唯一）</b>，则为"一对多"。</div>
+    <div class="point-row warn"><b>易错：</b>R.B 是主键 → 每个 S 元组最多配 1 个 R → 上界 = |S| = <b>10</b>；下界可为 0 → <b>[0,10]</b>（不是 [5,10]）。</div>
+  </div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 39</span><span class="point-cat">E-R 联系基数</span></div>
+    <div class="point-row"><b>考点：</b>基数<b>看问的是哪一侧</b>。"学生必须且只能属于一个班级"→ 学生侧 <b>(1,1)</b>。</div>
+    <div class="point-row warn"><b>易错：</b>(10,50) 是<b>班级侧</b>对学生人数的约束，别答错侧。</div>
+  </div>
+
+  <!-- 五、软件工程 -->
+  <div class="sec-head"><span class="sec-tag">05</span><h2>软件工程</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 21</span><span class="point-cat">装饰器模式</span></div>
+    <div class="point-row"><b>考点：</b>Decorator 属<b>结构型</b>模式，运行期动态给对象叠加职责，比继承灵活。</div>
+    <div class="point-row warn"><b>易错：</b>它<b>基于抽象构件 Component 接口</b>层层包装——"只能用于具体类"是错的；符合开闭原则。</div>
+  </div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 24</span><span class="point-cat">DO-178 vs CMMI</span></div>
+    <div class="point-row"><b>考点：</b>DO-178 是<b>航空适航专用</b>标准，要求<b>更具体、目标更清晰</b>；CMMI 是<b>通用</b>过程能力成熟度模型。</div>
+    <div class="point-row warn"><b>易错：</b><b>适用范围更广的是 CMMI</b>；航空合规细节是 DO-178 强项。</div>
+  </div>
+
+  <!-- 六、系统分析与设计 -->
+  <div class="sec-head"><span class="sec-tag">06</span><h2>系统分析与设计</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 42</span><span class="point-cat">AHP</span></div>
+    <div class="point-row"><b>考点：</b><b>AHP 层次分析法</b>由 Thomas L. Saaty 提出，用判断矩阵把定性判断转定量计算。</div>
+    <div class="point-row warn"><b>易错：</b>SAAM / ATAM / CBAM 是<b>软件架构评估</b>方法，不是 Saaty 的通用决策模型。</div>
+  </div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 53</span><span class="point-cat">结构化分析工具</span></div>
+    <div class="point-row"><b>考点：</b><b>DFD</b> 描述功能 / 数据流动、<b>数据字典</b>描述数据、<b>状态转换图 STD</b> 描述<b>行为模型</b>。</div>
+    <div class="point-row warn"><b>易错：</b>E-R 图是数据建模、甘特图是进度工具，都不是行为模型。</div>
+  </div>
+
+  <!-- 七、软件测试方法 -->
+  <div class="sec-head"><span class="sec-tag">07</span><h2>软件测试方法</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 36</span><span class="point-cat">因果图法</span></div>
+    <div class="point-row"><b>考点：</b>黑盒中<b>因果图法</b>专分析<b>多输入条件的组合及因果约束</b>（与 / 或 / 非 / 互斥），再转判定表设计用例。</div>
+    <div class="point-row warn"><b>易错：</b>边界值管边界、等价类管分区、错误推测靠经验，都不擅长条件组合。</div>
+  </div>
+
+  <!-- 八、系统可靠性分析 -->
+  <div class="sec-head"><span class="sec-tag">08</span><h2>系统可靠性分析</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 23</span><span class="point-cat">DO-178B 软件等级</span></div>
+    <div class="point-row"><b>考点：</b>按失效后果由重到轻 A→E：A 灾难性 / B 危险严重 / <b>C 重大（显著降低应对不利运行条件能力）</b> / D 较小 / E 无影响。</div>
+    <div class="point-row warn"><b>易错：</b>"显著降低"对应 <b>C 级</b>，不是 A/B。</div>
+  </div>
+
+  <!-- 九、架构质量属性 -->
+  <div class="sec-head"><span class="sec-tag">09</span><h2>软件架构质量属性</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 58</span><span class="point-cat">软件架构评估</span></div>
+    <div class="point-row"><b>考点：</b>架构评估（SAAM / ATAM）需各类干系人参与，围绕质量属性场景做权衡分析。</div>
+    <div class="point-row warn"><b>易错：</b>"敏感点一定只影响一个构件的特性"是错的——敏感点可影响一个或多个构件，别与"对单一质量属性敏感"混淆。</div>
+  </div>
+
+  <!-- 十、人工智能 -->
+  <div class="sec-head"><span class="sec-tag">10</span><h2>扩展 · 人工智能</h2><span class="rule"></span></div>
+  <div class="point">
+    <div class="point-head"><span class="point-no">原题 46</span><span class="point-cat">规则系统</span></div>
+    <div class="point-row"><b>考点：</b><b>专家系统</b>（知识库 + 推理机 + IF-THEN 产生式规则）是典型规则系统。</div>
+    <div class="point-row warn"><b>易错：</b>编译系统 = 语言翻译、操作系统 = 资源管理、DB 缓冲池 = 性能机制，都不是规则推理核心。</div>
+  </div>
+
+  <div class="footer">错题补漏要点 · 来自 75 题模拟卷 16 道错题 · 2026</div>
+</div>
+</body>
+</html>

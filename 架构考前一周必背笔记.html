@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>软件高级架构师 · 考前一周必背知识</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#05080e;--card:#111620;--elev:#161c28;--border:rgba(255,255,255,.06);--text:rgba(255,255,255,.92);--text2:rgba(255,255,255,.62);--muted:rgba(255,255,255,.3);--cyan:#00d4ff;--blue:#4d7cff;--purple:#a78bfa;--green:#34d399;--amber:#fbbf24;--rose:#f87171;--radius:8px;--sans:'Inter',-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace}
+body{font-family:var(--sans);color:var(--text);background:var(--bg);background-image:radial-gradient(ellipse at 20% 0%,rgba(52,211,153,.04)0%,transparent 50%),radial-gradient(ellipse at 80% 100%,rgba(167,139,250,.04)0%,transparent 50%);line-height:1.65;min-height:100vh;padding:32px 16px}
+.wrap{max-width:980px;margin:0 auto}
+.back{display:inline-block;color:var(--cyan);text-decoration:none;font-family:var(--mono);font-size:12px;margin-bottom:16px}
+.hero{text-align:center;padding:38px 20px 28px;background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:18px;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:0;left:22%;right:22%;height:1px;background:linear-gradient(90deg,transparent,var(--green),var(--cyan),transparent)}
+.hero-badge{font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:.2em;margin-bottom:8px}
+.hero h1{font-size:27px;font-weight:800}.hero h1 .accent{color:var(--green)}
+.hero-sub{font-size:13px;color:var(--muted);margin-top:9px}
+.hero-stats{display:flex;justify-content:center;gap:16px;margin-top:15px;flex-wrap:wrap}
+.hero-stat{padding:5px 14px;border-radius:4px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.05);font-size:12px;color:var(--text2)}
+.hero-stat strong{color:var(--green)}
+.sec-head{display:flex;align-items:center;gap:12px;margin:30px 0 12px}
+.sec-tag{font-family:var(--mono);font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;letter-spacing:.05em;color:var(--green);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.25)}
+.sec-head h2{font-size:17px;font-weight:700}
+.sec-head .rule{flex:1;height:1px;background:linear-gradient(90deg,rgba(255,255,255,.12),transparent)}
+.panel{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+.panel p{font-size:13.5px;color:var(--text2);margin:7px 0}
+.panel p b,.panel li b{color:var(--text);font-weight:600}
+.panel ol,.panel ul{margin-left:18px}
+.panel ol li,.panel ul li{font-size:13.5px;color:var(--text2);margin:6px 0;line-height:1.75}
+.hl{color:var(--green);font-weight:600}
+.hl-c{color:var(--cyan);font-weight:600}
+.hl-p{color:var(--purple);font-weight:600}
+.hl-a{color:var(--amber);font-weight:600}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.tbl th,.tbl td{padding:9px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,.05);color:var(--text2);vertical-align:top}
+.tbl th{background:rgba(255,255,255,.03);color:var(--text);font-family:var(--mono);font-size:10.5px;letter-spacing:.05em}
+.tbl tr:last-child td{border-bottom:none}
+.tbl td b{color:var(--text)}
+.tbl .c{font-family:var(--mono);color:var(--green);font-weight:600;white-space:nowrap}
+.tbl td strong{color:var(--text)}
+.notes{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:12px}
+.nl-cap{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.05em}
+.notes a,.link{font-size:11.5px;font-family:var(--mono);text-decoration:none;color:var(--cyan);background:rgba(0,212,255,.06);border:1px solid rgba(0,212,255,.18);border-radius:4px;padding:3px 9px;transition:.15s;display:inline-block}
+.notes a:hover,.link:hover{background:rgba(0,212,255,.14);border-color:rgba(0,212,255,.4)}
+.notes a::after{content:' \2197'}
+.mnemonic{display:inline-block;font-family:var(--mono);font-size:12px;color:var(--amber);background:rgba(251,191,36,.08);border:1px dashed rgba(251,191,36,.35);border-radius:6px;padding:6px 12px;margin:8px 0}
+.flow{font-family:var(--mono);font-size:12px;color:var(--text2);background:var(--elev);border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin:10px 0;overflow-x:auto;white-space:nowrap}
+.footer{text-align:center;padding:26px;font-size:12px;color:var(--muted);font-family:var(--mono)}
+@media(max-width:640px){.tbl{display:block;overflow-x:auto;white-space:nowrap}.hero h1{font-size:22px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="index.html">← 返回总索引</a>
+
+  <div class="hero">
+    <div class="hero-badge">EXAM CRAM · 考前一周必背</div>
+    <h1>软件高级架构师 · <span class="accent">考前必背知识</span></h1>
+    <div class="hero-sub">整理自《架构考前一周必背知识.pdf》· 每个专题附对应站内笔记（新标签打开）</div>
+    <div class="hero-stats">
+      <div class="hero-stat">专题 <strong>10</strong> 个</div>
+      <div class="hero-stat">知识点 <strong>80+</strong> 条</div>
+      <div class="hero-stat">来源 <strong>19</strong> 页</div>
+    </div>
+  </div>
+
+  <!-- 01 操作系统 -->
+  <div class="sec-head"><span class="sec-tag">01</span><h2>操作系统 · 常见调度算法</h2><span class="rule"></span></div>
+  <table class="tbl">
+    <thead><tr><th>调度算法</th><th>类型</th><th>特点</th><th>优点</th><th>缺点</th><th>适用场景</th></tr></thead>
+    <tbody>
+      <tr><td><b>先来先服务 FCFS</b></td><td>非抢占式</td><td>按任务到达顺序排队执行</td><td>简单、公平</td><td>对短作业不友好（护航效应）</td><td>批处理系统</td></tr>
+      <tr><td><b>短作业优先 SJF</b></td><td>非抢占 / 抢占</td><td>优先执行预计运行时间最短的作业（抢占式称 SRTF）</td><td>最小化平均等待时间</td><td>需预知作业时间，长作业可能饥饿</td><td>已知运行时间的批处理任务</td></tr>
+      <tr><td><b>优先级调度</b></td><td>抢占 / 非抢占</td><td>按优先级分配 CPU，可静态或动态调整</td><td>灵活性高</td><td>低优先级任务可能饥饿</td><td>实时系统 / 关键任务调度</td></tr>
+      <tr><td><b>轮转调度 RR</b></td><td>抢占式</td><td>每个任务分配固定时间片（如 10ms），超时后轮换</td><td>响应时间快</td><td>时间片大小影响切换频率</td><td>交互式系统（分时 OS）</td></tr>
+      <tr><td><b>多级反馈队列 MLFQ</b></td><td>抢占式</td><td>多优先级队列，任务动态升降级</td><td>平衡响应时间和吞吐量</td><td>参数配置复杂</td><td>通用系统（早期 Unix）</td></tr>
+      <tr><td><b>高响应比优先 HRRN</b></td><td>非抢占式</td><td>优先级 =（等待时间 + 预计运行时间）/ 预计运行时间</td><td>避免长作业饥饿</td><td>需预知作业时间</td><td>批处理与交互混合场景</td></tr>
+      <tr><td><b>多队列调度 MQ</b></td><td>抢占式</td><td>按任务类型分队列，每队列独立调度策略</td><td>支持异构任务</td><td>资源分配策略复杂</td><td>多核 / 多类型任务系统</td></tr>
+      <tr><td><b>公平共享调度 FSS</b></td><td>抢占式</td><td>按用户 / 组分配资源配额</td><td>资源分配公平</td><td>调度开销较大</td><td>多用户共享环境</td></tr>
+      <tr><td><b>最早截止时间优先 EDF</b></td><td>抢占式</td><td>优先执行截止时间最早的任务</td><td>满足实时性要求</td><td>需截止时间已知且可行</td><td>实时系统（软 / 硬实时）</td></tr>
+      <tr><td><b>速率单调调度 RMS</b></td><td>抢占式</td><td>周期性任务按周期频率分配优先级（周期越短优先级越高）</td><td>静态可调度性分析简单</td><td>仅适用于周期性任务</td><td>硬实时周期性任务</td></tr>
+      <tr><td><b>完全公平调度 CFS</b></td><td>抢占式</td><td>Linux 默认调度器，基于 vruntime 分配 CPU，红黑树管理队列</td><td>低延迟、高公平性</td><td>对实时任务支持需额外配置</td><td>现代 Linux 内核</td></tr>
+    </tbody>
+  </table>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="os-notes/os-process.html" target="_blank" rel="noopener">进程管理基础</a>
+    <a href="os-notes/index.html" target="_blank" rel="noopener">操作系统索引</a>
+  </div>
+
+  <!-- 02 数据库设计 -->
+  <div class="sec-head"><span class="sec-tag">02</span><h2>数据库系统 · 数据库设计六阶段</h2><span class="rule"></span></div>
+  <div class="panel">
+    <ol>
+      <li><b>需求分析</b>：分析数据存储要求，产出<b>数据流图、数据字典、需求说明书</b>；获得用户三个要求——<span class="hl">信息要求、处理要求、系统要求</span>。</li>
+      <li><b>概念结构设计</b>：设计 <b>E-R 图</b>（实体-联系图）。步骤：选择局部应用 → 逐一设计分 E-R 图 → E-R 图合并。合并时 3 类冲突：
+        <ul>
+          <li><b>属性冲突</b>：同一属性可能存在于不同分 E-R 图中。</li>
+          <li><b>命名冲突</b>：相同意义的属性命名不同，或同名属性意义不同。</li>
+          <li><b>结构冲突</b>：同一实体在不同分 E-R 图属性不同；同一对象在一图是实体、另一图是属性。</li>
+        </ul>
+      </li>
+      <li><b>逻辑结构设计</b>：E-R 图 → <b>关系模式</b>。步骤：确定数据模型 → 转换 → 确定完整性约束 → 确定用户视图。</li>
+      <li><b>物理设计</b>：确定数据分布、存储结构和访问方式。</li>
+      <li><b>数据库实施阶段</b>：建库、编制与调试程序、组织数据入库、试运行。</li>
+      <li><b>运行和维护阶段</b>：投入运行后不断评价、调整与修改。</li>
+    </ol>
+  </div>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="database-design-notes/db-design-stages.html" target="_blank" rel="noopener">数据库设计六阶段</a>
+    <a href="database-design-notes/knowledge-map.html" target="_blank" rel="noopener">数据库设计知识体系</a>
+  </div>
+
+  <!-- 03 内聚耦合 -->
+  <div class="sec-head"><span class="sec-tag">03</span><h2>系统分析与设计 · 内聚与耦合</h2><span class="rule"></span></div>
+  <div class="panel" style="margin-bottom:12px">
+    <p><b>内聚程度（从低到高）</b></p>
+    <table class="tbl">
+      <thead><tr><th>内聚分类</th><th>定义</th><th>记忆</th></tr></thead>
+      <tbody>
+        <tr><td><b>偶然内聚</b></td><td>模块内各处理元素之间没有任何联系</td><td>无直接关系</td></tr>
+        <tr><td><b>逻辑内聚</b></td><td>模块内执行若干逻辑上相似的功能，通过参数确定完成哪一个</td><td>逻辑相似、参数决定</td></tr>
+        <tr><td><b>时间内聚</b></td><td>把需要同时执行的动作组合在一起</td><td>同时执行</td></tr>
+        <tr><td><b>过程内聚</b></td><td>完成多个任务，这些任务必须按指定过程顺序执行</td><td>指定的过程顺序</td></tr>
+        <tr><td><b>通信内聚</b></td><td>所有处理元素都在同一个数据结构上操作</td><td>相同数据结构、输入输出</td></tr>
+        <tr><td><b>顺序内聚</b></td><td>各元素密切相关于同一功能且必须顺序执行，前一个输出是下一个输入</td><td>顺序执行、输入为输出</td></tr>
+        <tr><td><b>功能内聚</b></td><td>最强的内聚，所有单元共同作用完成一个功能，缺一不可</td><td>共同作用、缺一不可</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <p><b>耦合程度（从低到高）</b></p>
+    <table class="tbl">
+      <thead><tr><th>耦合分类</th><th>定义</th><th>记忆</th></tr></thead>
+      <tbody>
+        <tr><td><b>无直接耦合</b></td><td>两模块无直接关系，不传递任何信息</td><td>无直接关系</td></tr>
+        <tr><td><b>数据耦合</b></td><td>有调用关系，传递的是简单数据值（值传递）</td><td>传递数据值调用</td></tr>
+        <tr><td><b>标记耦合</b></td><td>两模块间传递的是数据结构</td><td>传递数据结构</td></tr>
+        <tr><td><b>控制耦合</b></td><td>一个模块调用另一个时传递的是控制变量</td><td>控制变量传递</td></tr>
+        <tr><td><b>外部耦合</b></td><td>模块间通过软件之外的环境联合（I/O、格式、通信协议）</td><td>软件外部环境</td></tr>
+        <tr><td><b>公共耦合</b></td><td>通过一个公共数据环境相互作用</td><td>外部公共数据</td></tr>
+        <tr><td><b>内容耦合</b></td><td>直接使用另一模块内部数据，或经非正常入口转入其内部</td><td>模块内部关联</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="software-engineering-notes/system-design.html" target="_blank" rel="noopener">系统设计（内聚耦合 / 概要 / 详细）</a>
+  </div>
+
+  <!-- 04 OO 设计原则 -->
+  <div class="sec-head"><span class="sec-tag">04</span><h2>面向对象设计原则</h2><span class="rule"></span></div>
+  <table class="tbl">
+    <thead><tr><th>设计原则</th><th>定义</th><th>频率</th></tr></thead>
+    <tbody>
+      <tr><td><b>单一职责原则 SRP</b></td><td>一个对象应该只包含单一的职责，并且该职责被完整地封装在一个类中</td><td class="c">★★★★☆</td></tr>
+      <tr><td><b>开闭原则 OCP</b></td><td>软件实体应当对扩展开放，对修改关闭</td><td class="c">★★★★★</td></tr>
+      <tr><td><b>里氏代换原则 LSP</b></td><td>所有引用基类的地方必须能透明地使用其子类的对象</td><td class="c">★★★★★</td></tr>
+      <tr><td><b>依赖倒转原则 DIP</b></td><td>高层模块不应依赖低层模块，二者都应依赖抽象；抽象不应依赖细节，细节应依赖抽象</td><td class="c">★★★★★</td></tr>
+      <tr><td><b>接口隔离原则 ISP</b></td><td>客户端不应该依赖那些它不需要的接口</td><td class="c">★★☆☆☆</td></tr>
+      <tr><td><b>合成复用原则 CRP</b></td><td>优先使用对象组合，而不是继承来达到复用的目的</td><td class="c">★★★★☆</td></tr>
+      <tr><td><b>迪米特法则 LoD</b></td><td>每一个软件单位对其他单位都只有最少的知识，且局限于与本单位密切相关的软件单位</td><td class="c">★★★☆☆</td></tr>
+    </tbody>
+  </table>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="software-engineering-notes/oo-uml-patterns.html" target="_blank" rel="noopener">OO · UML · 设计模式</a>
+    <a href="software-engineering-notes/oo-basics.html" target="_blank" rel="noopener">面向对象基础</a>
+  </div>
+
+  <!-- 05 设计模式 -->
+  <div class="sec-head"><span class="sec-tag">05</span><h2>设计模式</h2><span class="rule"></span></div>
+  <div class="panel" style="margin-bottom:12px">
+    <div class="mnemonic">创建型口诀：单抽元件厂</div>
+    <table class="tbl">
+      <thead><tr><th>模式</th><th>定义</th><th>记忆关键字</th></tr></thead>
+      <tbody>
+        <tr><td><b>Abstract Factory 抽象工厂</b></td><td>提供接口创建一系列相关或相互依赖的对象，无需指定具体类</td><td>抽象接口</td></tr>
+        <tr><td><b>Builder 构建器</b></td><td>将复杂类的表示与构造相分离，相同构建过程得出不同表示</td><td>类和构造分离</td></tr>
+        <tr><td><b>Factory Method 工厂方法</b></td><td>定义创建对象的接口，由子类决定实例化哪一个类</td><td>子类决定实例化</td></tr>
+        <tr><td><b>Prototype 原型</b></td><td>用原型实例指定创建对象的类型，通过拷贝原型创建新对象</td><td>原型实例，拷贝</td></tr>
+        <tr><td><b>Singleton 单例</b></td><td>保证一个类只有一个实例，并提供全局访问点</td><td>唯一实例</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel" style="margin-bottom:12px">
+    <div class="mnemonic">结构型口诀：外侨组员带配饰</div>
+    <table class="tbl">
+      <thead><tr><th>模式</th><th>定义</th><th>记忆关键字</th></tr></thead>
+      <tbody>
+        <tr><td><b>Adapter 适配器</b></td><td>将一个类的接口转换成用户希望的另一种接口，使原本不相容的接口协同工作</td><td>转换，兼容接口</td></tr>
+        <tr><td><b>Bridge 桥接</b></td><td>将类的抽象部分和实现部分分离，使它们可以独立变化</td><td>抽象和实现分离</td></tr>
+        <tr><td><b>Composite 组合</b></td><td>将对象组合成树型结构表示"整体-部分"层次，使单个对象与组合对象使用一致</td><td>整体-部分，树形结构</td></tr>
+        <tr><td><b>Decorator 装饰</b></td><td>动态给对象添加额外职责，比派生子类更灵活</td><td>附加职责</td></tr>
+        <tr><td><b>Facade 外观</b></td><td>定义高层接口，为子系统的一组接口提供一致外观，简化使用</td><td>对外统一接口</td></tr>
+        <tr><td><b>Flyweight 享元</b></td><td>提供支持大量细粒度对象共享的有效方法</td><td>细粒度，共享</td></tr>
+        <tr><td><b>Proxy 代理</b></td><td>为其他对象提供一种代理以控制对该对象的访问</td><td>代理控制</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="panel">
+    <div class="mnemonic">行为型口诀：观摩（模）对（迭）策，责令解放（访），戒（介）忘台（态）</div>
+    <table class="tbl">
+      <thead><tr><th>模式</th><th>定义</th><th>记忆关键字</th></tr></thead>
+      <tbody>
+        <tr><td><b>Chain of Responsibility 职责链</b></td><td>给多个对象处理请求的机会，将接收对象链接起来传递请求，直到有对象处理</td><td>传递请求、职责链接</td></tr>
+        <tr><td><b>Command 命令</b></td><td>将请求封装为对象，可参数化、排队、记录日志，支持可撤销</td><td>日志记录、可撤销</td></tr>
+        <tr><td><b>Interpreter 解释器</b></td><td>给定语言定义文法表示与解释器，据此解释句子</td><td>解释器，虚拟机</td></tr>
+        <tr><td><b>Iterator 迭代器</b></td><td>顺序访问聚合对象中的元素而不暴露内部表示</td><td>顺序访问，不暴露内部</td></tr>
+        <tr><td><b>Mediator 中介者</b></td><td>用中介对象封装一系列对象交互，达到低耦合、可独立改变交互</td><td>不直接引用</td></tr>
+        <tr><td><b>Memento 备忘录</b></td><td>不破坏封装前提下捕获并保存对象内部状态，以便日后恢复</td><td>保存，恢复</td></tr>
+        <tr><td><b>Observer 观察者</b></td><td>定义一对多依赖，状态改变时所有依赖者得到通知并自动更新</td><td>通知、自动更新</td></tr>
+        <tr><td><b>State 状态</b></td><td>允许对象在内部状态改变时改变其行为</td><td>状态变成类</td></tr>
+        <tr><td><b>Strategy 策略</b></td><td>定义一系列算法并封装，使它们可互相替换、独立于用户变化</td><td>算法替换</td></tr>
+        <tr><td><b>Template Method 模板方法</b></td><td>定义算法骨架，将某些步骤延迟到子类，不改变结构即可重定义步骤</td><td>子类按父类模板实现</td></tr>
+        <tr><td><b>Visitor 访问者</b></td><td>作用于某对象结构各元素的操作，不改变元素类即可定义新操作</td><td>数据和操作分离</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="software-engineering-notes/gof-23-patterns.html" target="_blank" rel="noopener">设计模式 23 种 GoF</a>
+    <a href="software-engineering-notes/oo-uml-patterns.html" target="_blank" rel="noopener">OO · UML · 设计模式</a>
+  </div>
+
+  <!-- 06 软件架构风格 -->
+  <div class="sec-head"><span class="sec-tag">06</span><h2>软件架构风格</h2><span class="rule"></span></div>
+  <table class="tbl">
+    <thead><tr><th>#</th><th>架构风格</th><th>常考关键字及实例</th><th>简介</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td><b>数据流-批处理</b></td><td>传统编译器，每个阶段产生的结果作为下一阶段输入，区别在于整体</td><td>一个接一个，以整体为单位</td></tr>
+      <tr><td class="c">2</td><td><b>数据流-管道-过滤器</b></td><td>（同上）</td><td>一个接一个，前一个输出是后一个输入</td></tr>
+      <tr><td class="c">3</td><td><b>调用/返回-主程序/子程序</b></td><td>无</td><td>显示调用，主程序直接调用子程序</td></tr>
+      <tr><td class="c">4</td><td><b>调用/返回-面向对象</b></td><td>无</td><td>对象是构件，通过对象调用封装的方法和属性</td></tr>
+      <tr><td class="c">5</td><td><b>调用/返回-层次结构</b></td><td>无</td><td>分层，每层最多影响其上下两层，有调用关系</td></tr>
+      <tr><td class="c">6</td><td><b>独立构件-进程通信</b></td><td>无</td><td>进程间独立的消息传递，同步异步</td></tr>
+      <tr><td class="c">7</td><td><b>独立构件-事件驱动（隐式调用）</b></td><td>事件触发推动动作，如语法高亮、语法错误提示</td><td>不直接调用，通过事件驱动</td></tr>
+      <tr><td class="c">8</td><td><b>虚拟机-解释器</b></td><td>自定义流程，按流程执行，规则随时改变，灵活定义、业务灵活组合。机器人</td><td>解释自定义规则，解释引擎、存储区、数据结构</td></tr>
+      <tr><td class="c">9</td><td><b>虚拟机-规则系统</b></td><td>（同上）</td><td>规则集、规则解释器、选择器和工作内存，用于 DSS、AI、专家系统</td></tr>
+      <tr><td class="c">10</td><td><b>仓库-数据库</b></td><td>现代编译器 IDE，以数据为中心，又称数据共享风格</td><td>中央共享数据源，独立处理单元</td></tr>
+      <tr><td class="c">11</td><td><b>仓库-超文本</b></td><td>（同上）</td><td>网状链接，多用于互联网</td></tr>
+      <tr><td class="c">12</td><td><b>仓库-黑板</b></td><td>（同上）</td><td>语音识别、知识推理等复杂问题，黑板、知识源、控制</td></tr>
+      <tr><td class="c">13</td><td><b>闭环过程控制</b></td><td>汽车巡航定速、空调温度调节，设定参数并不断调整</td><td>发出控制命令并接受反馈，循环往复达到平衡</td></tr>
+      <tr><td class="c">14</td><td><b>C2 风格</b></td><td>构件和连接件、顶部和底部</td><td>通过连接件绑定、按一组规则运作的并行构件网络</td></tr>
+    </tbody>
+  </table>
+  <div class="panel" style="margin-top:12px">
+    <p><b>分类归纳</b></p>
+    <ul>
+      <li><b>数据流风格</b>：批处理、管道-过滤器（实例：传统编译器）</li>
+      <li><b>调用/返回风格</b>：主程序/子程序、面向对象、层次结构</li>
+      <li><b>独立构件风格</b>：进程通信、事件驱动（隐式调用）（实例：语法高亮、错误提示）</li>
+      <li><b>虚拟机风格</b>：解释器、规则系统（应用：DSS、AI、专家系统）</li>
+      <li><b>仓库风格（数据共享）</b>：数据库、超文本、黑板（实例：IDE）</li>
+      <li><b>过程控制风格</b>：闭环过程控制（实例：巡航定速、空调温控）</li>
+      <li><b>C2 风格</b>：构件和连接件、顶部和底部，并行构件网络</li>
+    </ul>
+  </div>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="architecture-notes/arch-styles.html" target="_blank" rel="noopener">软件架构风格全览</a>
+  </div>
+
+  <!-- 07 ABSD -->
+  <div class="sec-head"><span class="sec-tag">07</span><h2>基于架构的软件开发（ABSD）</h2><span class="rule"></span></div>
+  <div class="panel">
+    <p><b>ABSD 是架构驱动</b>，强调由<b>业务、质量和功能需求的组合驱动架构设计</b>；采用<b>视角和视图</b>描述软件架构，采用<b>用例和质量属性场景</b>描述需求——用例描述功能需求，质量属性场景描述质量需求（非功能需求）。</p>
+    <p>使用 ABSD，设计活动可从项目总体功能框架明确就开始，即<b>需求获取和分析还没完成就开始了软件设计</b>。</p>
+    <p><b>三个基础：</b></p>
+    <ol>
+      <li><b>功能的分解</b>：使用已有的基于模块的内聚和耦合技术；</li>
+      <li><b>选择架构风格</b>：通过选择架构风格实现质量和业务需求；</li>
+      <li><b>软件模板的使用</b>：软件模板利用了一些软件系统的结构进行复用。</li>
+    </ol>
+    <p>ABSD 是<b>递归的</b>，且迭代的每个步骤都清晰定义；不管设计是否完成，架构总是清晰的，有助于降低架构设计的随意性。</p>
+    <p style="margin-top:12px"><b>六步过程：</b></p>
+    <div class="flow">体系结构需求 → 体系结构设计 → 体系结构文档化 → 体系结构复审 → 体系结构实现 → 体系结构演化</div>
+    <p style="color:var(--muted);font-size:12px">各步骤之间可迭代、可回退（图中虚线箭头标注 0:N、0:M），例如复审不通过则返回架构设计阶段重新设计、文档化，再复审。</p>
+    <table class="tbl" style="margin-top:10px">
+      <thead><tr><th>步骤</th><th>内容</th></tr></thead>
+      <tbody>
+        <tr><td><b>1. 架构需求</b></td><td>重在掌握<b>标识构件的三步</b>：① 生成类图 → ② 对类进行分组 → ③ 把类打包成构件。整体流程：需求获取（来自需求库）→【标识构件】→ 需求评审</td></tr>
+        <tr><td><b>2. 架构设计</b></td><td>将需求阶段的标识构件映射成构件并分析。流程：提出架构模型 → 映射构件 → 分析构件相互作用 → 产生架构 → 设计评审</td></tr>
+        <tr><td><b>3. 架构文档化</b></td><td>产出两种文档：<b>架构（体系结构）规格说明</b>、<b>测试架构（体系结构）需求的质量设计说明书</b>。文档至关重要，是所有人通信的手段，关系开发成败</td></tr>
+        <tr><td><b>4. 架构复审</b></td><td>由外部人员（用户代表、领域专家）参加，复审架构是否满足需求、质量问题、构件划分合理性；复审不过则返回架构设计阶段</td></tr>
+        <tr><td><b>5. 架构实现</b></td><td>用实体显示架构：实现构件，构件组装成系统</td></tr>
+        <tr><td><b>6. 架构演化</b></td><td>对架构进行改变，按需求增删构件，使架构可复用</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="architecture-notes/absd.html" target="_blank" rel="noopener">ABSD 基于架构的软件开发</a>
+    <a href="architecture-notes/arch-basics.html" target="_blank" rel="noopener">架构基础（SOA · DSSA · ABSD）</a>
+    <a href="architecture-notes/cbsd-vs-absd.html" target="_blank" rel="noopener">CBSD vs ABSD</a>
+  </div>
+
+  <!-- 08 质量属性 -->
+  <div class="sec-head"><span class="sec-tag">08</span><h2>软件系统的质量属性</h2><span class="rule"></span></div>
+  <div class="panel" style="margin-bottom:12px">
+    <p><b>开发期质量属性（开发者关注，6 个）</b></p>
+    <ul>
+      <li><b>易理解性</b>：设计被开发人员理解的难易程度。</li>
+      <li><b>可扩展性</b>：因适应新需求或需求变化而增加新功能的能力，也称灵活性。</li>
+      <li><b>可重用性</b>：重用软件系统或某一部分的难易程度。</li>
+      <li><b>可测试性</b>：对软件测试以证明其满足需求规范的难易程度。</li>
+      <li><b>可维护性</b>：修改缺陷、增加功能、提高质量属性时，识别修改点并实施修改的难易程度。</li>
+      <li><b>可移植性</b>：从一个运行环境转移到另一个不同运行环境的难易程度。</li>
+    </ul>
+  </div>
+  <div class="panel">
+    <p><b>运行期质量属性（用户关注，7 个）</b></p>
+    <ul>
+      <li><b>性能</b>：及时提供相应服务的能力，如速度、吞吐量、容量。</li>
+      <li><b>安全性</b>：兼顾向合法用户提供服务与阻止非授权使用的能力。</li>
+      <li><b>可伸缩性</b>：用户数和数据量增加时维持高服务质量的能力。</li>
+      <li><b>互操作性</b>：与其他系统交换数据和相互调用服务的难易程度。</li>
+      <li><b>可靠性</b>：一定时间内持续无故障运行的能力。</li>
+      <li><b>可用性</b>：一定时间内正常工作时间所占比例，受错误、攻击、高负载影响。</li>
+      <li><b>鲁棒性</b>：非正常情况（非法操作、软硬件故障）下仍能正常运行的能力，也称健壮性或容错性。</li>
+    </ul>
+  </div>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="quality-notes/quality-attributes.html" target="_blank" rel="noopener">软件质量属性全解</a>
+  </div>
+
+  <!-- 09 面向架构评估的质量属性 -->
+  <div class="sec-head"><span class="sec-tag">09</span><h2>面向架构评估的质量属性</h2><span class="rule"></span></div>
+  <table class="tbl">
+    <thead><tr><th>质量属性</th><th>核心定义与特征</th><th>关键子属性 / 策略</th></tr></thead>
+    <tbody>
+      <tr><td><b>性能 Performance</b></td><td>系统响应能力，用单位时间处理事务数或单个事务耗时衡量；重点优化资源管理和调度策略</td><td>响应时间、吞吐量、资源优化策略（并发、缓存、负载均衡）</td></tr>
+      <tr><td><b>可靠性 Reliability</b></td><td>错误或意外情况下维持功能的能力，用 MTTF/MTBF 量化；关注错误处理机制</td><td>容错（自动修复，如冗余）、健壮性（安全终止，如异常处理）、心跳检测</td></tr>
+      <tr><td><b>可用性 Availability</b></td><td>正常运行时间比例，用故障间隔时间和恢复速度衡量；依赖故障检测与恢复策略</td><td>冗余切换（主从库、灾备机房）、状态同步（检查点 / 回滚）</td></tr>
+      <tr><td><b>安全性 Security</b></td><td>阻止非授权访问并保障数据安全，涵盖机密性、完整性、可控性；需平衡安全与性能</td><td>身份认证（OAuth/JWT）、访问控制（RBAC）、数据加密（TLS/SSL）、审计追踪</td></tr>
+      <tr><td><b>可修改性 Modifiability</b></td><td>以低成本高效修改系统的能力，含维护、扩展、重组；需高内聚低耦合</td><td>可维护性（局部化修改、模块化）、可扩展性（松耦合、插件化）、结构重组（动态配置、微服务）、可移植性（环境无关性）</td></tr>
+      <tr><td><b>功能性 Functionality</b></td><td>完成预期任务的能力，需通过架构设计协调多组件协作</td><td>接口标准化（OpenAPI）、服务编排（工作流引擎）</td></tr>
+      <tr><td><b>可变性 Changeability</b></td><td>架构适应未来变更的能力，支持产品线开发或多版本演进</td><td>配置驱动设计（Feature Toggle）、抽象核心逻辑（DDD）</td></tr>
+      <tr><td><b>互操作性 Interoperability</b></td><td>与其他系统交换数据或服务的能力，依赖标准化接口协议</td><td>协议兼容（HTTP/REST、gRPC）、数据格式统一（JSON Schema、Protobuf）</td></tr>
+    </tbody>
+  </table>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="quality-notes/quality-evaluation.html" target="_blank" rel="noopener">质量属性 + 架构评估</a>
+    <a href="quality-notes/quality-attributes.html" target="_blank" rel="noopener">软件质量属性全解</a>
+  </div>
+
+  <!-- 10 质量属性场景 -->
+  <div class="sec-head"><span class="sec-tag">10</span><h2>质量属性场景描述</h2><span class="rule"></span></div>
+  <div class="panel" style="margin-bottom:12px">
+    <p>质量属性场景是描述系统如何满足特定质量属性需求的情境，由 <b>6 部分组成</b>：</p>
+    <ul>
+      <li><b>刺激源（谁）</b>：生成该刺激的实体（人、计算机系统或任何其他刺激器）。</li>
+      <li><b>刺激（做什么）</b>：当刺激到达系统时需要考虑的条件。</li>
+      <li><b>环境（在什么环境下）</b>：该刺激在某些条件内发生，系统可能处于过载、运行或其他情况。</li>
+      <li><b>制品（对哪个功能）</b>：某个被激励的制品，可能是整个系统或系统的一部分。</li>
+      <li><b>响应（得到什么反馈）</b>：刺激到达后所采取的行动。</li>
+      <li><b>响应度量（对反馈进行度量）</b>：响应发生时应当能以某种方式度量，以对需求进行测试。</li>
+    </ul>
+    <div class="mnemonic">口诀：谁 · 干什么 · 什么环境 · 对啥 · 啥反馈 · 怎么量</div>
+  </div>
+  <div class="panel">
+    <p><b>可修改性质量属性场景描述实例</b></p>
+    <table class="tbl">
+      <thead><tr><th>场景要素</th><th>可能的情况</th></tr></thead>
+      <tbody>
+        <tr><td><b>刺激源</b></td><td>最终用户、开发人员、系统管理员</td></tr>
+        <tr><td><b>刺激</b></td><td>希望增加、删除、修改、改变功能、质量属性、容量等</td></tr>
+        <tr><td><b>环境</b></td><td>系统设计时、编译时、构建时、运行时</td></tr>
+        <tr><td><b>制品</b></td><td>系统用户界面、平台、环境或与目标系统交互的系统</td></tr>
+        <tr><td><b>响应</b></td><td>查找架构中需要修改的位置，进行修改且不影响其他功能，对修改进行测试，部署修改</td></tr>
+        <tr><td><b>响应度量</b></td><td>根据受影响元素数量度量的成本、努力、资金；该修改对其他功能或质量属性影响的程度</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="notes"><span class="nl-cap">对应笔记</span>
+    <a href="quality-notes/quality-attributes.html" target="_blank" rel="noopener">6 要素场景描述法</a>
+    <a href="quality-notes/arch-evaluation.html" target="_blank" rel="noopener">架构评估 SAAM · ATAM · CBAM</a>
+  </div>
+
+  <div class="footer">软件高级架构师 · 考前一周必背知识 · 功不唐捐，玉汝于成</div>
+</div>
+</body>
+</html>
